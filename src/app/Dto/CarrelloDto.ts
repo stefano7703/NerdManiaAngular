@@ -1,3 +1,6 @@
+import { OrdineDto } from "./OrdineDto";
+import { UserDto } from "./UserDto";
+
 export class CarrelloDto {
   id: number;
   prezzoTotale: number;
