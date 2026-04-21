@@ -11,7 +11,7 @@ export class CatalogoService extends AbstractService<CatalogoDto> {
 
   constructor(protected override http: HttpClient) {
     super(http);
-    this.type = 'catalogo';
+    this.type = 'Catalogo';
   }
 
   // Trova catalogo per nome
