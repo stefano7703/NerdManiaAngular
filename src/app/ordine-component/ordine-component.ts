@@ -1,6 +1,6 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { OrdineDto } from '../Dto/OrdineDto';
-import { ordineService } from '../Service/OrdineService';
+import { ordineService } from '../Service/ordineService';
 import { CommonModule } from '@angular/common';
 
 @Component({
