@@ -1,3 +1,5 @@
+import { CategoriaDto } from "./CategoriaDto";
+
 export class ProdottoDto {
 
   id?: number;
@@ -5,14 +7,15 @@ export class ProdottoDto {
   prezzo: number;
   peso: number;
   descrizione: string;
-  categoria: Categoria;
+  categoria: CategoriaDto;
+
 
   constructor(
     nome: string,
     prezzo: number,
     peso: number,
     descrizione: string,
-    categoria: Categoria,
+    categoria: CategoriaDto,
     id?: number
   ) {
     this.id = id;
