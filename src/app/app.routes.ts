@@ -7,6 +7,7 @@ import { OrdineComponent } from './ordine-component/ordine-component';
 import { ProdottoComponent } from './prodotto-component/prodotto-component';
 import { SpedizioneComponent } from './spedizione-component/spedizione-component';
 import { UserComponent } from './user-component/user-component';
+import { CategoriaComponent } from './categoria-component/categoria-component';
 
 export const routes: Routes = [
      { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -18,5 +19,6 @@ export const routes: Routes = [
     { path: 'prodotto', component: ProdottoComponent},
     { path: 'spedizione', component: SpedizioneComponent},
     { path: 'user', component: UserComponent},
+    { path: 'categoria', component: CategoriaComponent},
     { path: '**', redirectTo: 'home' }
 ];
