@@ -1,1 +1,13 @@
-<p>user-component works!</p>
+<input #nomeRef type="text" placeholder="Cerca utente...">
+<button (click)="cercaPerNome(nomeRef.value)">Cerca</button>
+
+<button (click)="filtraPerCartaFedelta(true)">Con Carta</button>
+<button (click)="filtraPerCartaFedelta(false)">Senza Carta</button>
+
+<table>
+  <tr *ngFor="let u of users()">
+    <td>{{ u.nome }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.cartaFedelta ? '✅' : '❌' }}</td>
+  </tr>
+</table>

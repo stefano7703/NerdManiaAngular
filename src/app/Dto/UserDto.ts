@@ -1,14 +1,17 @@
+import { CarrelloDto } from "./CarrelloDto";
+import { OrdineDto } from "./OrdineDto";
+
 export class UserDto {
   id: number;
   username: string;
   nome: string;
   cognome: string;
   email: string;
-  cartaFedeltà: boolean;
+  cartaFedelta: boolean = false;
 
   carrello: CarrelloDto;
 
-  ordini: OrdineDto[];
+  ordini: OrdineDto[] | null;
 
   constructor(
     id: number,
@@ -18,14 +21,14 @@ export class UserDto {
     email: string,
     cartaFedeltà: boolean,
     carrello: CarrelloDto,
-    ordini: OrdineDto[]
+    ordini: OrdineDto[] | null
   ) {
     this.id = id;
     this.username = username;
     this.nome = nome;
     this.cognome = cognome;
     this.email = email;
-    this.cartaFedeltà = cartaFedeltà;
+    this.cartaFedelta = cartaFedeltà;
     this.carrello = carrello;
-    this.ordini = ordini;}
+    this.ordini = ordini ?? null;}
 }
