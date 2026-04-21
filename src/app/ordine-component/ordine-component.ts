@@ -1,13 +1,13 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { OrdineDto } from '../Dto/OrdineDto';
-import { ordineService } from '../Service/OrdineService';
+import { ordineService } from '../Service/ordineService';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-ordine',
   imports: [CommonModule],
-  templateUrl: './ordine.html',
-  styleUrl: './ordine.css',
+  templateUrl: './ordine-component.html',
+  styleUrl: './ordine-component.css',
   standalone: true,
 })
 export class OrdineComponent implements OnInit{

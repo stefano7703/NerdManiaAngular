@@ -12,7 +12,7 @@
 
   <!-- LISTA ORDINI -->
   <div class="grid">
-    @for (ordine of ListOrdini(); track ordine.id) {
+    @for (ordine of ListOrdini; track ordine.id) {
       <div class="card">
         <p><strong>ID:</strong> {{ordine.id}}</p>
         <p><strong>Costo:</strong> €{{ordine.costo_totale}}</p>
@@ -30,11 +30,6 @@
           </div>
         }
       </div>
-
-        <button class="delete-btn"
-                (click)="deleteById(ordine.id)">
-                🗑 Elimina
-        </button>
       </div>
     }
   </div>
