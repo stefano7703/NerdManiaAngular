@@ -1,3 +1,7 @@
+import { ProdottoDto } from "./ProdottoDto";
+import { SpedizioneDto } from "./SpedizioneDto";
+import { UserDto } from "./UserDto";
+
 export class OrdineDto {
 
   id: number;

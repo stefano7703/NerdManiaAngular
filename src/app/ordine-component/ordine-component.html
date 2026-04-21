@@ -1,1 +1,101 @@
-<p>ordine-component works!</p>
+<div class="container">
+
+  <h1 class="title">📦 Gestione Ordini</h1>
+
+  <!-- SEARCH BAR ID -->
+  <div class="search-box">
+    <input type="text" placeholder="Cerca per Username" #username>
+    <button (click)="findByUserUsername(username.value)">Cerca</button>
+  </div>
+
+  <hr>
+
+  <!-- LISTA ORDINI -->
+  <div class="grid">
+    @for (ordine of ListOrdini; track ordine.id) {
+      <div class="card">
+        <p><strong>ID:</strong> {{ordine.id}}</p>
+        <p><strong>Costo:</strong> €{{ordine.costo_totale}}</p>
+        <p><strong>Numero Prodotti:</strong> {{ordine.numero_prodotti}}</p>
+        <p><strong>Indirizzo:</strong> {{ordine.indirizzo_spedizione}}</p>
+
+              <!-- LISTA PRODOTTI -->
+      <div class="prodotti">
+        <p><strong>Prodotti:</strong></p>
+
+        @for (prodotto of ordine.prodotti; track prodotto.id) {
+          <div class="prodotto">
+            <p>Nome: {{prodotto.nome}}</p>
+            <p>Prezzo: €{{prodotto.prezzo}}</p>
+          </div>
+        }
+      </div>
+      </div>
+    }
+  </div>
+
+  <hr>
+
+  <!-- FILTRI
+  <div class="filters">
+
+    <div class="filter">
+      <input type="text" placeholder="Costo uguale" #costo>
+      <button (click)="trovaConCostoUguale(+costo.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Prodotti >" #num_prodotti>
+      <button (click)="trovaConNumeroProdottiMaggiore(+num_prodotti.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Indirizzo" #indirizzo>
+      <button (click)="trovaConIndirizzo(indirizzo.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Costo >" #costo1>
+      <button (click)="trovaConCostoMaggiore(+costo1.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Costo <" #costo2>
+      <button (click)="trovaConCostoMinore(+costo2.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Utente" #utente>
+      <button (click)="trovaPerUtente(+utente.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Prodotti>" #numero>
+      <input type="text" placeholder="Costo<" #costo3>
+      <button (click)="filtro(+numero.value, +costo3.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Costo Min" #min>
+      <input type="text" placeholder="Costo Max" #max>
+      <button (click)="trovaTraDueCosti(+min.value, +max.value)">Filtro</button>
+    </div>
+
+  </div>
+
+  <div class="actions">
+  <button (click)="toggleAddOrdine()">Aggiungi ordine</button>
+  <button (click)="ordinaPerCostoDecrescente()">⬇ Ordina per costo tutti gli ordini</button>
+  <button (click)="getAll()">Mostra tutti gli ordini</button>
+  </div>
+
+  @if (istoggleAddOrdine()) {
+  <div class="add-ordine-wrapper">
+    <app-add-ordine-component
+      (countValue)="onOrdineCreated($event)">
+    </app-add-ordine-component>
+  </div>
+  }
+
+</div>
+-->
