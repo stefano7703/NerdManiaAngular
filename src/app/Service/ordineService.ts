@@ -38,14 +38,14 @@ export class ordineService extends AbstractService<OrdineDto>{
   }
 
   findByCostoTotaleGreaterThan(prezzo: number): Observable<OrdineDto[]> {
-    return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/findByCostoTotaleGreaterThan?costo='+ prezzo);
+    return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/findByCostoTotaleGreaterThan?prezzo='+ prezzo);
   }
 
   findByCostoTotaleLessThan(prezzo: number): Observable<OrdineDto[]> {
-    return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/findByCostoTotaleLessThan?utente='+ prezzo);
+    return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/findByCostoTotaleLessThan?prezzo='+ prezzo);
   }
 
   findByProdottiId(prodottoId:number): Observable<OrdineDto[]> {
-    return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/filtro?prodottoId='+ prodottoId);
+    return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/findByProdottiId?prodottoId='+ prodottoId);
   }
 }
