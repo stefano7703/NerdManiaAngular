@@ -1,1 +1,68 @@
-<p>spedizione-component works!</p>
+<div class="container">
+
+  <h1 class="title">📦 Gestione Spedizioni</h1>
+
+  <!-- LISTA SPEDIZIONI -->
+  <div class="grid">
+    @for (spedizione of ListSpedizioni; track spedizione.id) {
+      <div class="card">
+        <p><strong>ID:</strong> {{spedizione.id}}</p>
+        <p><strong>Altezza:</strong> {{spedizione.altezza}}</p>
+        <p><strong>Spessore:</strong> {{spedizione.spessore}}</p>
+        <p><strong>Lunghezza:</strong> {{spedizione.lunghezza}}</p>
+        <p><strong>Peso:</strong> {{spedizione.peso}}</p>
+        <p><strong>Estero:</strong> {{spedizione.estero}}</p>
+        <p><strong>Fragile:</strong> {{spedizione.fragile}}</p>
+        <p><strong>Ordine:</strong></p>
+          <div class="ordine">
+            <p>ID: {{spedizione.ordine.id}}</p>
+            <p>Costo: {{spedizione.ordine.costoTotale}}</p>
+            <p>Indirizzo: {{spedizione.ordine.indirizzoSpedizione}}</p>
+          </div>
+      </div>
+    }
+  </div>
+
+  <hr>
+    
+  <!-- FILTRI-->
+  <div class="filters">
+
+    <div class="filter">
+      <input placeholder="Cerca spedizioni fragili">
+      <button (click)="findByFragileTrue()">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input placeholder="Cerca spedizioni all'estero">
+      <button (click)="findByEsteroTrue()">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Peso >" #peso>
+      <button (click)="findByPesoGreaterThan(+peso.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Peso <" #peso1>
+      <button (click)="findByPesoLessThan(+peso1.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Altezza min" #min>
+      <input type="text" placeholder="Altezza max" #max>
+      <button (click)="findByAltezzaBetween(+min.value, +max.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="OrdineId" #ordineID>
+      <button (click)="findByOrdineId(+ordineID.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Altezza>" #altezza>
+      <input type="text" placeholder="Lunghezza>" #lunghezza>
+      <button (click)="findByAltezzaGreaterThanOrLunghezzaGreaterThan(+altezza.value, +lunghezza.value)">Filtro</button>
+    </div>
+  </div>
+</div>

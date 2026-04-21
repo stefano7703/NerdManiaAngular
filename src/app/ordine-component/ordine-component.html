@@ -15,9 +15,8 @@
     @for (ordine of ListOrdini; track ordine.id) {
       <div class="card">
         <p><strong>ID:</strong> {{ordine.id}}</p>
-        <p><strong>Costo:</strong> €{{ordine.costo_totale}}</p>
-        <p><strong>Numero Prodotti:</strong> {{ordine.numero_prodotti}}</p>
-        <p><strong>Indirizzo:</strong> {{ordine.indirizzo_spedizione}}</p>
+        <p><strong>Costo:</strong> €{{ordine.costoTotale}}</p>
+        <p><strong>Indirizzo:</strong> {{ordine.indirizzoSpedizione}}</p>
 
               <!-- LISTA PRODOTTI -->
       <div class="prodotti">
@@ -25,8 +24,10 @@
 
         @for (prodotto of ordine.prodotti; track prodotto.id) {
           <div class="prodotto">
-            <p>Nome: {{prodotto.nome}}</p>
-            <p>Prezzo: €{{prodotto.prezzo}}</p>
+            <p>Nome:{{prodotto.nome}}</p>
+            <p>Prezzo:€{{prodotto.prezzo}}</p>
+            <p>Descrizione:{{prodotto.descrizione}}</p>
+            <p>Peso: {{prodotto.peso}}</p>
           </div>
         }
       </div>
@@ -35,67 +36,38 @@
   </div>
 
   <hr>
+  <!-- FILTRI-->
 
-  <!-- FILTRI
   <div class="filters">
 
     <div class="filter">
-      <input type="text" placeholder="Costo uguale" #costo>
-      <button (click)="trovaConCostoUguale(+costo.value)">Filtro</button>
+      <input placeholder="Ordine per costo decrescente">
+      <button (click)="findAllByOrderByCostoTotaleDesc()">Filtro</button>
     </div>
 
     <div class="filter">
-      <input type="text" placeholder="Prodotti >" #num_prodotti>
-      <button (click)="trovaConNumeroProdottiMaggiore(+num_prodotti.value)">Filtro</button>
+      <input placeholder="Ordina per costo crescente">
+      <button (click)="findAllByOrderByCostoTotaleAsc()">Filtro</button>
     </div>
 
     <div class="filter">
       <input type="text" placeholder="Indirizzo" #indirizzo>
-      <button (click)="trovaConIndirizzo(indirizzo.value)">Filtro</button>
+      <button (click)="findByIndirizzoSpedizioneContainingIgnoreCase(indirizzo.value)">Filtro</button>
     </div>
 
     <div class="filter">
-      <input type="text" placeholder="Costo >" #costo1>
-      <button (click)="trovaConCostoMaggiore(+costo1.value)">Filtro</button>
+      <input type="text" placeholder="Costo >" #prezzo>
+      <button (click)="findByCostoTotaleGreaterThan(+prezzo.value)">Filtro</button>
     </div>
 
     <div class="filter">
-      <input type="text" placeholder="Costo <" #costo2>
-      <button (click)="trovaConCostoMinore(+costo2.value)">Filtro</button>
+      <input type="text" placeholder="Costo <" #prezzo1>
+      <button (click)="findByCostoTotaleLessThan(+prezzo1.value)">Filtro</button>
     </div>
 
     <div class="filter">
-      <input type="text" placeholder="Utente" #utente>
-      <button (click)="trovaPerUtente(+utente.value)">Filtro</button>
+      <input type="text" placeholder="ProdottoId" #prodottoID>
+      <button (click)="findByProdottiId(+prodottoID.value)">Filtro</button>
     </div>
-
-    <div class="filter">
-      <input type="text" placeholder="Prodotti>" #numero>
-      <input type="text" placeholder="Costo<" #costo3>
-      <button (click)="filtro(+numero.value, +costo3.value)">Filtro</button>
-    </div>
-
-    <div class="filter">
-      <input type="text" placeholder="Costo Min" #min>
-      <input type="text" placeholder="Costo Max" #max>
-      <button (click)="trovaTraDueCosti(+min.value, +max.value)">Filtro</button>
-    </div>
-
   </div>
-
-  <div class="actions">
-  <button (click)="toggleAddOrdine()">Aggiungi ordine</button>
-  <button (click)="ordinaPerCostoDecrescente()">⬇ Ordina per costo tutti gli ordini</button>
-  <button (click)="getAll()">Mostra tutti gli ordini</button>
-  </div>
-
-  @if (istoggleAddOrdine()) {
-  <div class="add-ordine-wrapper">
-    <app-add-ordine-component
-      (countValue)="onOrdineCreated($event)">
-    </app-add-ordine-component>
-  </div>
-  }
-
 </div>
--->
