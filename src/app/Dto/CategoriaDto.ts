@@ -1,3 +1,6 @@
+import { CatalogoDto } from "./CatalogoDto";
+import { ProdottoDto } from "./ProdottoDto";
+
 export class CategoriaDto {
   id: number;
   nome: string;
