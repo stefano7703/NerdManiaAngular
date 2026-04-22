@@ -1,3 +1,4 @@
+import { AddUserComponent } from './addOn/add-user-component/add-user-component';
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home-component/home-component';
 import { CarrelloComponent } from './carrello-component/carrello-component';
@@ -9,18 +10,25 @@ import { SpedizioneComponent } from './spedizione-component/spedizione-component
 import { UserComponent } from './user-component/user-component';
 import { CategoriaComponent } from './categoria-component/categoria-component';
 import { LoginComponent } from './addOn/login-component/login-component';
+import { AuthGuard } from './Guard/AuthGuard';
 
 export const routes: Routes = [
-     { path: '', redirectTo: 'home', pathMatch: 'full' },
-    { path: 'home', component: HomeComponent },
-    { path: 'carrello', component: CarrelloComponent},
-    { path: 'login', component: LoginComponent },
-    { path: 'catalogo', component: CatalogoComponent},
-    { path: 'magazzino', component: MagazzinoComponent},
-    { path: 'ordine', component: OrdineComponent},
-    { path: 'prodotto', component: ProdottoComponent},
-    { path: 'spedizione', component: SpedizioneComponent},
-    { path: 'user', component: UserComponent},
-    { path: 'categoria', component: CategoriaComponent},
-    { path: '**', redirectTo: 'home' }
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent },
+  { path: 'carrello', component: CarrelloComponent },
+  { path: 'catalogo', component: CatalogoComponent },
+  { path: 'magazzino', component: MagazzinoComponent },
+  { path: 'ordine', component: OrdineComponent },
+  { path: 'prodotto', component: ProdottoComponent },
+  { path: 'spedizione', component: SpedizioneComponent },
+  { path: 'categoria', component: CategoriaComponent },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: AddUserComponent },
+  {
+    path: 'user',
+    component: UserComponent,
+    canActivate: [AuthGuard]
+  },
+  { path: '**', redirectTo: 'home' }
 ];

@@ -147,6 +147,12 @@
   stroke-linejoin: round;
   fill: none;
 }
+.logout-link {
+  cursor: pointer;
+}
+.logout-link:hover {
+  opacity: 0.8;
+}
 
 @media (max-width: 980px) {
   .site-header {

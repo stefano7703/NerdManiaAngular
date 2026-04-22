@@ -4,50 +4,78 @@ import { Component, OnInit, signal } from '@angular/core';
 import { UserDto } from '../Dto/UserDto';
 import { CarrelloDto } from '../Dto/CarrelloDto';
 import { AddUserComponent } from '../addOn/add-user-component/add-user-component';
+import { AuthService } from '../Service/AuthService';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-component',
   standalone: true,
-  imports: [CommonModule, AddUserComponent],
+  imports: [CommonModule],
   templateUrl: './user-component.html',
   styleUrl: './user-component.css',
 })
 export class UserComponent implements OnInit {
 
-
   showAddUser = signal(false);
-  // Stato del componente tramite Signals
+
   users = signal<UserDto[]>([]);
 
-  // Signal per un singolo utente (usato per dettagli o form)
   user = signal<UserDto>(
-    new UserDto(0, '', '', '', '', '', false, new CarrelloDto(0, 0, 0), null)
+    new UserDto(
+      0,
+      '',
+      '',
+      '',
+      '',
+      '',
+      false,
+      new CarrelloDto(0, 0, 0),
+      null
+    )
   );
 
-  // Signal per gestire messaggi di errore o disponibilità username/email
+  isLogged = signal(false);
+
   checkResult = signal<{ message: string; exists: boolean | null }>({
     message: '',
     exists: null,
   });
 
-  constructor(private service: userService) {}
+  constructor(
+    private service: userService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Se vuoi caricare tutti gli utenti all'avvio, decommenta:
-    // this.caricaTutti();
+
+    const loggedUser = this.authService.getUser();
+
+    if (loggedUser) {
+      this.user.set(loggedUser);
+      this.isLogged.set(true);
+    }
+
   }
 
-  // --- Metodi di Ricerca ---
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 
+  /*
   cercaPerNome(nome: string) {
     if (!nome) return;
-    this.service.findByNomeContainingIgnoreCase(nome).subscribe((data) => {
-      this.users.set(data);
-    });
+
+    this.service
+      .findByNomeContainingIgnoreCase(nome)
+      .subscribe((data) => {
+        this.users.set(data);
+      });
   }
 
-
   filtraPerCartaFedelta(possiedeCarta: boolean) {
+
     const call = possiedeCarta
       ? this.service.findByCartaFedeltaTrue()
       : this.service.findByCartaFedeltaFalse();
@@ -57,59 +85,69 @@ export class UserComponent implements OnInit {
     });
   }
 
-  // --- Metodi di Verifica (Exists) ---
+  verificaUsername(username: string) {
 
-verificaUsername(username: string) {
-  if (!username) return;
+    if (!username) return;
 
-  this.service.exiexistsByUsername(username).subscribe({
-    next: (exists) => {
-      console.log('Risposta server (exists):', exists);
-      this.checkResult.set({
-        exists: exists,
-        message: exists ? 'Username già occupato' : 'Username disponibile',
-      });
-    },
-    error: (err) => {
-      console.error('Errore durante la verifica:', err);
-      this.checkResult.set({
-        exists: true, // Lo impostiamo a true per sicurezza o gestiamo l'errore
-        message: 'Errore di connessione al server',
-      });
-    }
-  });
-}
+    this.service.exiexistsByUsername(username).subscribe({
+      next: (exists) => {
+        this.checkResult.set({
+          exists: exists,
+          message: exists
+            ? 'Username già occupato'
+            : 'Username disponibile',
+        });
+      },
 
-  verificaEmail(email: string) {
-    this.service.exiexistsByEmail(email).subscribe((exists) => {
-      this.checkResult.set({
-        exists,
-        message: exists ? 'Email già registrata' : 'Email disponibile',
-      });
+      error: () => {
+        this.checkResult.set({
+          exists: true,
+          message: 'Errore di connessione al server',
+        });
+      }
     });
+
   }
 
-  // --- Utility ---
+  verificaEmail(email: string) {
+
+    this.service.exiexistsByEmail(email).subscribe((exists) => {
+
+      this.checkResult.set({
+        exists,
+        message: exists
+          ? 'Email già registrata'
+          : 'Email disponibile',
+      });
+
+    });
+
+  }
 
   reset() {
     this.users.set([]);
-    this.checkResult.set({ message: '', exists: null });
+    this.checkResult.set({
+      message: '',
+      exists: null
+    });
   }
 
+
   openAddUser() {
-  this.showAddUser.set(true);
-}
+    this.showAddUser.set(true);
+  }
 
-closeAddUser() {
-  this.showAddUser.set(false);
-}
+  closeAddUser() {
+    this.showAddUser.set(false);
+  }
 
-onUserAdded(user: UserDto) {
-  console.log('Utente aggiunto:', user);
+  onUserAdded(user: UserDto) {
 
-  this.showAddUser.set(false);
+    console.log('Utente aggiunto:', user);
 
-  // opzionale: ricaricare lista utenti
-  // this.caricaTutti();
-}
+    this.showAddUser.set(false);
+
+  }
+    */
+
 }
