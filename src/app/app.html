@@ -1,45 +1,40 @@
 <header class="site-header">
-	<a class="brand" routerLink="/home" aria-label="Vai alla home di NerdMania">
-		<img
-			class="brand-logo"
-			ngSrc="/logo-nerdmania.webp"
-			alt="Logo NerdMania"
-			width="190"
-			height="84"
-			priority
-		/>
+  <a class="brand" routerLink="/home" aria-label="Vai alla home di NerdMania">
+    <img class="brand-logo" ngSrc="/logo-nerdmania.webp" alt="Logo NerdMania" width="190" height="84" priority />
 
-	</a>
+  </a>
 
-	<nav class="main-nav" aria-label="Navigazione principale">
-		<a routerLink="/home" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-		<a routerLink="/catalogo" routerLinkActive="is-active">Catalogo</a>
-		<a routerLink="/user" routerLinkActive="is-active">Profilo</a>
-	</nav>
+  <nav class="main-nav" aria-label="Navigazione principale">
+    <a routerLink="/home" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="/catalogo" routerLinkActive="is-active">Catalogo</a>
+    <a
+  [routerLink]="authService.isLoggedIn() ? '/user' : '/login'"
+>
+  Profilo
+</a>
+
+    <ng-container *ngIf="authService.loggedIn$ | async">
+      <a href="#" (click)="logout(); $event.preventDefault()" class="nav-link logout-link">
+  Logout
+</a>
+    </ng-container>
+
+  </nav>
 </header>
 
 <main class="app-content">
-	<router-outlet />
+  <router-outlet />
 </main>
 
 <footer class="site-footer" aria-label="Informazioni legali">
-	<p class="footer-brand">NerdMania Ecommerce</p>
-	<p class="footer-copy">© 2026 NerdMania. Tutti i diritti riservati.</p>
+  <p class="footer-brand">NerdMania Ecommerce</p>
+  <p class="footer-copy">© 2026 NerdMania. Tutti i diritti riservati.</p>
 </footer>
 
-<a
-	class="floating-cart-btn"
-	routerLink="/carrello"
-	aria-label="Apri il carrello"
-	title="Apri il carrello"
->
-	<svg
-		viewBox="0 0 24 24"
-		class="floating-cart-icon"
-		aria-hidden="true"
-	>
-		<path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 2-1.6L21 7H7" />
-		<circle cx="10" cy="19" r="1.7" />
-		<circle cx="17" cy="19" r="1.7" />
-	</svg>
+<a class="floating-cart-btn" routerLink="/carrello" aria-label="Apri il carrello" title="Apri il carrello">
+  <svg viewBox="0 0 24 24" class="floating-cart-icon" aria-hidden="true">
+    <path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 2-1.6L21 7H7" />
+    <circle cx="10" cy="19" r="1.7" />
+    <circle cx="17" cy="19" r="1.7" />
+  </svg>
 </a>

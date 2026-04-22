@@ -1,55 +1,179 @@
-<div class="user-container">
-  <h2>Gestione Utenti</h2>
+<main class="home-shell" *ngIf="isLogged()">
 
-  <div class="controls-section">
-    <input #nomeRef type="text" placeholder="Cerca per nome...">
-    <button (click)="cercaPerNome(nomeRef.value)">Cerca</button>
-    <button class="secondary" (click)="filtraPerCartaFedelta(true)">Con Carta</button>
-    <button class="secondary" (click)="filtraPerCartaFedelta(false)">Senza Carta</button>
-    <button (click)="openAddUser()">
-  Aggiungi utente
-</button>
-  </div>
+  <section class="hero">
 
-  <app-add-user-component
-  *ngIf="showAddUser()"
-  (onUserAdded)="onUserAdded($event)">
-</app-add-user-component>
+    <div>
 
-  <div class="controls-section">
-    <input #userRef type="text" placeholder="Verifica username...">
-    <button (click)="verificaUsername(userRef.value)">Verifica</button>
+      <p class="hero-eyebrow">
+        Area personale NerdMania
+      </p>
 
-    <div *ngIf="checkResult().exists !== null"
-         [ngClass]="checkResult().exists ? 'feedback-msg msg-error' : 'feedback-msg msg-success'">
-      {{ checkResult().message }}
+      <h2>
+        {{ user().nome }} {{ user().cognome }}
+      </h2>
+
+      <p>
+        Username:
+        <strong>{{ user().username }}</strong>
+      </p>
+
+      <p>
+        Email:
+        <strong>{{ user().email }}</strong>
+      </p>
+
+      <div class="hero-actions">
+
+        <button
+          class="hero-cta"
+          (click)="logout()"
+        >
+          Logout
+        </button>
+
+      </div>
+
     </div>
-  </div>
 
-  <table class="results-table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>Email</th>
-        <th>Carta Fedeltà</th>
-        <th>Username</th>
-        <th>Totale Carrello</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let u of users()">
-        <td>{{ u.id }}</td>
-        <td>{{ u.nome }}</td>
-        <td>{{ u.email }}</td>
-        <td>
-          <span [class]="u.cartaFedelta ? 'badge badge-true' : 'badge badge-false'">
-            {{ u.cartaFedelta ? 'Attiva' : 'No' }}
-          </span>
-        </td>
-        <td>{{ u.username }}</td>
-        <td>{{u.carrello?.prezzoTotale}} </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+    <!-- IMMAGINE PROFILO -->
+
+    <div class="profile-image-wrapper">
+
+      <img
+        src="assets/user.png"
+        alt="Profilo utente"
+        class="profile-image"
+      />
+
+    </div>
+
+  </section>
+
+  <!-- DATI UTENTE -->
+
+  <section class="data-section">
+
+    <h3>I tuoi dati</h3>
+
+    <div class="cards-grid">
+
+      <div class="data-card">
+
+        <p class="card-kicker">
+          Carta fedeltà
+        </p>
+
+        <h4>Stato</h4>
+
+        <p class="data-main">
+
+          {{
+            user().cartaFedelta
+              ? 'Attiva'
+              : 'Non attiva'
+          }}
+
+        </p>
+
+        <p class="data-sub">
+          Accumula punti sugli acquisti
+        </p>
+
+      </div>
+
+      <div class="data-card">
+
+        <p class="card-kicker">
+          Ordini
+        </p>
+
+        <h4>Numero ordini</h4>
+
+        <p class="data-main">
+
+          {{
+            user().ordini?.length || 0
+          }}
+
+        </p>
+
+        <p class="data-sub">
+          Storico acquisti effettuati
+        </p>
+
+      </div>
+
+      <div class="data-card">
+
+        <p class="card-kicker">
+          Carrello
+        </p>
+
+        <h4>Prodotti nel carrello</h4>
+
+        <p class="data-main">
+
+          {{
+            user().carrello || 0
+          }}
+
+        </p>
+
+        <p class="data-sub">
+          Articoli pronti all'acquisto
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<!-- NON LOGGATO -->
+
+<main
+  class="home-shell"
+  *ngIf="!isLogged()"
+>
+
+  <section class="hero">
+
+    <div>
+
+      <p class="hero-eyebrow">
+        Accesso richiesto
+      </p>
+
+      <h2>
+        Devi effettuare il login
+      </h2>
+
+      <p>
+        Accedi per visualizzare il tuo profilo.
+      </p>
+
+      <div class="hero-actions">
+
+        <button
+          class="hero-cta"
+          routerLink="/login"
+        >
+          Vai al login
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="hero-burst">
+
+      <span>Login</span>
+      <small>Required</small>
+
+    </div>
+
+  </section>
+
+</main>

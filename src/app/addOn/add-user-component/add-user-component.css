@@ -1,107 +1,154 @@
-.form-container {
-  max-width: 420px;
-  margin: 40px auto;
-  padding: 25px;
-
-  background-color: #ffffff;
-
-  border-radius: 10px;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  font-family: Arial, Helvetica, sans-serif;
+:host {
+	display: block;
 }
 
-h2 {
-  text-align: center;
+.home-shell {
+	max-width: 1160px;
+	margin: 0 auto;
+	padding: 1.8rem 1rem 3rem;
+	color: var(--color-jet);
+	background:
+		radial-gradient(circle at 18% 16%, rgba(0, 180, 216, 0.2), transparent 18%),
+		radial-gradient(circle at 88% 76%, rgba(230, 57, 70, 0.13), transparent 20%),
+		var(--color-smoke);
+}
 
-  margin-bottom: 20px;
+.hero {
+	border: 3px solid var(--color-jet);
+	border-radius: 18px;
+	padding: 1.6rem;
+	background:
+		linear-gradient(132deg, rgba(0, 180, 216, 0.15), transparent 60%),
+		linear-gradient(176deg, rgba(255, 212, 0, 0.15), transparent 75%),
+		var(--color-jet);
+	color: var(--color-smoke);
+	box-shadow: 6px 7px 0 var(--color-jet);
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
+	gap: 1.2rem;
+}
 
-  color: #333;
+.hero h2 {
+	margin: 0.3rem 0 0.7rem;
+	font-family: 'Bangers', Impact, sans-serif;
+	font-size: clamp(2rem, 4.5vw, 3rem);
+	color: var(--color-gold);
+	text-shadow: 2px 2px 0 #000;
+}
+
+.hero-eyebrow {
+	margin: 0;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	font-size: 0.8rem;
+	color: var(--color-turquoise);
+}
+
+.hero p {
+	margin: 0;
+	opacity: 0.9;
+}
+
+/* FORM */
+.hero-form {
+	margin-top: 1.2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.9rem;
 }
 
 .form-group {
-  margin-bottom: 16px;
-
-  display: flex;
-
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
 }
 
 label {
-  margin-bottom: 6px;
-
-  font-weight: bold;
-
-  color: #444;
+	font-weight: 800;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	color: var(--color-smoke);
 }
 
 input {
-  padding: 10px;
-
-  border-radius: 6px;
-
-  border: 1px solid #ccc;
-
-  font-size: 14px;
-
-  transition: border 0.2s;
+	padding: 0.75rem 0.9rem;
+	border-radius: 10px;
+	border: 2px solid var(--color-jet);
+	background: #fff;
+	font-weight: 600;
 }
 
 input:focus {
-  outline: none;
+	outline: none;
+	border-color: var(--color-gold);
+	box-shadow: 0 0 0 3px rgba(255, 212, 0, 0.25);
+}
 
-  border-color: #1976d2;
+/* BOTTONI */
+.hero-actions {
+	display: flex;
+	gap: 0.8rem;
+	margin-top: 1.2rem;
+	flex-wrap: wrap;
+}
+
+.hero-cta {
+	border: 0;
+	border-radius: 10px;
+	padding: 0.7rem 1.3rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	background: var(--color-gold);
+	color: var(--color-jet);
+	box-shadow: 0 3px 0 #8d7400;
+	cursor: pointer;
+}
+
+.hero-secondary {
+	border-radius: 10px;
+	padding: 0.65rem 1rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	border: 2px solid var(--color-turquoise);
+	color: var(--color-smoke);
+	background: rgba(0, 180, 216, 0.2);
+	cursor: pointer;
+}
+
+.hero-secondary:hover {
+	background: var(--color-turquoise);
+	color: var(--color-jet);
+}
+
+/* BURST */
+.hero-burst {
+	justify-self: center;
+	align-self: center;
+	width: 160px;
+	aspect-ratio: 1;
+	clip-path: polygon(50% 0%, 61% 16%, 79% 6%, 76% 25%, 97% 23%, 85% 40%, 100% 50%, 84% 60%, 97% 78%, 76% 75%, 80% 94%, 61% 84%, 50% 100%, 39% 84%, 20% 94%, 24% 75%, 3% 78%, 16% 60%, 0% 50%, 15% 40%, 3% 23%, 24% 25%, 21% 6%, 39% 16%);
+	background: var(--color-turquoise);
+	color: var(--color-smoke);
+	display: grid;
+	place-items: center;
+	border: 3px solid var(--color-smoke);
+	box-shadow: 0 0 0 4px var(--color-jet);
+}
+
+.hero-burst span {
+	font-family: 'Bangers', Impact, sans-serif;
+	font-size: 2.1rem;
+}
+
+.hero-burst small {
+	font-size: 0.65rem;
+	font-weight: 800;
+	text-transform: uppercase;
 }
 
 .error {
-  margin-top: 5px;
-
-  color: red;
-
-  font-size: 12px;
-}
-
-.button-group {
-  margin-top: 20px;
-
-  display: flex;
-
-  justify-content: space-between;
-
-  gap: 10px;
-}
-
-.btn {
-  flex: 1;
-
-  padding: 10px;
-
-  border: none;
-
-  border-radius: 6px;
-
-  font-size: 14px;
-
-  cursor: pointer;
-
-  transition: background-color 0.2s;
-}
-
-.primary {
-  background-color: #1976d2;
-
-  color: white;
-}
-
-.primary:hover {
-  background-color: #125ea5;
-}
-
-.secondary {
-  background-color: #e0e0e0;
-}
-
-.secondary:hover {
-  background-color: #cfcfcf;
+	margin-top: 0.6rem;
+	color: var(--color-red);
+	font-weight: 800;
 }
