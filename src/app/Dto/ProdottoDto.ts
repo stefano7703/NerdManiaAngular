@@ -10,7 +10,6 @@ export class ProdottoDto {
   immagineUrl: string;
   categoria: CategoriaDto;
 
-
   constructor(
     nome: string,
     prezzo: number,
