@@ -129,6 +129,76 @@
 
   </section>
 
+  <!-- LISTA ORDINI -->
+  <section class="orders-section" *ngIf="user().ordini?.length">
+
+    <h3>I tuoi ordini</h3>
+
+    <div class="orders-list">
+
+      <div 
+        class="order-card"
+        *ngFor="let ordine of user().ordini"
+      >
+
+        <!-- HEADER ORDINE -->
+        <div class="order-header">
+
+          <div>
+            <p class="order-id">
+              Ordine #{{ ordine.id }}
+            </p>
+
+            <p class="order-address">
+              {{ ordine.indirizzoSpedizione }}
+            </p>
+          </div>
+        </div>
+
+        <!-- PRODOTTI -->
+        <div class="order-products">
+
+          <div 
+            class="product-row"
+            *ngFor="let prodotto of ordine.prodotti"
+          >
+
+            <img 
+              [src]="prodotto.immagineUrl || 'assets/no-image.png'"
+              class="product-img"
+              alt="{{ prodotto.nome }}"
+            />
+
+            <div class="product-info">
+
+              <p class="product-name">
+                {{ prodotto.nome }}
+              </p>
+
+              <p class="product-meta">
+                €{{ prodotto.prezzo }}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="order-footer">
+
+          Totale:
+          <strong>€{{ ordine.costoTotale }}</strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </main>
 
 <!-- NON LOGGATO -->
