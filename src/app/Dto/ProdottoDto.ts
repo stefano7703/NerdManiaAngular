@@ -7,6 +7,7 @@ export class ProdottoDto {
   prezzo: number;
   peso: number;
   descrizione: string;
+  immagineUrl: string;
   categoria: CategoriaDto;
 
 
@@ -16,12 +17,14 @@ export class ProdottoDto {
     peso: number,
     descrizione: string,
     categoria: CategoriaDto,
+    immagineUrl: string,
     id?: number
   ) {
     this.id = id;
     this.nome = nome;
     this.prezzo = prezzo;
     this.peso = peso;
+    this.immagineUrl = immagineUrl;
     this.descrizione = descrizione;
     this.categoria = categoria;
   }
