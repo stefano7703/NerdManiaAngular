@@ -1,1 +1,160 @@
-<p>catalogo-component works!</p>
+<main class="catalog-container">
+  <section class="catalog-header">
+    <h1>Catalogo Prodotti</h1>
+  </section>
+
+  <section class="filters-panel" aria-label="Filtri catalogo">
+    <div class="filter-item">
+      <label for="catalogo-filter">Catalogo</label>
+      <select
+        id="catalogo-filter"
+        [ngModel]="selectedCatalogoId()"
+        (ngModelChange)="onCatalogoChange($event)"
+      >
+        <option [ngValue]="null">Tutti i cataloghi</option>
+        @for (catalog of cataloghi(); track catalog.id) {
+          <option [ngValue]="catalog.id">{{ catalog.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <label for="categoria-filter">Categoria</label>
+      <select
+        id="categoria-filter"
+        [ngModel]="selectedCategoriaId()"
+        (ngModelChange)="onCategoriaChange($event)"
+      >
+        <option [ngValue]="null">Tutte le categorie</option>
+        @for (categoria of categorieFiltrate(); track categoria.id) {
+          <option [ngValue]="categoria.id">{{ categoria.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <button type="button" class="btn-reset" (click)="resetFiltri()">Reset filtri</button>
+  </section>
+
+  @if (loading()) {
+    <section class="catalog-content">
+      <p class="status-message loading">Caricamento prodotti in corso...</p>
+    </section>
+  } @else if (error()) {
+    <section class="catalog-content">
+      <p class="status-message error">Errore: {{ error() }}</p>
+    </section>
+  } @else if (prodottiFiltrati().length === 0) {
+    <section class="catalog-content">
+      <p class="status-message empty">Nessun prodotto trovato con i filtri selezionati</p>
+    </section>
+  } @else {
+    <section class="catalog-content">
+      <p class="products-count">Prodotti visualizzati: <strong>{{ prodottiFiltrati().length }}</strong></p>
+
+      <div class="products-grid">
+        @for (item of prodottiFiltrati(); track item.prodotto.id ?? item.prodotto.nome) {
+          <article class="product-card">
+            <div class="badges">
+              <span class="badge-catalogo">{{ item.catalogoNome }}</span>
+              <span class="badge-categoria">{{ item.categoriaNome }}</span>
+            </div>
+
+            <div class="product-header">
+              <h5 class="product-name">{{ item.prodotto.nome }}</h5>
+              <span class="product-price">€{{ item.prodotto.prezzo.toFixed(2) }}</span>
+            </div>
+
+            <p class="product-description">{{ item.prodotto.descrizione || 'Nessuna descrizione disponibile' }}</p>
+
+            <div class="product-meta">
+              <span class="weight"><strong>Peso:</strong> {{ item.prodotto.peso.toFixed(2) }} kg</span>
+            </div>
+
+            <button type="button" class="btn-add-to-cart" (click)="openAddToCart(item.prodotto)">
+              Aggiungi al Carrello
+            </button>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Modal per aggiungere al carrello -->
+  @if (selectedProduct(); as product) {
+    <div class="modal-overlay" (click)="closeAddToCart()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Aggiungi al Carrello</h3>
+          <button 
+            type="button"
+            class="close-btn"
+            (click)="closeAddToCart()"
+            aria-label="Chiudi"
+          >
+            ✕
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p class="product-info">
+            <strong>{{ product.nome }}</strong><br>
+            Prezzo: €{{ product.prezzo.toFixed(2) }}
+          </p>
+          
+          <label for="quantity">Quantità:</label>
+          <div class="quantity-control">
+            <button 
+              type="button"
+              class="qty-btn"
+              (click)="decrementQuantity()"
+              [disabled]="cartQuantity() <= 1"
+            >
+              −
+            </button>
+            <input 
+              id="quantity"
+              type="number" 
+              [ngModel]="cartQuantity()"
+              (ngModelChange)="cartQuantity.set($event)"
+              min="1"
+              class="qty-input"
+            />
+            <button 
+              type="button"
+              class="qty-btn"
+              (click)="incrementQuantity()"
+            >
+              +
+            </button>
+          </div>
+
+          <p class="total-price">
+            Totale: <strong>€{{ (product.prezzo * cartQuantity()).toFixed(2) }}</strong>
+          </p>
+        </div>
+        
+        <div class="modal-footer">
+          <button 
+            type="button"
+            class="btn-cancel"
+            (click)="closeAddToCart()"
+          >
+            Annulla
+          </button>
+          <button 
+            type="button"
+            class="btn-confirm"
+            (click)="confirmAddToCart()"
+            [disabled]="addingToCart()"
+          >
+            @if (addingToCart()) {
+              Aggiungendo...
+            } @else {
+              Conferma
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</main>

@@ -1,1 +1,65 @@
+<main class="home-shell">
+	<section class="hero" aria-labelledby="home-title">
+		<div class="hero-copy">
+			<p class="hero-eyebrow">Nuove uscite e collezioni leggendarie</p>
+			<h2 id="home-title">{{ welcomeTitle }}: il tuo multiverso nerd</h2>
+			<p>{{ welcomeMessage }} Fumetti, manga, action figure e chicche da veri collezionisti.</p>
+			<div class="hero-actions">
+				<button type="button" class="hero-cta" (click)="goToCatalogo()">
+					Entra nel catalogo
+				</button>
+			</div>
+		</div>
+		<div class="hero-burst" aria-hidden="true">
+			<span>Pow!</span>
+			<small>Drop della settimana</small>
+		</div>
+	</section>
+
+	<section class="data-section" aria-labelledby="featured-products-title">
+		<h3 id="featured-products-title">Hot Picks del momento</h3>
+		@if (isLoadingProdotti()) {
+			<p class="state">Caricamento prodotti in corso...</p>
+		} @else if (prodottiError()) {
+			<p class="state error">{{ prodottiError() }}</p>
+		} @else if (featuredProdotti().length === 0) {
+			<p class="state">Nessun prodotto disponibile.</p>
+		} @else {
+			<div class="cards-grid">
+				@for (prodotto of featuredProdotti(); track prodotto.id ?? prodotto.nome) {
+					<article class="data-card product-card">
+						<p class="card-kicker">Top item</p>
+						<h4>{{ prodotto.nome }}</h4>
+						<p class="data-main">{{ prodotto.prezzo }} EUR</p>
+						<p class="data-sub">{{ prodotto.descrizione }}</p>
+						<a routerLink="/catalogo" class="data-link">Vai alla scheda</a>
+					</article>
+				}
+			</div>
+		}
+	</section>
+
+	<section class="data-section" aria-labelledby="featured-categories-title">
+		<h3 id="featured-categories-title">Categorie dell'universo NerdMania</h3>
+		@if (isLoadingCategorie()) {
+			<p class="state">Caricamento categorie in corso...</p>
+		} @else if (categorieError()) {
+			<p class="state error">{{ categorieError() }}</p>
+		} @else if (featuredCategorie().length === 0) {
+			<p class="state">Nessuna categoria disponibile.</p>
+		} @else {
+			<div class="cards-grid">
+				@for (categoria of featuredCategorie(); track categoria.id) {
+					<article class="data-card category-card">
+						<h4>{{ categoria.nome }}</h4>
+						<p class="data-main">{{ prodottiCount(categoria) }} prodotti</p>
+						<a routerLink="/categoria" class="data-link">Vai alle categorie</a>
+					</article>
+				}
+			</div>
+		}
+	</section>
+
+
+</main>
 
