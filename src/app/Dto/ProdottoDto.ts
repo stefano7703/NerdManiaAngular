@@ -7,7 +7,7 @@ export class ProdottoDto {
   prezzo: number;
   peso: number;
   descrizione: string;
-  immagineUrl: string;
+  immagineUrl?: string;
   categoria: CategoriaDto;
 
   constructor(
@@ -16,7 +16,7 @@ export class ProdottoDto {
     peso: number,
     descrizione: string,
     categoria: CategoriaDto,
-    immagineUrl: string,
+    immagineUrl?: string,
     id?: number
   ) {
     this.id = id;
