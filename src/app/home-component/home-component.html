@@ -17,7 +17,7 @@
 	</section>
 
 	<section class="data-section" aria-labelledby="featured-products-title">
-		<h3 id="featured-products-title">Hot Picks del momento</h3>
+		<h3 id="featured-products-title">Articoli più venduti!!!</h3>
 		@if (isLoadingProdotti()) {
 			<p class="state">Caricamento prodotti in corso...</p>
 		} @else if (prodottiError()) {
@@ -29,6 +29,17 @@
 				@for (prodotto of featuredProdotti(); track prodotto.id ?? prodotto.nome) {
 					<article class="data-card product-card">
 						<p class="card-kicker">Top item</p>
+						@if (prodotto.immagineUrl?.trim()) {
+							<div class="product-image-wrap">
+								<img
+									class="product-image"
+									[src]="prodotto.immagineUrl"
+									[alt]="'Immagine di ' + prodotto.nome"
+									loading="lazy"
+									(error)="onImageError($event)"
+								/>
+							</div>
+						}
 						<h4>{{ prodotto.nome }}</h4>
 						<p class="data-main">{{ prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ prodotto.descrizione }}</p>
@@ -39,23 +50,40 @@
 		}
 	</section>
 
-	<section class="data-section" aria-labelledby="featured-categories-title">
-		<h3 id="featured-categories-title">Categorie dell'universo NerdMania</h3>
-		@if (isLoadingCategorie()) {
-			<p class="state">Caricamento categorie in corso...</p>
-		} @else if (categorieError()) {
-			<p class="state error">{{ categorieError() }}</p>
-		} @else if (featuredCategorie().length === 0) {
-			<p class="state">Nessuna categoria disponibile.</p>
+	<section class="data-section" aria-labelledby="catalog-spotlight-title">
+		<h3 id="catalog-spotlight-title">Esplora i nostri cataloghi</h3>
+		@if (isLoadingProdotti()) {
+			<p class="state">Caricamento prodotti in corso...</p>
+		} @else if (prodottiError()) {
+			<p class="state error">{{ prodottiError() }}</p>
+		} @else if (catalogoHighlights().length === 0) {
+			<p class="state">Nessun catalogo con prodotti disponibile.</p>
 		} @else {
 			<div class="cards-grid">
-				@for (categoria of featuredCategorie(); track categoria.id) {
-					<article class="data-card category-card">
-						<h4>{{ categoria.nome }}</h4>
-						<p class="data-main">{{ prodottiCount(categoria) }} prodotti</p>
-						<a routerLink="/categoria" class="data-link">Vai alle categorie</a>
-					</article>
+				@for (highlight of catalogoHighlights(); track highlight.catalogoKey) {
+				<div class="catalog-col">
+				@if (highlight.catalogoId !== null) {
+					<a class="catalog-col-label" routerLink="/catalogo" [queryParams]="{ catalogoId: highlight.catalogoId }">{{ highlight.catalogoNome }}</a>
+				} @else {
+					<a class="catalog-col-label" routerLink="/catalogo">{{ highlight.catalogoNome }}</a>
 				}
+				<article class="data-card product-card catalog-rotating-card">
+						@if (highlight.prodotto.immagineUrl?.trim()) {
+							<div class="product-image-wrap">
+								<img
+									class="product-image"
+									[src]="highlight.prodotto.immagineUrl"
+									[alt]="'Immagine di ' + highlight.prodotto.nome"
+									loading="lazy"
+									(error)="onImageError($event)"
+								/>
+							</div>
+						}
+						<h4>{{ highlight.prodotto.nome }}</h4>
+						<p class="data-main">{{ highlight.prodotto.prezzo }} EUR</p>
+						<p class="data-sub">{{ highlight.prodotto.descrizione }}</p>
+						<a routerLink="/catalogo" class="data-link">Vai al catalogo</a>
+					</article>				</div>				}
 			</div>
 		}
 	</section>

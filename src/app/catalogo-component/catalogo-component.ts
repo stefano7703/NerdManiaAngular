@@ -2,11 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { CatalogoDto } from '../Dto/CatalogoDto';
 import { CategoriaDto } from '../Dto/CategoriaDto';
 import { ProdottoDto } from '../Dto/ProdottoDto';
+import { CarrelloDto } from '../Dto/CarrelloDto';
 import { CatalogoService } from '../Service/CatalogoService';
 import { ProdottoService } from '../Service/ProdottoService';
+import { CarrelloService } from '../Service/CarrelloService';
 
 type ProdottoView = {
   prodotto: ProdottoDto;
@@ -15,6 +18,8 @@ type ProdottoView = {
   catalogoId: number;
   catalogoNome: string;
 };
+
+type SortOrder = 'none' | 'price-desc' | 'price-asc';
 
 @Component({
   selector: 'app-catalogo-component',
@@ -26,6 +31,9 @@ type ProdottoView = {
 export class CatalogoComponent implements OnInit {
   private readonly prodottoService = inject(ProdottoService);
   private readonly catalogoService = inject(CatalogoService);
+  private readonly carrelloService = inject(CarrelloService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly pageSize = 8;
 
   cataloghi = signal<CatalogoDto[]>([]);
   categorie = signal<CategoriaDto[]>([]);
@@ -33,6 +41,9 @@ export class CatalogoComponent implements OnInit {
 
   selectedCatalogoId = signal<number | null>(null);
   selectedCategoriaId = signal<number | null>(null);
+  nomeFilter = signal('');
+  sortOrder = signal<SortOrder>('none');
+  currentPage = signal(1);
 
   loading = signal(false);
   error = signal<string | null>(null);
@@ -40,6 +51,7 @@ export class CatalogoComponent implements OnInit {
   selectedProduct = signal<ProdottoDto | null>(null);
   addingToCart = signal(false);
   cartQuantity = signal(1);
+  cartSuccess = signal<string | null>(null);
 
   categorieFiltrate = computed(() => {
     const catalogId = this.selectedCatalogoId();
@@ -52,15 +64,83 @@ export class CatalogoComponent implements OnInit {
   prodottiFiltrati = computed(() => {
     const catalogId = this.selectedCatalogoId();
     const categoriaId = this.selectedCategoriaId();
+    const nomeQuery = this.nomeFilter().trim().toLowerCase();
+    const order = this.sortOrder();
 
-    return this.prodottiView().filter((item) => {
+    const filtered = this.prodottiView().filter((item) => {
       const matchCatalogo = catalogId === null || item.catalogoId === catalogId;
       const matchCategoria = categoriaId === null || item.categoriaId === categoriaId;
-      return matchCatalogo && matchCategoria;
+      const nome = (item.prodotto.nome ?? '').toLowerCase();
+      const matchNome = nomeQuery.length === 0 || nome.includes(nomeQuery);
+      return matchCatalogo && matchCategoria && matchNome;
+    });
+
+    if (order === 'none') {
+      return filtered;
+    }
+
+    return [...filtered].sort((left, right) => {
+      const priceDiff = left.prodotto.prezzo - right.prodotto.prezzo;
+      return order === 'price-asc' ? priceDiff : -priceDiff;
     });
   });
 
+  totalItems = computed(() => this.prodottiFiltrati().length);
+
+  totalPages = computed(() => {
+    const total = this.totalItems();
+    if (total === 0) {
+      return 0;
+    }
+    return Math.ceil(total / this.pageSize);
+  });
+
+  safeCurrentPage = computed(() => {
+    const total = this.totalPages();
+    if (total === 0) {
+      return 1;
+    }
+    return Math.min(this.currentPage(), total);
+  });
+
+  prodottiPaginati = computed(() => {
+    const items = this.prodottiFiltrati();
+    if (items.length === 0) {
+      return [];
+    }
+
+    const page = this.safeCurrentPage();
+    const start = (page - 1) * this.pageSize;
+    return items.slice(start, start + this.pageSize);
+  });
+
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    return Array.from({ length: total }, (_, index) => index + 1);
+  });
+
+  visibleRangeStart = computed(() => {
+    if (this.totalItems() === 0) {
+      return 0;
+    }
+    return (this.safeCurrentPage() - 1) * this.pageSize + 1;
+  });
+
+  visibleRangeEnd = computed(() => {
+    if (this.totalItems() === 0) {
+      return 0;
+    }
+    return Math.min(this.safeCurrentPage() * this.pageSize, this.totalItems());
+  });
+
   ngOnInit(): void {
+    const catalogoIdParam = this.route.snapshot.queryParamMap.get('catalogoId');
+    if (catalogoIdParam !== null) {
+      const id = Number(catalogoIdParam);
+      if (!isNaN(id)) {
+        this.selectedCatalogoId.set(id);
+      }
+    }
     this.loadData();
   }
 
@@ -105,6 +185,7 @@ export class CatalogoComponent implements OnInit {
           this.prodottiView.set(this.flattenProdotti(prodottiItems, catalogoByCategoriaId, catalogoByCategoriaNome));
           this.categorie.set(this.extractCategorie(prodottiItems, catalogoByCategoriaId, catalogoByCategoriaNome));
           this.cataloghi.set(this.extractCataloghi(prodottiItems, catalogoByCategoriaId, catalogoByCategoriaNome));
+          this.currentPage.set(1);
           this.loading.set(false);
         },
         error: (err) => {
@@ -249,6 +330,7 @@ export class CatalogoComponent implements OnInit {
   onCatalogoChange(value: number | null): void {
     const nextCatalogo = value === null ? null : Number(value);
     this.selectedCatalogoId.set(nextCatalogo);
+    this.currentPage.set(1);
 
     if (nextCatalogo === null) {
       return;
@@ -269,11 +351,49 @@ export class CatalogoComponent implements OnInit {
 
   onCategoriaChange(value: number | null): void {
     this.selectedCategoriaId.set(value === null ? null : Number(value));
+    this.currentPage.set(1);
+  }
+
+  onNomeFilterChange(value: string): void {
+    this.nomeFilter.set(value ?? '');
+    this.currentPage.set(1);
+  }
+
+  onSortOrderChange(value: SortOrder): void {
+    if (value !== 'none' && value !== 'price-desc' && value !== 'price-asc') {
+      this.sortOrder.set('none');
+      this.currentPage.set(1);
+      return;
+    }
+    this.sortOrder.set(value);
+    this.currentPage.set(1);
   }
 
   resetFiltri(): void {
     this.selectedCatalogoId.set(null);
     this.selectedCategoriaId.set(null);
+    this.nomeFilter.set('');
+    this.sortOrder.set('none');
+    this.currentPage.set(1);
+  }
+
+  goToPage(page: number): void {
+    const total = this.totalPages();
+    if (total === 0) {
+      this.currentPage.set(1);
+      return;
+    }
+
+    const nextPage = Math.max(1, Math.min(page, total));
+    this.currentPage.set(nextPage);
+  }
+
+  nextPage(): void {
+    this.goToPage(this.safeCurrentPage() + 1);
+  }
+
+  previousPage(): void {
+    this.goToPage(this.safeCurrentPage() - 1);
   }
 
   openAddToCart(product: ProdottoDto): void {
@@ -281,9 +401,18 @@ export class CatalogoComponent implements OnInit {
     this.cartQuantity.set(1);
   }
 
+  onImageError(event: Event): void {
+    const target = event.target;
+    if (!(target instanceof HTMLImageElement)) {
+      return;
+    }
+    target.style.display = 'none';
+  }
+
   closeAddToCart(): void {
     this.selectedProduct.set(null);
     this.cartQuantity.set(1);
+    this.cartSuccess.set(null);
   }
 
   confirmAddToCart(): void {
@@ -291,13 +420,43 @@ export class CatalogoComponent implements OnInit {
     const qty = this.cartQuantity();
     if (!product || qty < 1) return;
 
-    this.addingToCart.set(true);
+    const cartIdStr = localStorage.getItem('cartId');
+    if (!cartIdStr) {
+      this.error.set('Devi effettuare il login per aggiungere prodotti al carrello');
+      return;
+    }
 
-    setTimeout(() => {
-      alert(`Aggiunto ${qty} x "${product.nome}" al carrello`);
-      this.addingToCart.set(false);
-      this.closeAddToCart();
-    }, 500);
+    const cartId = Number(cartIdStr);
+    this.addingToCart.set(true);
+    this.cartSuccess.set(null);
+
+    this.carrelloService.read(cartId).pipe(take(1)).subscribe({
+      next: (cart) => {
+        const updated = new CarrelloDto(
+          cart.prezzoTotale + product.prezzo * qty,
+          cart.quantita + qty,
+          cart.peso + (product.peso ?? 0) * qty,
+          cart.user,
+          cart.ordine,
+          cart.id,
+        );
+        this.carrelloService.update(updated).pipe(take(1)).subscribe({
+          next: () => {
+            this.addingToCart.set(false);
+            this.cartSuccess.set(`${qty} × "${product.nome}" aggiunto al carrello`);
+            setTimeout(() => this.closeAddToCart(), 1500);
+          },
+          error: (err) => {
+            this.addingToCart.set(false);
+            this.error.set(err?.message ?? 'Errore aggiunta al carrello');
+          },
+        });
+      },
+      error: (err) => {
+        this.addingToCart.set(false);
+        this.error.set(err?.message ?? 'Carrello non trovato. Effettua il login.');
+      },
+    });
   }
 
   decrementQuantity(): void {

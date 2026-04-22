@@ -2,11 +2,12 @@ import { CarrelloDto } from "./CarrelloDto";
 import { OrdineDto } from "./OrdineDto";
 
 export class UserDto {
-  id: number;
+  id?: number;
   username: string;
   nome: string;
   cognome: string;
   email: string;
+  password: string;
   cartaFedelta: boolean = false;
 
   carrello: CarrelloDto;
@@ -19,6 +20,7 @@ export class UserDto {
     nome: string,
     cognome: string,
     email: string,
+    password: string,
     cartaFedeltà: boolean,
     carrello: CarrelloDto,
     ordini: OrdineDto[] | null
@@ -28,6 +30,7 @@ export class UserDto {
     this.nome = nome;
     this.cognome = cognome;
     this.email = email;
+    this.password = password;
     this.cartaFedelta = cartaFedeltà;
     this.carrello = carrello;
     this.ordini = ordini ?? null;}

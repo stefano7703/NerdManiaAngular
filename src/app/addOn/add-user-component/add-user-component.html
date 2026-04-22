@@ -1,0 +1,65 @@
+<main class="home-shell">
+
+  <section class="hero" aria-labelledby="register-title">
+
+    <div class="hero-copy">
+
+      <p class="hero-eyebrow">Unisciti al multiverso NerdMania</p>
+
+      <h2 id="register-title">Crea il tuo account</h2>
+
+      <p>
+        Registrati per iniziare la tua collezione di fumetti, manga e action figure.
+      </p>
+
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="hero-form">
+
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" formControlName="nome" />
+        </div>
+
+        <div class="form-group">
+          <label>Cognome</label>
+          <input type="text" formControlName="cognome" />
+        </div>
+
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" formControlName="username" />
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" />
+        </div>
+
+        <div class="button-group hero-actions">
+
+          <button type="submit" class="hero-cta" [disabled]="userForm.invalid">
+            Registrati
+          </button>
+
+          <button type="button" class="hero-secondary" (click)="userForm.reset()">
+            Reset
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="hero-burst" aria-hidden="true">
+      <span>Join</span>
+      <small>Start adventure</small>
+    </div>
+
+  </section>
+
+</main>

@@ -32,6 +32,30 @@
       </select>
     </div>
 
+    <div class="filter-item">
+      <label for="nome-filter">Nome contiene</label>
+      <input
+        id="nome-filter"
+        type="text"
+        [ngModel]="nomeFilter()"
+        (ngModelChange)="onNomeFilterChange($event)"
+        placeholder="Cerca per nome prodotto"
+      />
+    </div>
+
+    <div class="filter-item">
+      <label for="sort-order">Ordina per prezzo</label>
+      <select
+        id="sort-order"
+        [ngModel]="sortOrder()"
+        (ngModelChange)="onSortOrderChange($event)"
+      >
+        <option value="none">Nessun ordinamento</option>
+        <option value="price-desc">Dal piu costoso al piu economico</option>
+        <option value="price-asc">Dal piu economico al piu costoso</option>
+      </select>
+    </div>
+
     <button type="button" class="btn-reset" (click)="resetFiltri()">Reset filtri</button>
   </section>
 
@@ -49,15 +73,30 @@
     </section>
   } @else {
     <section class="catalog-content">
-      <p class="products-count">Prodotti visualizzati: <strong>{{ prodottiFiltrati().length }}</strong></p>
+      <p class="products-count">
+        Prodotti visualizzati: <strong>{{ visibleRangeStart() }}-{{ visibleRangeEnd() }}</strong>
+        di <strong>{{ totalItems() }}</strong>
+      </p>
 
       <div class="products-grid">
-        @for (item of prodottiFiltrati(); track item.prodotto.id ?? item.prodotto.nome) {
+        @for (item of prodottiPaginati(); track item.prodotto.id ?? item.prodotto.nome) {
           <article class="product-card">
             <div class="badges">
               <span class="badge-catalogo">{{ item.catalogoNome }}</span>
               <span class="badge-categoria">{{ item.categoriaNome }}</span>
             </div>
+
+            @if (item.prodotto.immagineUrl?.trim()) {
+              <div class="product-image-wrap">
+                <img
+                  class="product-image"
+                  [src]="item.prodotto.immagineUrl"
+                  [alt]="'Immagine di ' + item.prodotto.nome"
+                  loading="lazy"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            }
 
             <div class="product-header">
               <h5 class="product-name">{{ item.prodotto.nome }}</h5>
@@ -76,6 +115,42 @@
           </article>
         }
       </div>
+
+      @if (totalPages() > 1) {
+        <nav class="pagination" aria-label="Paginazione prodotti">
+          <button
+            type="button"
+            class="btn-page"
+            (click)="previousPage()"
+            [disabled]="safeCurrentPage() <= 1"
+          >
+            Precedente
+          </button>
+
+          <div class="page-number-list" role="group" aria-label="Seleziona pagina">
+            @for (page of pageNumbers(); track page) {
+              <button
+                type="button"
+                class="btn-page-number"
+                [class.active]="page === safeCurrentPage()"
+                (click)="goToPage(page)"
+                [attr.aria-current]="page === safeCurrentPage() ? 'page' : null"
+              >
+                {{ page }}
+              </button>
+            }
+          </div>
+
+          <button
+            type="button"
+            class="btn-page"
+            (click)="nextPage()"
+            [disabled]="safeCurrentPage() >= totalPages()"
+          >
+            Successiva
+          </button>
+        </nav>
+      }
     </section>
   }
 
@@ -134,6 +209,9 @@
         </div>
         
         <div class="modal-footer">
+          @if (cartSuccess()) {
+            <p class="cart-success">{{ cartSuccess() }}</p>
+          }
           <button 
             type="button"
             class="btn-cancel"

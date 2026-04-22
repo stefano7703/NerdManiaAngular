@@ -1,0 +1,115 @@
+<main class="home-shell">
+
+  <!-- ================= LOGIN ================= -->
+  <section class="hero" *ngIf="mode === 'login'">
+
+    <div class="hero-copy">
+
+      <p class="hero-eyebrow">Bentornato nel multiverso NerdMania</p>
+
+      <h2>Login</h2>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="hero-form">
+
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" formControlName="username" />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" />
+        </div>
+
+        <div class="error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <div class="hero-actions">
+
+          <button type="submit" class="hero-cta" [disabled]="loginForm.invalid">
+            Accedi
+          </button>
+
+          <button type="button" class="hero-secondary" (click)="showRegister()">
+            Registrati
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+    <div class="hero-burst" aria-hidden="true">
+      <span>Join</span>
+      <small>Start adventure</small>
+    </div>
+
+  </section>
+
+  <!-- ================= REGISTER ================= -->
+  <section class="hero" *ngIf="mode === 'register'">
+
+    <div class="hero-copy">
+
+      <p class="hero-eyebrow">Unisciti al multiverso NerdMania</p>
+
+      <h2 id="register-title">Crea il tuo account</h2>
+
+      <p>
+        Registrati per iniziare la tua collezione di fumetti, manga e action figure.
+      </p>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="hero-form">
+
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" formControlName="nome" />
+        </div>
+
+        <div class="form-group">
+          <label>Cognome</label>
+          <input type="text" formControlName="cognome" />
+        </div>
+
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" formControlName="username" />
+          <div class="error" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" />
+        </div>
+
+        <div class="button-group hero-actions">
+
+          <button type="submit" class="hero-cta" [disabled]="registerForm.invalid">
+            Registrati
+          </button>
+
+          <button type="button" class="hero-secondary" (click)="showLogin()">
+            Torna al login
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+    <div class="hero-burst" aria-hidden="true">
+      <span>Join</span>
+      <small>Start adventure</small>
+    </div>
+
+  </section>
+
+</main>
