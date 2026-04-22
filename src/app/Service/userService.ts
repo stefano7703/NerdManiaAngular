@@ -2,38 +2,45 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserDto } from '../Dto/UserDto';
 import { AbstractService } from './abstract-service';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class userService extends AbstractService<UserDto>{
-
+export class userService extends AbstractService<UserDto> {
   private baseProjectUrl: string = '';
 
   constructor(http: HttpClient) {
     super(http);
     this.type = 'User';
-    this.baseProjectUrl = this.baseProjectUrl + '/' + this.type;
+    this.baseProjectUrl = this.baseUrl + '/' + this.type;
   }
 
-
-  findByNomeContainingIgnoreCase(nome: string) {
-    return this.http.get<UserDto[]>(`${this.baseProjectUrl}/findByNomeContainingIgnoreCase?nome=${nome}`);
+  findByNomeContainingIgnoreCase(nome: string): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(
+      `${this.baseProjectUrl}/findByNomeContainingIgnoreCase?nome=${nome}`,
+    );
   }
 
-  findByCartaFedeltaTrue() {
+  findByCartaFedeltaTrue(): Observable<UserDto[]> {
     return this.http.get<UserDto[]>(`${this.baseProjectUrl}/findByCartaFedeltaTrue`);
   }
 
-  findByCartaFedeltaFalse() {
+  findByCartaFedeltaFalse(): Observable<UserDto[]> {
     return this.http.get<UserDto[]>(`${this.baseProjectUrl}/findByCartaFedeltaFalse`);
   }
 
-  exiexistsByUsername(username: string) {
-    return this.http.get<boolean>(`${this.baseProjectUrl}/existsByUsername?username=${username}`);
+  exiexistsByUsername(username: string): Observable<boolean> {
+    return this.http.get<boolean>(
+      `${this.baseProjectUrl}/exiexistsByUsername?username=${username}`,
+    );
   }
 
-  exiexistsByEmail(email: string) {
-    return this.http.get<boolean>(`${this.baseProjectUrl}/existsByEmail?email=${email}`);
+  exiexistsByEmail(email: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseProjectUrl}/exiexistsByEmail?email=${email}`);
+  }
+
+  register(user: UserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.baseProjectUrl}/register`, user);
   }
 }

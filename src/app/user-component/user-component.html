@@ -1,13 +1,55 @@
-<input #nomeRef type="text" placeholder="Cerca utente...">
-<button (click)="cercaPerNome(nomeRef.value)">Cerca</button>
+<div class="user-container">
+  <h2>Gestione Utenti</h2>
 
-<button (click)="filtraPerCartaFedelta(true)">Con Carta</button>
-<button (click)="filtraPerCartaFedelta(false)">Senza Carta</button>
+  <div class="controls-section">
+    <input #nomeRef type="text" placeholder="Cerca per nome...">
+    <button (click)="cercaPerNome(nomeRef.value)">Cerca</button>
+    <button class="secondary" (click)="filtraPerCartaFedelta(true)">Con Carta</button>
+    <button class="secondary" (click)="filtraPerCartaFedelta(false)">Senza Carta</button>
+    <button (click)="openAddUser()">
+  Aggiungi utente
+</button>
+  </div>
 
-<table>
-  <tr *ngFor="let u of users()">
-    <td>{{ u.nome }}</td>
-    <td>{{ u.email }}</td>
-    <td>{{ u.cartaFedelta ? '✅' : '❌' }}</td>
-  </tr>
-</table>
+  <app-add-user-component
+  *ngIf="showAddUser()"
+  (onUserAdded)="onUserAdded($event)">
+</app-add-user-component>
+
+  <div class="controls-section">
+    <input #userRef type="text" placeholder="Verifica username...">
+    <button (click)="verificaUsername(userRef.value)">Verifica</button>
+
+    <div *ngIf="checkResult().exists !== null"
+         [ngClass]="checkResult().exists ? 'feedback-msg msg-error' : 'feedback-msg msg-success'">
+      {{ checkResult().message }}
+    </div>
+  </div>
+
+  <table class="results-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Carta Fedeltà</th>
+        <th>Username</th>
+        <th>Totale Carrello</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of users()">
+        <td>{{ u.id }}</td>
+        <td>{{ u.nome }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          <span [class]="u.cartaFedelta ? 'badge badge-true' : 'badge badge-false'">
+            {{ u.cartaFedelta ? 'Attiva' : 'No' }}
+          </span>
+        </td>
+        <td>{{ u.username }}</td>
+        <td>{{u.carrello?.prezzoTotale}} </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
