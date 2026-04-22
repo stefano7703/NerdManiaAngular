@@ -8,11 +8,13 @@ import { ProdottoComponent } from './prodotto-component/prodotto-component';
 import { SpedizioneComponent } from './spedizione-component/spedizione-component';
 import { UserComponent } from './user-component/user-component';
 import { CategoriaComponent } from './categoria-component/categoria-component';
+import { LoginComponent } from './addOn/login-component/login-component';
 
 export const routes: Routes = [
      { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: 'home', component: HomeComponent },
     { path: 'carrello', component: CarrelloComponent},
+    { path: 'login', component: LoginComponent },
     { path: 'catalogo', component: CatalogoComponent},
     { path: 'magazzino', component: MagazzinoComponent},
     { path: 'ordine', component: OrdineComponent},
