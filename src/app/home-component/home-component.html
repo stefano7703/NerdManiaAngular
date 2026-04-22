@@ -5,9 +5,8 @@
 			<h2 id="home-title">{{ welcomeTitle }}: il tuo multiverso nerd</h2>
 			<p>{{ welcomeMessage }} Fumetti, manga, action figure e chicche da veri collezionisti.</p>
 			<div class="hero-actions">
-				<button type="button" class="hero-cta" (click)="goToCatalogo()">
-					Entra nel catalogo
-				</button>
+				<a class="hero-cta" routerLink="/login">Login</a>
+				<a class="hero-secondary" routerLink="/login">Registrati</a>
 			</div>
 		</div>
 		<div class="hero-burst" aria-hidden="true">
