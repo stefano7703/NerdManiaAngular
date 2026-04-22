@@ -7,6 +7,7 @@ import { CatalogoDto } from '../Dto/CatalogoDto';
 import { CategoriaDto } from '../Dto/CategoriaDto';
 import { ProdottoDto } from '../Dto/ProdottoDto';
 import { CarrelloDto } from '../Dto/CarrelloDto';
+import { UserDto } from '../Dto/UserDto';
 import { CatalogoService } from '../Service/CatalogoService';
 import { ProdottoService } from '../Service/ProdottoService';
 import { CarrelloService } from '../Service/CarrelloService';
@@ -17,6 +18,15 @@ type ProdottoView = {
   categoriaNome: string;
   catalogoId: number;
   catalogoNome: string;
+};
+
+type StoredCartItem = {
+  productId: number;
+  nome: string;
+  immagineUrl?: string;
+  quantity: number;
+  unitPrice: number;
+  unitWeight: number;
 };
 
 type SortOrder = 'none' | 'price-desc' | 'price-asc';
@@ -415,33 +425,185 @@ export class CatalogoComponent implements OnInit {
     this.cartSuccess.set(null);
   }
 
-  confirmAddToCart(): void {
-    const product = this.selectedProduct();
-    const qty = this.cartQuantity();
-    if (!product || qty < 1) return;
+  private getStoredUser(): UserDto | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) {
+      return null;
+    }
 
+    try {
+      return JSON.parse(raw) as UserDto;
+    } catch {
+      return null;
+    }
+  }
+
+  private resolveCartFromActive(
+    userId: number,
+    onFound: (cartId: number) => void,
+    onMissing: () => void
+  ): void {
+    this.carrelloService.findCarrelliAttivi().pipe(take(1)).subscribe({
+      next: (items) => {
+        const match = (items ?? []).find((cart) => (cart.userId ?? cart.user?.id) === userId && (cart.id ?? 0) > 0);
+        if (match?.id) {
+          localStorage.setItem('cartId', String(match.id));
+          onFound(match.id);
+          return;
+        }
+        onMissing();
+      },
+      error: () => {
+        onMissing();
+      },
+    });
+  }
+
+  private resolveCartId(onSuccess: (cartId: number) => void, onFailure: (message: string) => void): void {
     const cartIdStr = localStorage.getItem('cartId');
-    if (!cartIdStr) {
-      this.error.set('Devi effettuare il login per aggiungere prodotti al carrello');
+    if (cartIdStr) {
+      const parsed = Number(cartIdStr);
+      if (!isNaN(parsed) && parsed > 0) {
+        onSuccess(parsed);
+        return;
+      }
+    }
+
+    const user = this.getStoredUser();
+    if (!user?.id) {
+      onFailure('Devi effettuare il login per aggiungere prodotti al carrello');
       return;
     }
 
-    const cartId = Number(cartIdStr);
-    this.addingToCart.set(true);
-    this.cartSuccess.set(null);
+    if (user.carrello?.id && user.carrello.id > 0) {
+      localStorage.setItem('cartId', String(user.carrello.id));
+      onSuccess(user.carrello.id);
+      return;
+    }
 
+    this.carrelloService.findByUser(user).pipe(take(1)).subscribe({
+      next: (cart) => {
+        if (cart?.id !== undefined && cart.id !== null && cart.id > 0) {
+          localStorage.setItem('cartId', String(cart.id));
+          onSuccess(cart.id);
+          return;
+        }
+        this.resolveCartFromActive(user.id!, onSuccess, () => this.createCartForUser(user, onSuccess, onFailure));
+      },
+      error: () => {
+        this.resolveCartFromActive(user.id!, onSuccess, () => this.createCartForUser(user, onSuccess, onFailure));
+      },
+    });
+  }
+
+  private createCartForUser(
+    user: UserDto,
+    onSuccess: (cartId: number) => void,
+    onFailure: (message: string) => void
+  ): void {
+    const userRef = { id: user.id } as UserDto;
+    const newCart = {
+      prezzoTotale: 0,
+      quantita: 0,
+      peso: 0,
+      userId: userRef.id,
+    } as CarrelloDto;
+    this.carrelloService.insert(newCart).pipe(take(1)).subscribe({
+      next: () => {
+        this.carrelloService.findByUser(userRef).pipe(take(1)).subscribe({
+          next: (savedCart: CarrelloDto) => {
+            if (savedCart?.id !== undefined && savedCart.id !== null && savedCart.id > 0) {
+              localStorage.setItem('cartId', String(savedCart.id));
+              onSuccess(savedCart.id);
+              return;
+            }
+            this.resolveCartFromActive(userRef.id!, onSuccess, () => {
+              onFailure('Impossibile creare il carrello per questo utente');
+            });
+          },
+          error: () => {
+            this.resolveCartFromActive(userRef.id!, onSuccess, () => {
+              onFailure('Impossibile creare il carrello per questo utente');
+            });
+          },
+        });
+      },
+      error: () => {
+        onFailure('Impossibile creare il carrello per questo utente');
+      },
+    });
+  }
+
+  private cartItemsStorageKey(cartId: number): string {
+    return `cart-items:${cartId}`;
+  }
+
+  private loadStoredCartItems(cartId: number): StoredCartItem[] {
+    const raw = localStorage.getItem(this.cartItemsStorageKey(cartId));
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed as StoredCartItem[] : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private saveStoredCartItems(cartId: number, items: StoredCartItem[]): void {
+    localStorage.setItem(this.cartItemsStorageKey(cartId), JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent('cart-items-changed'));
+  }
+
+  private storeProductInCartItems(cartId: number, product: ProdottoDto, qty: number): void {
+    const productId = Number(product.id);
+    if (isNaN(productId) || productId <= 0) {
+      return;
+    }
+
+    const items = this.loadStoredCartItems(cartId);
+    const index = items.findIndex((item) => item.productId === productId);
+    if (index >= 0) {
+      const existing = items[index];
+      items[index] = {
+        ...existing,
+        quantity: existing.quantity + qty,
+        unitPrice: product.prezzo,
+        unitWeight: product.peso ?? 0,
+        immagineUrl: product.immagineUrl,
+      };
+      this.saveStoredCartItems(cartId, items);
+      return;
+    }
+
+    items.push({
+      productId,
+      nome: product.nome,
+      immagineUrl: product.immagineUrl,
+      quantity: qty,
+      unitPrice: product.prezzo,
+      unitWeight: product.peso ?? 0,
+    });
+    this.saveStoredCartItems(cartId, items);
+  }
+
+  private addProductToCart(cartId: number, product: ProdottoDto, qty: number, allowRetry = true): void {
     this.carrelloService.read(cartId).pipe(take(1)).subscribe({
       next: (cart) => {
+        const fallbackUserId = this.getStoredUser()?.id ?? null;
+        const userId = cart.userId ?? cart.user?.id ?? fallbackUserId;
         const updated = new CarrelloDto(
           cart.prezzoTotale + product.prezzo * qty,
           cart.quantita + qty,
           cart.peso + (product.peso ?? 0) * qty,
-          cart.user,
-          cart.ordine,
+          userId,
           cart.id,
         );
         this.carrelloService.update(updated).pipe(take(1)).subscribe({
           next: () => {
+            this.storeProductInCartItems(cartId, product, qty);
             this.addingToCart.set(false);
             this.cartSuccess.set(`${qty} × "${product.nome}" aggiunto al carrello`);
             setTimeout(() => this.closeAddToCart(), 1500);
@@ -453,10 +615,38 @@ export class CatalogoComponent implements OnInit {
         });
       },
       error: (err) => {
+        const status = Number(err?.status ?? 0);
+        if (allowRetry && (status === 403 || status === 404)) {
+          localStorage.removeItem('cartId');
+          this.resolveCartId(
+            (newCartId) => this.addProductToCart(newCartId, product, qty, false),
+            (message) => {
+              this.addingToCart.set(false);
+              this.error.set(message);
+            }
+          );
+          return;
+        }
         this.addingToCart.set(false);
         this.error.set(err?.message ?? 'Carrello non trovato. Effettua il login.');
       },
     });
+  }
+
+  confirmAddToCart(): void {
+    const product = this.selectedProduct();
+    const qty = this.cartQuantity();
+    if (!product || qty < 1) return;
+    this.addingToCart.set(true);
+    this.cartSuccess.set(null);
+
+    this.resolveCartId(
+      (cartId) => this.addProductToCart(cartId, product, qty),
+      (message) => {
+        this.addingToCart.set(false);
+        this.error.set(message);
+      }
+    );
   }
 
   decrementQuantity(): void {
