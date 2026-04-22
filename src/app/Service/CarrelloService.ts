@@ -24,7 +24,7 @@ export class CarrelloService extends AbstractService<CarrelloDto> {
 	}
 
 	findByPrezzoTotaleGreaterThan(prezzo: number): Observable<CarrelloDto[]> {
-		const params = new HttpParams().set('prezzo', String(prezzo));
+		const params = new HttpParams().set('prezzoTotale', String(prezzo));
 		return this.http.get<CarrelloDto[]>(`${this.baseUrl}/${this.type}/findByPrezzoTotaleGreaterThan`, { params });
 	}
 

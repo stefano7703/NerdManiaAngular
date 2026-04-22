@@ -62,7 +62,7 @@ export class OrdineComponent implements OnInit{
 
 
   findByProdottiId(prodottoId:number) {
-  this.service.findByCostoTotaleLessThan(prodottoId).subscribe(ordini => {
+  this.service.findByProdottiId(prodottoId).subscribe(ordini => {
   this.ListOrdini=ordini;
   })
   }

@@ -1,0 +1,253 @@
+:host { display: block; }
+
+.cart-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  color: var(--color-jet);
+}
+
+.cart-header {
+  margin-bottom: 2rem;
+  border-bottom: 3px solid var(--color-gold);
+  padding-bottom: 1.5rem;
+}
+
+.cart-header h1 {
+  margin: 0 0 1rem 0;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: var(--color-jet);
+}
+
+.cart-selector {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cart-selector label {
+  font-weight: 600;
+  color: var(--color-jet);
+  margin: 0;
+}
+
+.cart-select-dropdown {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: white;
+  color: var(--color-jet);
+  cursor: pointer;
+}
+
+.cart-select-dropdown:hover,
+.cart-select-dropdown:focus {
+  border-color: var(--color-gold);
+  outline: none;
+}
+
+.cart-summary {
+  background: linear-gradient(135deg, var(--color-jet) 0%, #2a3f50 100%);
+  color: var(--color-smoke);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 2rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+.cart-content {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.status-message {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.status-message.loading {
+  color: var(--color-turquoise);
+  font-weight: 600;
+}
+
+.status-message.error {
+  color: var(--color-red);
+  font-weight: 600;
+}
+
+.status-message.empty {
+  color: #999;
+  font-style: italic;
+}
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.cart-table thead {
+  background: var(--color-jet);
+  color: var(--color-smoke);
+  font-weight: 600;
+}
+
+.cart-table thead th {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--color-gold);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cart-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s;
+}
+
+.cart-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.cart-table tbody tr:hover:not(.loading-row) {
+  background: #f0f0f0;
+}
+
+.cart-table tbody tr.loading-row {
+  opacity: 0.6;
+}
+
+.cart-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.cart-table .price {
+  font-weight: 600;
+  color: var(--color-red);
+}
+
+.cart-table .qty-input {
+  width: 70px;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.cart-table .qty-input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.cart-table .user-info {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.cart-table .no-user {
+  color: #999;
+  font-style: italic;
+}
+
+.cart-table .actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+button[type='button'] {
+  padding: 0.4rem 0.8rem;
+  border: 0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+button[type='button']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button[type='button']:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.btn-update {
+  background: var(--color-gold);
+  color: var(--color-jet);
+}
+
+.btn-delete {
+  background: var(--color-red);
+  color: white;
+}
+
+.cart-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cart-actions button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .cart-summary {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cart-table {
+    font-size: 0.85rem;
+  }
+
+  .cart-table thead th,
+  .cart-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .cart-table .qty-input {
+    width: 60px;
+  }
+
+  .cart-table .actions {
+    flex-direction: column;
+  }
+
+  button[type='button'] {
+    width: 100%;
+  }
+}

@@ -3,15 +3,15 @@ import { CategoriaDto } from "./CategoriaDto";
 export class CatalogoDto{
     id: number;
     nome: string;
-    categoria?: CategoriaDto | null;
+    categorie?: CategoriaDto[] | null;
 
     constructor(
         id: 0,
         nome: string,
-        categoria?: CategoriaDto
+        categorie?: CategoriaDto[]
     ) {
         this.id = id;
         this.nome = nome;
-        this.categoria = categoria ?? null;
+        this.categorie = categorie ?? null;
     }
 }
