@@ -29,11 +29,6 @@ export class SpedizioneComponent implements OnInit{
   })
   }
 
-  findByEsteroTrue() {
-  this.service.findByEsteroTrue().subscribe(spedizioni => {
-  this.ListSpedizioni=spedizioni;
-  })
-  }
 
   findByPesoGreaterThan(peso:number) {
   this.service.findByPesoGreaterThan(peso).subscribe(spedizioni => {

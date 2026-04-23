@@ -99,12 +99,26 @@
         <p class="status-message success order-feedback">{{ orderSuccess() }}</p>
       }
 
+      <section class="shipping-section" aria-label="Indirizzo di spedizione">
+        <label for="shippingAddress" class="shipping-label">Indirizzo di spedizione</label>
+        <input
+          id="shippingAddress"
+          type="text"
+          class="shipping-input"
+          placeholder="Inserisci via, numero civico, CAP, città"
+          [ngModel]="shippingAddress()"
+          (ngModelChange)="shippingAddress.set($event)"
+          [disabled]="sendingOrder()"
+          required
+        />
+      </section>
+
       <div class="cart-actions">
         <button
           type="button"
           class="icon-btn icon-send"
-          (click)="submitOrder()"
-          [disabled]="sendingOrder() || cartItems().length === 0 || modifyingIds().has(selectedCarrello()!.id!)"
+          (click)="requestOrderConfirmation()"
+          [disabled]="sendingOrder() || cartItems().length === 0 || !isShippingAddressValid() || modifyingIds().has(selectedCarrello()!.id!)"
           aria-label="Invia ordine"
         >
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
@@ -128,3 +142,22 @@
     </section>
   }
 </main>
+
+@if (orderConfirmOpen()) {
+  <div class="order-modal-backdrop" (click)="cancelOrderConfirmation()" aria-hidden="true"></div>
+  <section class="order-modal" role="dialog" aria-modal="true" aria-labelledby="order-confirm-title">
+    <h2 id="order-confirm-title">Conferma invio ordine</h2>
+    <p>Stai per inviare l'ordine con {{ totalItems() }} articoli per un totale di €{{ totalPrice().toFixed(2) }}.</p>
+    <p>Indirizzo di spedizione: <strong>{{ shippingAddress().trim() }}</strong></p>
+    <p>Vuoi procedere?</p>
+
+    <div class="order-modal-actions">
+      <button type="button" class="icon-btn modal-cancel" (click)="cancelOrderConfirmation()" [disabled]="sendingOrder()">
+        Annulla
+      </button>
+      <button type="button" class="icon-btn icon-send" (click)="submitOrder()" [disabled]="sendingOrder()">
+        {{ sendingOrder() ? 'Invio in corso...' : 'Conferma invio' }}
+      </button>
+    </div>
+  </section>
+}
