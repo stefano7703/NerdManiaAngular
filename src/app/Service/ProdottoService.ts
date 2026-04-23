@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { ProdottoDto } from '../Dto/ProdottoDto';
 import { AbstractService } from "./abstract-service";
 
@@ -23,6 +23,8 @@ export class ProdottoService extends AbstractService<ProdottoDto>{
 findById(id: number): Observable<ProdottoDto> {
   return this.http.get<ProdottoDto>(
     this.baseUrl + '/' + this.type + '/findById?id=' + id
+  ).pipe(
+    catchError(() => this.read(id))
   );
 }
 

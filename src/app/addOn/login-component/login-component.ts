@@ -58,18 +58,21 @@ export class LoginComponent {
     }
 
     const userRef = { id: user.id } as UserDto;
-    this.carrelloService.findByUser(userRef).pipe(take(1)).subscribe({
-      next: (cart) => {
-        if (this.storeCartId(cart)) {
-          onDone();
-          return;
-        }
-        this.createCartForUser(userRef, onDone);
-      },
-      error: () => {
-        this.createCartForUser(userRef, onDone);
-      },
-    });
+    this.carrelloService
+      .findByUser(userRef)
+      .pipe(take(1))
+      .subscribe({
+        next: (cart) => {
+          if (this.storeCartId(cart)) {
+            onDone();
+            return;
+          }
+          this.createCartForUser(userRef, onDone);
+        },
+        error: () => {
+          this.createCartForUser(userRef, onDone);
+        },
+      });
   }
 
   private createCartForUser(userRef: UserDto, onDone: () => void): void {
@@ -84,18 +87,21 @@ export class LoginComponent {
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.carrelloService.findByUser(userRef).pipe(take(1)).subscribe({
-            next: (savedCart) => {
-              if (!this.storeCartId(savedCart)) {
+          this.carrelloService
+            .findByUser(userRef)
+            .pipe(take(1))
+            .subscribe({
+              next: (savedCart) => {
+                if (!this.storeCartId(savedCart)) {
+                  localStorage.removeItem('cartId');
+                }
+                onDone();
+              },
+              error: () => {
                 localStorage.removeItem('cartId');
-              }
-              onDone();
-            },
-            error: () => {
-              localStorage.removeItem('cartId');
-              onDone();
-            },
-          });
+                onDone();
+              },
+            });
         },
         error: () => {
           localStorage.removeItem('cartId');
@@ -159,15 +165,23 @@ export class LoginComponent {
 
     this.http.post('http://localhost:8080/User/register', user).subscribe({
       next: () => {
-        alert('Registrazione completata');
         this.mode = 'login';
+        this.showPopup = true
         this.registerForm.reset();
       },
       error: () => {
-
-          this.errorMessage = 'Errore registrazione';
-
+        this.errorMessage = 'Errore registrazione';
       },
     });
+  }
+
+  showPopup = false;
+
+  openPopup() {
+    this.showPopup = true;
+  }
+
+  closePopup() {
+    this.showPopup = false;
   }
 }
