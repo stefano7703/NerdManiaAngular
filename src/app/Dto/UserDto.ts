@@ -8,6 +8,7 @@ export class UserDto {
   cognome: string;
   email: string;
   password: string;
+  ruolo: string;
   cartaFedelta: boolean = false;
 
   carrello: CarrelloDto;
@@ -21,6 +22,7 @@ export class UserDto {
     cognome: string,
     email: string,
     password: string,
+    ruolo: string,
     cartaFedeltà: boolean,
     carrello: CarrelloDto,
     ordini: OrdineDto[] | null
@@ -31,6 +33,7 @@ export class UserDto {
     this.cognome = cognome;
     this.email = email;
     this.password = password;
+    this.ruolo = ruolo;
     this.cartaFedelta = cartaFedeltà;
     this.carrello = carrello;
     this.ordini = ordini ?? null;}
