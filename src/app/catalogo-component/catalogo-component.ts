@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CatalogoDto } from '../Dto/CatalogoDto';
 import { CategoriaDto } from '../Dto/CategoriaDto';
 import { ProdottoDto } from '../Dto/ProdottoDto';
@@ -33,7 +34,7 @@ type SortOrder = 'none' | 'price-desc' | 'price-asc';
 
 @Component({
   selector: 'app-catalogo-component',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './catalogo-component.html',
   styleUrl: './catalogo-component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
