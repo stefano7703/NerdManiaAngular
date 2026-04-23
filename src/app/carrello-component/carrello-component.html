@@ -92,7 +92,26 @@
         </div>
       </section>
 
+      @if (orderError()) {
+        <p class="status-message error order-feedback">{{ orderError() }}</p>
+      }
+      @if (orderSuccess()) {
+        <p class="status-message success order-feedback">{{ orderSuccess() }}</p>
+      }
+
       <div class="cart-actions">
+        <button
+          type="button"
+          class="icon-btn icon-send"
+          (click)="submitOrder()"
+          [disabled]="sendingOrder() || cartItems().length === 0 || modifyingIds().has(selectedCarrello()!.id!)"
+          aria-label="Invia ordine"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M2 21 23 12 2 3l3 7 11 2-11 2-3 7z" fill="currentColor"/>
+          </svg>
+          <span class="btn-label">{{ sendingOrder() ? 'Invio in corso...' : 'Invia ordine' }}</span>
+        </button>
         <button 
           type="button"
           class="icon-btn icon-delete"

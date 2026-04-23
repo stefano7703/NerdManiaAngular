@@ -104,6 +104,11 @@
   font-weight: 600;
 }
 
+.status-message.success {
+  color: #0f766e;
+  font-weight: 600;
+}
+
 .status-message.empty {
   color: #999;
   font-style: italic;
@@ -263,6 +268,11 @@
   color: white;
 }
 
+.icon-send {
+  background: #0f766e;
+  color: #ffffff;
+}
+
 .icon-plus,
 .icon-minus {
   background: #e5e7eb;
@@ -276,9 +286,15 @@
 .cart-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 0.7rem;
   margin-top: 0.3rem;
   padding: 1.2rem 1.2rem 1.4rem;
   border-top: 1px solid #e5e7eb;
+}
+
+.order-feedback {
+  padding-top: 1rem;
+  padding-bottom: 0.2rem;
 }
 
 .btn-label {
@@ -333,6 +349,11 @@
   }
 
   .icon-delete {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .icon-send {
     width: 100%;
     border-radius: 12px;
   }
