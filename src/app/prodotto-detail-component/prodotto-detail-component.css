@@ -250,12 +250,32 @@
 	box-shadow: 0 3px 0 #8d7400;
 }
 
+.action-primary:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
 .action-secondary {
 	border: 2px solid var(--color-turquoise);
 	padding: 0.68rem 1rem;
 	background: rgba(0, 180, 216, 0.14);
 	color: var(--color-jet);
 	text-decoration: none;
+}
+
+.cart-feedback {
+	margin: 0.85rem 0 0;
+	font-size: 0.92rem;
+	font-weight: 700;
+}
+
+.cart-feedback.error {
+	color: var(--color-red);
+}
+
+.cart-feedback.success {
+	color: #16a34a;
 }
 
 .detail-state-box {
