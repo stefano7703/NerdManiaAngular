@@ -19,7 +19,7 @@ export class App implements OnInit, OnDestroy {
 
   private readonly cartChangedListener = () => this.refreshCartItemCount();
   private routerSubscription?: Subscription;
-  private readonly isBrowser: boolean;
+  private readonly isBrowser: boolean | undefined;
 
   constructor(
     public authService: AuthService,
