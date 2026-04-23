@@ -29,6 +29,11 @@
 			<div class="cards-grid">
 				@for (prodotto of featuredProdotti(); track prodotto.id ?? prodotto.nome) {
 					<article class="data-card product-card">
+						<a
+							class="card-link-overlay"
+							[routerLink]="['/prodotto', prodotto.id]"
+							[attr.aria-label]="'Apri la scheda di ' + prodotto.nome"
+						></a>
 						<p class="card-kicker">Top item</p>
 						@if (prodotto.immagineUrl?.trim()) {
 							<div class="product-image-wrap">
@@ -44,7 +49,6 @@
 						<h4>{{ prodotto.nome }}</h4>
 						<p class="data-main">{{ prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ prodotto.descrizione }}</p>
-						<a [routerLink]="['/prodotto', prodotto.id]" class="data-link">Vai alla scheda</a>
 					</article>
 				}
 			</div>
@@ -69,6 +73,11 @@
 					<a class="catalog-col-label" routerLink="/catalogo">{{ highlight.catalogoNome }}</a>
 				}
 				<article class="data-card product-card catalog-rotating-card">
+						<a
+							class="card-link-overlay"
+							[routerLink]="['/prodotto', highlight.prodotto.id]"
+							[attr.aria-label]="'Apri la scheda di ' + highlight.prodotto.nome"
+						></a>
 						@if (highlight.prodotto.immagineUrl?.trim()) {
 							<div class="product-image-wrap">
 								<img
@@ -83,7 +92,6 @@
 						<h4>{{ highlight.prodotto.nome }}</h4>
 						<p class="data-main">{{ highlight.prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ highlight.prodotto.descrizione }}</p>
-						<a [routerLink]="['/prodotto', highlight.prodotto.id]" class="data-link">Vai alla scheda</a>
 					</article>				</div>				}
 			</div>
 		}
