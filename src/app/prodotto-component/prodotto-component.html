@@ -1,1 +1,107 @@
-<p>prodotto-component works!</p>
+<div class="container">
+  <h2>Test Prodotto</h2>
+ 
+    <div class="grid">
+
+  <div class="card" *ngIf="prodotto">
+    <p><strong>ID:</strong> {{prodotto.id}}</p>
+    <p><strong>Nome:</strong> {{prodotto.nome}}</p>
+    <p><strong>Descrizione:</strong> {{prodotto.descrizione}}</p>
+    <p><strong>Peso:</strong> {{prodotto.peso}}</p>
+    <p><strong>Prezzo:</strong> €{{prodotto.prezzo}}</p>
+    
+    </div>
+
+    <div class="grid">
+    @for (prodotto of ListProdotti; track prodotto.id) {
+      <div class="card">
+        <p><strong>ID:</strong> {{prodotto?.id}}</p>
+        <p><strong>Nome:</strong> {{prodotto?.nome}}</p>
+        <p><strong>Descrizione:</strong> {{prodotto?.descrizione}}</p>
+        <p><strong>Peso:</strong> {{prodotto?.peso}}</p>
+        <p><strong>Prezzo:</strong> €{{prodotto.prezzo}}</p>
+        </div>
+      }
+    </div>
+
+
+
+  <hr>
+
+  <div>
+    <h3>Trova prodotto per ID</h3>
+    <input #idInput type="number" placeholder="Inserisci ID prodotto">
+    <button (click)="findById(+idInput.value)">Cerca per ID</button>
+  </div>
+
+  <hr>
+
+  <div>
+    <h3>Trova prodotti economici</h3>
+    <input #prezzoMaxInput type="number"  placeholder="Prezzo massimo">
+    <button (click)="findProdottiEconomici(+prezzoMaxInput.value)">Cerca economici</button>
+  </div>
+
+  <hr>
+
+  <div>
+    <h3>Trova prodotti costosi</h3>
+    <input #prezzoMinInput type="number" step="0.01" placeholder="Prezzo minimo">
+    <button (click)="findProdottiCostosi(+prezzoMinInput.value)">Cerca costosi</button>
+  </div>
+
+  <hr>
+
+  <div>
+    <h3>Trova prodotti per range di peso</h3>
+    <input #pesoMinInput type="number" step="0.01" placeholder="Peso minimo">
+    <input #pesoMaxInput type="number" step="0.01" placeholder="Peso massimo">
+    <button (click)="findByPesoRange(+pesoMinInput.value, +pesoMaxInput.value)">Cerca per peso</button>
+  </div>
+
+  <hr>
+
+  <div>
+    <h3>Trova tutti ordinati per nome</h3>
+    <button (click)="findAllOrderByNome()">Carica prodotti ordinati</button>
+  </div>
+
+  <hr>
+
+  <div>
+    <h3>Trova prodotti per categoria</h3>
+    <input #categoriaIdInput type="number" placeholder="ID categoria">
+    <button (click)="findByCategoriaId(+categoriaIdInput.value)">Cerca per categoria</button>
+  </div>
+
+  <hr>
+
+  <div>
+    <h3>Risultati</h3>
+
+    <table border="1" cellpadding="8" cellspacing="0" *ngIf="ListProdotti.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Prezzo</th>
+          <th>Peso</th>
+          <th>Descrizione</th>
+          <th>Immagine URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prodotto of ListProdotti">
+          <td>{{ prodotto.id }}</td>
+          <td>{{ prodotto.nome }}</td>
+          <td>{{ prodotto.prezzo }}</td>
+          <td>{{ prodotto.peso }}</td>
+          <td>{{ prodotto.descrizione }}</td>
+          <td>{{ prodotto.immagineUrl }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="ListProdotti.length === 0">Nessun prodotto da visualizzare.</p>
+  </div>
+</div>
