@@ -3,7 +3,10 @@ import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
+import { take } from 'rxjs';
+import { CarrelloDto } from '../../Dto/CarrelloDto';
 import { AuthService } from '../../Service/AuthService';
+import { CarrelloService } from '../../Service/CarrelloService';
 import { UserDto } from '../../Dto/UserDto';
 
 interface LoginResponse {
@@ -30,7 +33,76 @@ export class LoginComponent {
     private http: HttpClient,
     private router: Router,
     private authService: AuthService,
+    private carrelloService: CarrelloService,
   ) {}
+
+  private storeCartId(cart: CarrelloDto | null | undefined): boolean {
+    if (cart?.id !== undefined && cart.id !== null && cart.id > 0) {
+      localStorage.setItem('cartId', String(cart.id));
+      return true;
+    }
+    return false;
+  }
+
+  private ensureCartForUser(user: UserDto, onDone: () => void): void {
+    if (!user?.id) {
+      localStorage.removeItem('cartId');
+      onDone();
+      return;
+    }
+
+    if (user.carrello?.id && user.carrello.id > 0) {
+      localStorage.setItem('cartId', String(user.carrello.id));
+      onDone();
+      return;
+    }
+
+    const userRef = { id: user.id } as UserDto;
+    this.carrelloService.findByUser(userRef).pipe(take(1)).subscribe({
+      next: (cart) => {
+        if (this.storeCartId(cart)) {
+          onDone();
+          return;
+        }
+        this.createCartForUser(userRef, onDone);
+      },
+      error: () => {
+        this.createCartForUser(userRef, onDone);
+      },
+    });
+  }
+
+  private createCartForUser(userRef: UserDto, onDone: () => void): void {
+    const newCart = {
+      prezzoTotale: 0,
+      quantita: 0,
+      peso: 0,
+      userId: userRef.id,
+    } as CarrelloDto;
+    this.carrelloService
+      .insert(newCart)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.carrelloService.findByUser(userRef).pipe(take(1)).subscribe({
+            next: (savedCart) => {
+              if (!this.storeCartId(savedCart)) {
+                localStorage.removeItem('cartId');
+              }
+              onDone();
+            },
+            error: () => {
+              localStorage.removeItem('cartId');
+              onDone();
+            },
+          });
+        },
+        error: () => {
+          localStorage.removeItem('cartId');
+          onDone();
+        },
+      });
+  }
 
   // ---------------- LOGIN FORM ----------------
   loginForm = new FormGroup({
@@ -71,7 +143,7 @@ export class LoginComponent {
       next: (res) => {
         this.authService.login(res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
-        this.router.navigate(['/home']);
+        this.ensureCartForUser(res.user, () => this.router.navigate(['/home']));
       },
       error: () => {
         this.errorMessage = 'Credenziali errate';
