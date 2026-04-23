@@ -1,0 +1,273 @@
+<div class="home-shell">
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div>
+
+      <p class="hero-eyebrow">
+        Pannello amministratore
+      </p>
+
+      <h2>
+        Gestione utenti
+      </h2>
+
+      <p>
+        Cerca, filtra e gestisci gli utenti registrati nel sistema.
+      </p>
+
+      <div class="hero-actions">
+
+        <button class="hero-cta" (click)="openAddUser()">
+
+          Aggiungi utente
+
+        </button>
+
+        <button class="hero-secondary" (click)="reset()">
+
+          Reset
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="hero-burst">
+
+      <span>
+        ADMIN
+      </span>
+
+      <small>
+        gestione utenti
+      </small>
+
+    </div>
+
+  </section>
+
+  <!-- AZIONI RAPIDE -->
+
+  <section class="quick-links">
+
+    <h3>
+      Azioni rapide
+    </h3>
+
+    <div class="quick-links-grid">
+
+      <!-- CERCA PER NOME -->
+
+      <div class="quick-card">
+
+        <span>
+          Cerca utente
+        </span>
+
+        <small>
+          Trova utenti per nome
+        </small>
+
+        <input type="text" placeholder="Nome utente" #nomeInput (keyup.enter)="cercaPerNome(nomeInput.value)" />
+
+        <button class="hero-secondary" (click)="cercaPerNome(nomeInput.value)">
+
+          Cerca
+
+        </button>
+
+      </div>
+
+      <!-- FILTRA CARTA FEDELTA -->
+
+      <div class="quick-card">
+
+        <span>
+          Carta fedeltà
+        </span>
+
+        <small>
+          Filtra utenti
+        </small>
+
+        <button class="hero-secondary" (click)="filtraPerCartaFedelta(true)">
+
+          Con carta
+
+        </button>
+
+        <button class="hero-secondary" (click)="filtraPerCartaFedelta(false)">
+
+          Senza carta
+
+        </button>
+
+      </div>
+
+      <!-- VERIFICA USERNAME -->
+
+      <div class="quick-card">
+
+        <span>
+          Verifica username
+        </span>
+
+        <small>
+          Controlla disponibilità
+        </small>
+
+        <input type="text" placeholder="Username" #usernameInput
+          (keyup.enter)="verificaUsername(usernameInput.value)" />
+
+        <button class="hero-secondary" (click)="verificaUsername(usernameInput.value)">
+
+          Verifica
+
+        </button>
+
+        <p class="state" [class.error]="checkResult().exists">
+
+          {{ checkResult().message }}
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- LISTA UTENTI -->
+
+  <section class="data-section">
+
+    <h3>
+      Utenti trovati ({{ users().length }})
+    </h3>
+
+    <div class="cards-grid" *ngIf="users().length > 0; else noUsers">
+
+      <div class="data-card user-card" *ngFor="let u of users()">
+
+        <div class="delete-icon" (click)="deleteUser(u)">
+          🗑️
+        </div>
+        <p class="card-kicker">
+          Utente
+        </p>
+
+        <h4>
+
+          {{ u.nome }}
+          {{ u.cognome }}
+
+        </h4>
+
+        <p class="data-main">
+
+          {{ u.username }}
+
+        </p>
+
+        <p class="data-sub">
+
+          {{ u.email }}
+
+        </p>
+
+        <div class="user-meta">
+
+          <span class="user-role">
+            {{ u.ruolo }}
+          </span>
+
+          <!-- CARTA FEDELTÀ + SWITCH -->
+          <div class="card-switch-wrapper">
+
+            <span class="user-card-status" [class.active]="u.cartaFedelta" [class.inactive]="!u.cartaFedelta">
+
+              Carta fedeltà
+
+            </span>
+
+            <!-- SWITCH -->
+            <label class="switch">
+
+              <input type="checkbox" [checked]="u.cartaFedelta" (change)="toggleCartaFedelta(u)" />
+
+              <span class="slider"></span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- NESSUN UTENTE -->
+
+    <ng-template #noUsers>
+
+      <p class="state">
+        Nessun utente trovato
+      </p>
+
+    </ng-template>
+
+  </section>
+
+
+
+  <!-- MODALE ADD USER -->
+
+  <!--
+  Ricordati:
+  devi avere AddUserComponent importato
+  -->
+
+  <!--
+  <app-add-user-component
+    *ngIf="showAddUser()"
+    (close)="closeAddUser()"
+    (userAdded)="onUserAdded($event)">
+  </app-add-user-component>
+  -->
+
+</div>
+
+  <!-- DELETE POPUP -->
+<div class="popup-overlay" *ngIf="showDeletePopup()">
+
+  <div class="popup danger">
+
+    <div class="popup-burst danger-burst">
+      <span>ATTENZIONE</span>
+      <small>Eliminare utente?</small>
+    </div>
+
+    <p>
+      Questa azione non può essere annullata.
+    </p>
+
+    <div class="hero-actions">
+
+      <button class="hero-cta" (click)="confirmDelete()">
+        Sì, elimina
+      </button>
+
+      <button class="hero-secondary" (click)="cancelDelete()">
+        Annulla
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

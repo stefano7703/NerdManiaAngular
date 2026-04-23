@@ -43,4 +43,8 @@ export class userService extends AbstractService<UserDto> {
   register(user: UserDto): Observable<UserDto> {
     return this.http.post<UserDto>(`${this.baseProjectUrl}/register`, user);
   }
+
+  updateCartaFedelta(id: number, value: boolean) {
+    return this.http.patch(`${this.baseProjectUrl}/updateCartaFedelta?id=${id}&value=${value}`, {});
+  }
 }

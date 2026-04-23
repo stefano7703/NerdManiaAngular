@@ -5,21 +5,55 @@
   </a>
 
   <nav class="main-nav" aria-label="Navigazione principale">
-    <a routerLink="/home" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-    <a routerLink="/catalogo" routerLinkActive="is-active">Catalogo</a>
+
+  <a routerLink="/home"
+     routerLinkActive="is-active"
+     [routerLinkActiveOptions]="{ exact: true }">
+     Home
+  </a>
+
+  <a routerLink="/catalogo"
+     routerLinkActive="is-active">
+     Catalogo
+  </a>
+
+  <a
+    [routerLink]="authService.isLoggedIn() ? '/user' : '/login'">
+    Profilo
+  </a>
+
+  <!-- SEZIONI SOLO ADMIN -->
+
+  <ng-container *ngIf="authService.isAdmin()">
+
+    <a routerLink="/gestione-utenti"
+       routerLinkActive="is-active">
+       Gestione utenti
+    </a>
+
+    <a routerLink="/gestione-prodotti"
+       routerLinkActive="is-active">
+       Gestione prodotti
+    </a>
+
+  </ng-container>
+
+  <!-- LOGOUT -->
+
+  <ng-container *ngIf="authService.loggedIn$ | async">
+
     <a
-  [routerLink]="authService.isLoggedIn() ? '/user' : '/login'"
->
-  Profilo
-</a>
+      href="#"
+      (click)="logout(); $event.preventDefault()"
+      class="nav-link logout-link">
 
-    <ng-container *ngIf="authService.loggedIn$ | async">
-      <a href="#" (click)="logout(); $event.preventDefault()" class="nav-link logout-link">
-  Logout
-</a>
-    </ng-container>
+      Logout
 
-  </nav>
+    </a>
+
+  </ng-container>
+
+</nav>
 </header>
 
 <main class="app-content">

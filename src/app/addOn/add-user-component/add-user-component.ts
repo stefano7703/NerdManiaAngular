@@ -47,6 +47,7 @@ export class AddUserComponent {
         username: this.userForm.value.username!,
         email: this.userForm.value.email!,
         password: this.userForm.value.password!,
+        ruolo: 'USER',
         cartaFedelta: false,
         carrello: new CarrelloDto(0, 0, 0),
         ordini: null,

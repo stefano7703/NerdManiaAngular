@@ -11,6 +11,7 @@ import { UserComponent } from './user-component/user-component';
 import { CategoriaComponent } from './categoria-component/categoria-component';
 import { LoginComponent } from './addOn/login-component/login-component';
 import { AuthGuard } from './Guard/AuthGuard';
+import { GestioneUtentiComponent } from './addOn/gestione-utenti-component/gestione-utenti-component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: AddUserComponent },
+  {path: 'gestione-utenti', component: GestioneUtentiComponent},
   {
     path: 'user',
     component: UserComponent,
