@@ -44,7 +44,7 @@
 						<h4>{{ prodotto.nome }}</h4>
 						<p class="data-main">{{ prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ prodotto.descrizione }}</p>
-						<a routerLink="/catalogo" class="data-link">Vai alla scheda</a>
+						<a [routerLink]="['/prodotto', prodotto.id]" class="data-link">Vai alla scheda</a>
 					</article>
 				}
 			</div>
@@ -83,7 +83,7 @@
 						<h4>{{ highlight.prodotto.nome }}</h4>
 						<p class="data-main">{{ highlight.prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ highlight.prodotto.descrizione }}</p>
-						<a routerLink="/catalogo" class="data-link">Vai al catalogo</a>
+						<a [routerLink]="['/prodotto', highlight.prodotto.id]" class="data-link">Vai alla scheda</a>
 					</article>				</div>				}
 			</div>
 		}

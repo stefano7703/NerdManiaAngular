@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ProdottoDto } from '../Dto/ProdottoDto';
+import { AbstractService } from "./abstract-service";
 
 type ProdottoPageResponse = {
   content?: ProdottoDto[];
@@ -11,37 +12,57 @@ type ProdottoPageResponse = {
 @Injectable({
   providedIn: 'root',
 })
-export class ProdottoService {
+export class ProdottoService extends AbstractService<ProdottoDto>{
 
-  private apiUrl = 'http://localhost:8080/Prodotto';
-
-  constructor(private http: HttpClient) {}
-
-  getAll(): Observable<ProdottoDto[]> {
-    const params = new HttpParams().set('page', '0').set('size', '200');
-    return this.http
-      .get<ProdottoPageResponse>(`${this.apiUrl}/prodotti`, { params })
-      .pipe(map((response) => response.content ?? []));
+   constructor(http: HttpClient) {
+    super(http);
+    this.type = 'Prodotto';
+     const baseProjectUrl = this.baseUrl + '/' + this.type;
   }
 
-  getById(id: number): Observable<ProdottoDto> {
-    return this.http.get<ProdottoDto>(`${this.apiUrl}/${id}`);
-  }
+findById(id: number): Observable<ProdottoDto> {
+  return this.http.get<ProdottoDto>(
+    this.baseUrl + '/' + this.type + '/findById?id=' + id
+  );
+}
 
-  create(prodotto: ProdottoDto): Observable<ProdottoDto> {
-    return this.http.post<ProdottoDto>(this.apiUrl, prodotto);
-  }
+findProdottiEconomici(prezzoMax: number): Observable<ProdottoDto[]> {
+  return this.http.get<ProdottoDto[]>(
+    this.baseUrl + '/' + this.type + '/findProdottiEconomici?prezzoMax=' + prezzoMax
+  );
+}
 
-  update(id: number, prodotto: ProdottoDto): Observable<ProdottoDto> {
-    return this.http.put<ProdottoDto>(`${this.apiUrl}/${id}`, prodotto);
-  }
+findProdottiCostosi(prezzoMin: number): Observable<ProdottoDto[]> {
+  return this.http.get<ProdottoDto[]>(
+    this.baseUrl + '/' + this.type + '/findProdottiCostosi?prezzoMin=' + prezzoMin
+  );
+}
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+findByPesoRange(pesoMin: number, pesoMax: number): Observable<ProdottoDto[]> {
+  return this.http.get<ProdottoDto[]>(
+    this.baseUrl + '/' + this.type + '/findByPesoRange?pesoMin=' + pesoMin + '&pesoMax=' + pesoMax
+  );
+}
 
-  search(keyword: string): Observable<ProdottoDto[]> {
-    const params = new HttpParams().set('keyword', keyword);
-    return this.http.get<ProdottoDto[]>(`${this.apiUrl}/search`, { params });
-  }
+findAllOrderByNome(): Observable<ProdottoDto[]> {
+  return this.http.get<ProdottoDto[]>(
+    this.baseUrl + '/' + this.type + '/findAllOrderByNome'
+  );
+}
+
+findByCategoriaId(categoriaId: number): Observable<ProdottoDto[]> {
+  return this.http.get<ProdottoDto[]>(
+    this.baseUrl + '/' + this.type + '/findByCategoriaId?categoriaId=' + categoriaId
+  );
+}
+
+
+ 
+
+
+
+
+
+
+
 }

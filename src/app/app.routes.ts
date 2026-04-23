@@ -11,6 +11,7 @@ import { UserComponent } from './user-component/user-component';
 import { CategoriaComponent } from './categoria-component/categoria-component';
 import { LoginComponent } from './addOn/login-component/login-component';
 import { AuthGuard } from './Guard/AuthGuard';
+import { ProdottoDetailComponent } from './prodotto-detail-component/prodotto-detail-component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -19,6 +20,7 @@ export const routes: Routes = [
   { path: 'catalogo', component: CatalogoComponent },
   { path: 'magazzino', component: MagazzinoComponent },
   { path: 'ordine', component: OrdineComponent },
+  { path: 'prodotto/:id', component: ProdottoDetailComponent },
   { path: 'prodotto', component: ProdottoComponent },
   { path: 'spedizione', component: SpedizioneComponent },
   { path: 'categoria', component: CategoriaComponent },

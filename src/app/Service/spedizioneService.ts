@@ -19,10 +19,6 @@ export class spedizioneService extends AbstractService<SpedizioneDto>{
     return this.http.get<SpedizioneDto[]>(this.baseUrl + '/' + this.type + '/findByFragileTrue');
   }
 
-    findByEsteroTrue(): Observable<SpedizioneDto[]> {
-    return this.http.get<SpedizioneDto[]>(this.baseUrl + '/' + this.type + '/findByEsteroTrue');
-  }
-
     findByPesoGreaterThan(peso:number): Observable<SpedizioneDto[]> {
     return this.http.get<SpedizioneDto[]>(this.baseUrl + '/' + this.type + '/findByPesoGreaterThan?peso='+ peso);
   }
