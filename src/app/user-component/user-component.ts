@@ -28,6 +28,7 @@ export class UserComponent implements OnInit {
       '',
       '',
       '',
+      '',
       false,
       new CarrelloDto(0, 0, 0),
       null
