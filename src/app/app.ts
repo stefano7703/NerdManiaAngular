@@ -1,19 +1,22 @@
-import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
-import { AsyncPipe, CommonModule, NgOptimizedImage } from '@angular/common';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, OnDestroy, OnInit, signal, Inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from './Service/AuthService';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, NgOptimizedImage, AsyncPipe],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, NgOptimizedImage],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnInit, OnDestroy {
   protected readonly title = signal('NerdManiaAngular');
   cartItemCount = signal(0);
+
   private readonly cartChangedListener = () => this.refreshCartItemCount();
   private routerSubscription?: Subscription;
   private readonly isBrowser: boolean;
@@ -21,11 +24,10 @@ export class App {
   constructor(
     public authService: AuthService,
     private router: Router,
-    @Inject(PLATFORM_ID) platformId: object,
-  ) {
-    this.isBrowser = isPlatformBrowser(platformId);
-  }
+    @Inject(PLATFORM_ID) private platformId: object
+  ) {}
 
+  // ---------------- INIT ----------------
   ngOnInit(): void {
     if (!this.isBrowser) {
       this.cartItemCount.set(0);
@@ -33,8 +35,12 @@ export class App {
     }
 
     this.refreshCartItemCount();
-    window.addEventListener('cart-items-changed', this.cartChangedListener);
-    window.addEventListener('storage', this.cartChangedListener);
+
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('cart-items-changed', this.cartChangedListener);
+      window.addEventListener('storage', this.cartChangedListener);
+    }
+
     this.routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.refreshCartItemCount();
@@ -42,16 +48,17 @@ export class App {
     });
   }
 
+  // ---------------- DESTROY ----------------
   ngOnDestroy(): void {
-    if (!this.isBrowser) {
-      return;
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('cart-items-changed', this.cartChangedListener);
+      window.removeEventListener('storage', this.cartChangedListener);
     }
 
-    window.removeEventListener('cart-items-changed', this.cartChangedListener);
-    window.removeEventListener('storage', this.cartChangedListener);
     this.routerSubscription?.unsubscribe();
   }
 
+  // ---------------- CART COUNT ----------------
   private refreshCartItemCount(): void {
     if (!this.isBrowser) {
       this.cartItemCount.set(0);
@@ -62,6 +69,8 @@ export class App {
       this.cartItemCount.set(0);
       return;
     }
+
+    if (!isPlatformBrowser(this.platformId)) return;
 
     const cartId = localStorage.getItem('cartId');
     if (!cartId) {
@@ -77,18 +86,24 @@ export class App {
 
     try {
       const items = JSON.parse(raw);
+
       const count = Array.isArray(items)
-        ? items.reduce((sum: number, item: { quantity?: number }) => sum + Math.max(0, Number(item?.quantity ?? 0)), 0)
+        ? items.reduce(
+            (sum: number, item: { quantity?: number }) =>
+              sum + Math.max(0, Number(item?.quantity ?? 0)),
+            0
+          )
         : 0;
+
       this.cartItemCount.set(count);
     } catch {
       this.cartItemCount.set(0);
     }
   }
 
-  logout() {
+  // ---------------- LOGOUT ----------------
+  logout(): void {
     this.authService.logout();
     this.cartItemCount.set(0);
   }
-
 }

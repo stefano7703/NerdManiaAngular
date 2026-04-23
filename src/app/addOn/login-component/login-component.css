@@ -165,3 +165,58 @@ input:focus {
 	color: var(--color-red);
 	font-weight: 800;
 }
+
+/* ================= POPUP OVERLAY ================= */
+.popup-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+	display: grid;
+	place-items: center;
+	z-index: 999;
+}
+
+/* ================= POPUP BOX ================= */
+.popup {
+	background: var(--color-smoke);
+	border: 3px solid var(--color-jet);
+	border-radius: 16px;
+	padding: 1.6rem;
+	width: min(420px, 90%);
+	box-shadow: 8px 8px 0 var(--color-jet);
+	text-align: center;
+	color: var(--color-jet);
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+/* ================= BURST STYLE ================= */
+.popup-burst {
+	width: 140px;
+	aspect-ratio: 1;
+	margin: 0 auto;
+	clip-path: polygon(
+		50% 0%, 61% 16%, 79% 6%, 76% 25%, 97% 23%, 85% 40%,
+		100% 50%, 84% 60%, 97% 78%, 76% 75%, 80% 94%,
+		61% 84%, 50% 100%, 39% 84%, 20% 94%, 24% 75%,
+		3% 78%, 16% 60%, 0% 50%, 15% 40%, 3% 23%, 24% 25%, 21% 6%, 39% 16%
+	);
+	background: var(--color-turquoise);
+	border: 3px solid var(--color-jet);
+	display: grid;
+	place-items: center;
+	color: var(--color-smoke);
+	box-shadow: 0 0 0 4px var(--color-jet);
+}
+
+.popup-burst span {
+	font-family: 'Bangers', Impact, sans-serif;
+	font-size: 2rem;
+}
+
+.popup-burst small {
+	font-size: 0.65rem;
+	font-weight: 800;
+	text-transform: uppercase;
+}

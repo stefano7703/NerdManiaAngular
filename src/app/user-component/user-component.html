@@ -103,28 +103,6 @@
 
       </div>
 
-      <div class="data-card">
-
-        <p class="card-kicker">
-          Carrello
-        </p>
-
-        <h4>Prodotti nel carrello</h4>
-
-        <p class="data-main">
-
-          {{
-            user().carrello || 0
-          }}
-
-        </p>
-
-        <p class="data-sub">
-          Articoli pronti all'acquisto
-        </p>
-
-      </div>
-
     </div>
 
   </section>
@@ -136,7 +114,7 @@
 
     <div class="orders-list">
 
-      <div 
+      <div
         class="order-card"
         *ngFor="let ordine of user().ordini"
       >
@@ -158,12 +136,12 @@
         <!-- PRODOTTI -->
         <div class="order-products">
 
-          <div 
+          <div
             class="product-row"
             *ngFor="let prodotto of ordine.prodotti"
           >
 
-            <img 
+            <img
               [src]="prodotto.immagineUrl || 'assets/no-image.png'"
               class="product-img"
               alt="{{ prodotto.nome }}"
