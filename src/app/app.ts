@@ -1,5 +1,6 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { AsyncPipe, CommonModule, NgOptimizedImage } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from './Service/AuthService';
@@ -15,13 +16,22 @@ export class App {
   cartItemCount = signal(0);
   private readonly cartChangedListener = () => this.refreshCartItemCount();
   private routerSubscription?: Subscription;
+  private readonly isBrowser: boolean;
 
   constructor(
     public authService: AuthService,
     private router: Router,
-  ) {}
+    @Inject(PLATFORM_ID) platformId: object,
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
+    if (!this.isBrowser) {
+      this.cartItemCount.set(0);
+      return;
+    }
+
     this.refreshCartItemCount();
     window.addEventListener('cart-items-changed', this.cartChangedListener);
     window.addEventListener('storage', this.cartChangedListener);
@@ -33,12 +43,21 @@ export class App {
   }
 
   ngOnDestroy(): void {
+    if (!this.isBrowser) {
+      return;
+    }
+
     window.removeEventListener('cart-items-changed', this.cartChangedListener);
     window.removeEventListener('storage', this.cartChangedListener);
     this.routerSubscription?.unsubscribe();
   }
 
   private refreshCartItemCount(): void {
+    if (!this.isBrowser) {
+      this.cartItemCount.set(0);
+      return;
+    }
+
     if (!this.authService.isLoggedIn()) {
       this.cartItemCount.set(0);
       return;
