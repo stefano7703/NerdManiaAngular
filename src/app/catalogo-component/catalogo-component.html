@@ -81,6 +81,11 @@
       <div class="products-grid">
         @for (item of prodottiPaginati(); track item.prodotto.id ?? item.prodotto.nome) {
           <article class="product-card">
+            <a
+              class="card-link-overlay"
+              [routerLink]="['/prodotto', item.prodotto.id]"
+              [attr.aria-label]="'Apri la scheda di ' + item.prodotto.nome"
+            ></a>
             <div class="badges">
               <span class="badge-catalogo">{{ item.catalogoNome }}</span>
               <span class="badge-categoria">{{ item.categoriaNome }}</span>
@@ -114,13 +119,6 @@
             </div>
 
             <div class="product-actions">
-              <a
-                class="btn-details"
-                [routerLink]="['/prodotto', item.prodotto.id]"
-              >
-                Vai alla scheda
-              </a>
-
               <button
                 type="button"
                 class="btn-add-to-cart"

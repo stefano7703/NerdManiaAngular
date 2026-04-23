@@ -30,7 +30,7 @@
 
         <div class="detail-content">
           <p class="detail-kicker">
-            {{ item.categoria?.nome || 'Categoria non disponibile' }}
+            {{ item.categoria.nome || 'Categoria non disponibile' }}
           </p>
 
           <h1>{{ item.nome }}</h1>
@@ -89,14 +89,26 @@
             </p>
 
             <div class="detail-actions">
-              <button type="button" class="action-primary" (click)="addToCart()">
-                Aggiungi al carrello
+              <button type="button" class="action-primary" (click)="addToCart()" [disabled]="addingToCart()">
+                @if (addingToCart()) {
+                  Aggiungendo...
+                } @else {
+                  Aggiungi al carrello
+                }
               </button>
 
               <button type="button" class="action-secondary" (click)="goBack()">
                 Continua lo shopping
               </button>
             </div>
+
+            @if (cartError()) {
+              <p class="cart-feedback error">{{ cartError() }}</p>
+            }
+
+            @if (cartSuccess()) {
+              <p class="cart-feedback success">{{ cartSuccess() }}</p>
+            }
           </section>
         </div>
       </div>
