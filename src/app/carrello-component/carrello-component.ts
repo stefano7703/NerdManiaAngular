@@ -4,6 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
 import { CarrelloDto } from '../Dto/CarrelloDto';
 import { CarrelloService } from '../Service/CarrelloService';
+import { ordineService } from '../Service/ordineService';
+import { UserDto } from '../Dto/UserDto';
+import { OrdineDto } from '../Dto/OrdineDto';
+
+type CartItem = {
+  productId: number;
+  nome: string;
+  immagineUrl?: string;
+  quantity: number;
+  unitPrice: number;
+  unitWeight: number;
+};
 
 @Component({
   selector: 'app-carrello-component',
@@ -14,12 +26,17 @@ import { CarrelloService } from '../Service/CarrelloService';
 })
 export class CarrelloComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
+  private readonly ordineSrv = inject(ordineService);
 
   // State
   carrelli = signal<CarrelloDto[]>([]);
   selectedCarrelloId = signal<number | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
+  cartItems = signal<CartItem[]>([]);
+  orderError = signal<string | null>(null);
+  orderSuccess = signal<string | null>(null);
+  sendingOrder = signal(false);
 
   // Derived state
   selectedCarrello = computed(() => {
@@ -28,105 +45,314 @@ export class CarrelloComponent implements OnInit {
     return this.carrelli().find(c => c.id === id) ?? null;
   });
 
-  totalPrice = computed(() => 
-    this.selectedCarrello()?.prezzoTotale ?? 0
-  );
-  totalItems = computed(() =>
-    this.selectedCarrello()?.quantita ?? 0
-  );
+  totalPrice = computed(() => {
+    if (this.cartItems().length > 0) {
+      const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
+      return Number(sum.toFixed(2));
+    }
+    return this.selectedCarrello()?.prezzoTotale ?? 0;
+  });
+
+  totalItems = computed(() => {
+    if (this.cartItems().length > 0) {
+      return this.cartItems().reduce((acc, item) => acc + item.quantity, 0);
+    }
+    return this.selectedCarrello()?.quantita ?? 0;
+  });
+
+  totalWeight = computed(() => {
+    if (this.cartItems().length > 0) {
+      const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitWeight, 0);
+      return Number(sum.toFixed(3));
+    }
+    return this.selectedCarrello()?.peso ?? 0;
+  });
 
   // Tracking modifications
   modifyingIds = signal<Set<number>>(new Set());
 
   ngOnInit(): void {
-    this.loadCarrelli();
+    this.loadCurrentUserCart();
   }
 
-  private loadCarrelli(): void {
-    this.loading.set(true);
-    this.error.set(null);
-    this.carrelloService.findCarrelliAttivi()
-      .pipe(take(1))
-      .subscribe({
-        next: (data) => {
-          console.log('[Carrello DEBUG]', data);
-          const items = Array.isArray(data) ? data : [];
-          this.carrelli.set(items);
-          // Auto-select first cart if available
-          if (items.length > 0) {
-            this.selectedCarrelloId.set(items[0].id ?? null);
-          }
-          this.loading.set(false);
-        },
-        error: (err) => {
-          this.error.set(err?.message ?? 'Errore caricamento carrello');
-          this.loading.set(false);
-        },
-      });
-  }
+  private getStoredUserId(): number | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) {
+      return null;
+    }
 
-  selectCarrello(id: number | undefined): void {
-    if (id !== undefined) {
-      this.selectedCarrelloId.set(id);
+    try {
+      const parsed = JSON.parse(raw) as UserDto;
+      const id = Number(parsed?.id);
+      return isNaN(id) || id <= 0 ? null : id;
+    } catch {
+      return null;
     }
   }
 
-  onCarrelloSelect(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const id = Number(target.value);
-    this.selectCarrello(isNaN(id) ? undefined : id);
+  private setCurrentCart(cart: CarrelloDto): void {
+    this.carrelli.set([cart]);
+    this.selectedCarrelloId.set(cart.id ?? null);
+    this.loadCartItemsForCurrentCart(cart.id ?? null);
+    if (cart.id) {
+      localStorage.setItem('cartId', String(cart.id));
+    }
+    window.dispatchEvent(new CustomEvent('cart-items-changed'));
   }
 
-  updateQuantita(newQuantita: number): void {
-    const carrello = this.selectedCarrello();
-    if (!carrello || !carrello.id || newQuantita < 0) return;
+  private cartItemsStorageKey(cartId: number): string {
+    return `cart-items:${cartId}`;
+  }
 
-    this.modifyingIds().add(carrello.id);
-    const updated = new CarrelloDto(
-      carrello.prezzoTotale ?? 0,
-      newQuantita,
-      carrello.peso ?? 0,
-      carrello.user ?? null,
-      carrello.ordine ?? null,
-      carrello.id
-    );
+  private loadCartItemsForCurrentCart(cartId: number | null): void {
+    if (!cartId) {
+      this.cartItems.set([]);
+      return;
+    }
 
+    const raw = localStorage.getItem(this.cartItemsStorageKey(cartId));
+    if (!raw) {
+      this.cartItems.set([]);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      this.cartItems.set(Array.isArray(parsed) ? parsed as CartItem[] : []);
+    } catch {
+      this.cartItems.set([]);
+    }
+  }
+
+  private persistCartItems(cartId: number, items: CartItem[]): void {
+    localStorage.setItem(this.cartItemsStorageKey(cartId), JSON.stringify(items));
+    this.cartItems.set(items);
+    window.dispatchEvent(new CustomEvent('cart-items-changed'));
+  }
+
+  private syncCartTotalsFromItems(cart: CarrelloDto, items: CartItem[]): void {
+    if (!cart.id) {
+      return;
+    }
+
+    const quantita = items.reduce((acc, item) => acc + item.quantity, 0);
+    const prezzoTotale = Number(items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0).toFixed(2));
+    const peso = Number(items.reduce((acc, item) => acc + item.quantity * item.unitWeight, 0).toFixed(3));
+    const userId = cart.userId ?? cart.user?.id ?? null;
+
+    const updated = new CarrelloDto(prezzoTotale, quantita, peso, userId, cart.id);
+    this.modifyingIds().add(cart.id);
     this.carrelloService.update(updated)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.carrelli.update(items =>
-            items.map(c => c.id === carrello.id ? { ...c, quantita: newQuantita } : c)
+          this.carrelli.update((current) =>
+            current.map((c) => c.id === cart.id ? { ...c, quantita, prezzoTotale, peso } : c)
           );
-          this.modifyingIds().delete(carrello.id);
+          this.modifyingIds().delete(cart.id!);
         },
         error: (err) => {
-          this.error.set(err?.message ?? 'Errore aggiornamento');
-          this.modifyingIds().delete(carrello.id);
+          this.error.set(err?.message ?? 'Errore aggiornamento carrello');
+          this.modifyingIds().delete(cart.id!);
         },
       });
   }
 
-  removeFromCart(): void {
-    const carrello = this.selectedCarrello();
-    if (!carrello?.id) return;
+  private createUserCart(userId: number, onDone: () => void): void {
+    const payload = {
+      prezzoTotale: 0,
+      quantita: 0,
+      peso: 0,
+      userId,
+    } as CarrelloDto;
 
-    this.modifyingIds().add(carrello.id);
-    this.carrelloService.delete(carrello.id)
+    this.carrelloService.insert(payload)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.carrelli.update(items => items.filter(c => c.id !== carrello.id));
-          // Auto-select next cart or null
-          const remaining = this.carrelli().filter(c => c.id !== carrello.id);
-          this.selectedCarrelloId.set(remaining.length > 0 ? remaining[0].id ?? null : null);
-          this.modifyingIds().delete(carrello.id);
+          const userRef = { id: userId } as UserDto;
+          this.carrelloService.findByUser(userRef)
+            .pipe(take(1))
+            .subscribe({
+              next: (createdCart) => {
+                if (createdCart?.id) {
+                  this.setCurrentCart(createdCart);
+                }
+                onDone();
+              },
+              error: () => {
+                this.error.set('Carrello creato ma non recuperabile al momento');
+                onDone();
+              },
+            });
+        },
+        error: () => {
+          this.error.set('Errore creazione carrello');
+          onDone();
+        },
+      });
+  }
+
+  private loadCurrentUserCart(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    const userId = this.getStoredUserId();
+    if (!userId) {
+      this.error.set('Devi effettuare il login per vedere il carrello');
+      this.loading.set(false);
+      return;
+    }
+
+    const userRef = { id: userId } as UserDto;
+    this.carrelloService.findByUser(userRef)
+      .pipe(take(1))
+      .subscribe({
+        next: (cart) => {
+          if (cart?.id) {
+            this.setCurrentCart(cart);
+            this.loading.set(false);
+            return;
+          }
+          this.createUserCart(userId, () => this.loading.set(false));
+        },
+        error: () => {
+          this.createUserCart(userId, () => this.loading.set(false));
+        },
+      });
+  }
+
+  updateItemQuantita(productId: number, value: number): void {
+    this.orderError.set(null);
+    this.orderSuccess.set(null);
+
+    const carrello = this.selectedCarrello();
+    if (!carrello?.id) {
+      return;
+    }
+
+    const nextQty = Math.max(0, Math.trunc(value));
+    const nextItems = this.cartItems()
+      .map((item) => item.productId === productId ? { ...item, quantity: nextQty } : item)
+      .filter((item) => item.quantity > 0);
+
+    this.persistCartItems(carrello.id, nextItems);
+    this.syncCartTotalsFromItems(carrello, nextItems);
+  }
+
+  removeItem(productId: number): void {
+    this.orderError.set(null);
+    this.orderSuccess.set(null);
+
+    const carrello = this.selectedCarrello();
+    if (!carrello?.id) {
+      return;
+    }
+
+    const nextItems = this.cartItems().filter((item) => item.productId !== productId);
+    this.persistCartItems(carrello.id, nextItems);
+    this.syncCartTotalsFromItems(carrello, nextItems);
+  }
+
+  removeFromCart(): void {
+    this.orderError.set(null);
+    this.orderSuccess.set(null);
+
+    const carrello = this.selectedCarrello();
+    if (!carrello?.id) return;
+    const carrelloId = carrello.id;
+    const userId = this.getStoredUserId();
+    if (!userId) {
+      this.error.set('Utente non valido, effettua nuovamente il login');
+      return;
+    }
+
+    this.modifyingIds().add(carrelloId);
+    this.carrelloService.delete(carrelloId)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          localStorage.removeItem('cartId');
+          localStorage.removeItem(this.cartItemsStorageKey(carrelloId));
+          window.dispatchEvent(new CustomEvent('cart-items-changed'));
+          this.createUserCart(userId, () => {
+            this.modifyingIds().delete(carrelloId);
+          });
         },
         error: (err) => {
           this.error.set(err?.message ?? 'Errore eliminazione');
-          this.modifyingIds().delete(carrello.id);
+          this.modifyingIds().delete(carrelloId);
         },
       });
+  }
+
+  submitOrder(): void {
+    this.orderError.set(null);
+    this.orderSuccess.set(null);
+
+    const carrello = this.selectedCarrello();
+    const userId = this.getStoredUserId();
+    const items = this.cartItems();
+
+    if (!carrello?.id) {
+      this.orderError.set('Carrello non disponibile.');
+      return;
+    }
+
+    if (!userId) {
+      this.orderError.set('Devi effettuare il login per inviare l\'ordine.');
+      return;
+    }
+
+    if (items.length === 0) {
+      this.orderError.set('Aggiungi almeno un articolo prima di inviare l\'ordine.');
+      return;
+    }
+
+    const ordinePayload = {
+      id: 0,
+      costoTotale: this.totalPrice(),
+      indirizzoSpedizione: 'Indirizzo da confermare',
+      user: { id: userId },
+      spedizione: null,
+      prodotti: this.expandProductsForOrder(items),
+    } as unknown as OrdineDto;
+
+    this.sendingOrder.set(true);
+    this.ordineSrv.insert(ordinePayload)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.persistCartItems(carrello.id!, []);
+          this.syncCartTotalsFromItems(carrello, []);
+          this.orderSuccess.set('Ordine inviato con successo.');
+          this.sendingOrder.set(false);
+        },
+        error: (err) => {
+          const status = Number(err?.status ?? 0);
+          if (status === 401) {
+            this.orderError.set('Sessione scaduta. Effettua nuovamente il login.');
+          } else if (status === 403) {
+            this.orderError.set('Non sei autorizzato a inviare l\'ordine.');
+          } else {
+            this.orderError.set(err?.message ?? 'Errore durante l\'invio dell\'ordine.');
+          }
+          this.sendingOrder.set(false);
+        },
+      });
+  }
+
+  private expandProductsForOrder(items: CartItem[]): Array<{ id: number }> {
+    const result: Array<{ id: number }> = [];
+
+    for (const item of items) {
+      const qty = Math.max(0, Math.trunc(item.quantity));
+      for (let i = 0; i < qty; i += 1) {
+        result.push({ id: item.productId });
+      }
+    }
+
+    return result;
   }
 
   isModifying(id: number | undefined): boolean {

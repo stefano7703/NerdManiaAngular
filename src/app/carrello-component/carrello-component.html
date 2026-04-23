@@ -3,25 +3,6 @@
     <h1>Il Mio Carrello</h1>
   </section>
 
-  <!-- Cart selector -->
-  @if (carrelli().length > 0) {
-    <section class="cart-selector">
-      <label for="cart-select">Seleziona Carrello:</label>
-      <select 
-        id="cart-select"
-        class="cart-select-dropdown"
-        [value]="selectedCarrelloId() ?? ''"
-        (change)="onCarrelloSelect($event)"
-      >
-        @for (cart of carrelli(); track cart.id) {
-          <option [value]="cart.id">
-            Carrello #{{ cart.id }} - €{{ cart.prezzoTotale.toFixed(2) }}
-          </option>
-        }
-      </select>
-    </section>
-  }
-
   @if (loading()) {
     <section class="cart-content">
       <p class="status-message loading">Caricamento carrello in corso...</p>
@@ -34,80 +15,114 @@
     <section class="cart-content">
       <p class="status-message empty">Il carrello è vuoto</p>
     </section>
-  } @else if (!selectedCarrello()) {
-    <section class="cart-content">
-      <p class="status-message empty">Seleziona un carrello</p>
-    </section>
   } @else {
-    <section class="cart-summary">
-      <div class="summary-item">
-        <strong>Quantità:</strong> <span class="summary-value">{{ totalItems() }}</span>
-      </div>
-      <div class="summary-item">
-        <strong>Totale:</strong> <span class="summary-value">€{{ totalPrice().toFixed(2) }}</span>
-      </div>
-    </section>
-
     <section class="cart-content">
-      <table class="cart-table">
-        <thead>
-          <tr>
-            <th>Proprietà</th>
-            <th>Valore</th>
-            <th>Azione</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Quantità</strong></td>
-            <td>
-              <input 
-                type="number" 
-                class="qty-input"
-                [(ngModel)]="selectedCarrello()!.quantita" 
-                min="0" 
-                [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
-              />
-            </td>
-            <td class="actions">
-              <button 
-                type="button"
-                class="btn-update"
-                (click)="updateQuantita(selectedCarrello()!.quantita)"
-                [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
-              >
-                Salva
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>Peso</strong></td>
-            <td>{{ selectedCarrello()!.peso.toFixed(2) }} kg</td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><strong>Prezzo Totale</strong></td>
-            <td class="price">€{{ selectedCarrello()!.prezzoTotale.toFixed(2) }}</td>
-            <td></td>
-          </tr>
-          @if (selectedCarrello()!.user) {
+      @if (cartItems().length === 0) {
+        <p class="status-message empty">Nessun articolo nel carrello.</p>
+      } @else {
+        <table class="cart-table">
+          <thead>
             <tr>
-              <td><strong>Utente</strong></td>
-              <td>{{ selectedCarrello()!.user?.username }}</td>
-              <td></td>
+              <th>Articolo</th>
+              <th>Prezzo</th>
+              <th>Quantità</th>
+              <th>Subtotale</th>
+              <th>Azione</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (item of cartItems(); track item.productId) {
+              <tr>
+                <td>
+                  <div class="item-info">
+                    @if (item.immagineUrl?.trim()) {
+                      <div class="item-thumb-wrap">
+                        <img class="item-thumb" [src]="item.immagineUrl" [alt]="item.nome" />
+                      </div>
+                    }
+                    <div>
+                      <strong>{{ item.nome }}</strong>
+                    </div>
+                  </div>
+                </td>
+                <td>€{{ item.unitPrice.toFixed(2) }}</td>
+                <td>
+                  <input
+                    type="number"
+                    class="qty-input"
+                    [ngModel]="item.quantity"
+                    (ngModelChange)="updateItemQuantita(item.productId, $event)"
+                    min="0"
+                    [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
+                  />
+                </td>
+                <td class="price">€{{ (item.unitPrice * item.quantity).toFixed(2) }}</td>
+                <td class="actions">
+                  <button
+                    type="button"
+                    class="icon-btn icon-delete"
+                    (click)="removeItem(item.productId)"
+                    [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
+                    aria-label="Rimuovi articolo dal carrello"
+                  >
+                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                      <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9zM7 9h2v9H7V9z" fill="currentColor"/>
+                    </svg>
+                    <span class="sr-only">Rimuovi</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <section class="cart-summary bottom">
+        <div class="summary-item">
+          <strong>Quantità totale</strong>
+          <span class="summary-value">{{ totalItems() }}</span>
+        </div>
+        <div class="summary-item">
+          <strong>Peso totale</strong>
+          <span class="summary-value">{{ totalWeight().toFixed(2) }} kg</span>
+        </div>
+        <div class="summary-item">
+          <strong>Prezzo totale</strong>
+          <span class="summary-value">€{{ totalPrice().toFixed(2) }}</span>
+        </div>
+      </section>
+
+      @if (orderError()) {
+        <p class="status-message error order-feedback">{{ orderError() }}</p>
+      }
+      @if (orderSuccess()) {
+        <p class="status-message success order-feedback">{{ orderSuccess() }}</p>
+      }
 
       <div class="cart-actions">
+        <button
+          type="button"
+          class="icon-btn icon-send"
+          (click)="submitOrder()"
+          [disabled]="sendingOrder() || cartItems().length === 0 || modifyingIds().has(selectedCarrello()!.id!)"
+          aria-label="Invia ordine"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M2 21 23 12 2 3l3 7 11 2-11 2-3 7z" fill="currentColor"/>
+          </svg>
+          <span class="btn-label">{{ sendingOrder() ? 'Invio in corso...' : 'Invia ordine' }}</span>
+        </button>
         <button 
           type="button"
-          class="btn-delete"
+          class="icon-btn icon-delete"
           (click)="removeFromCart()"
           [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
+          aria-label="Elimina carrello"
         >
-          Elimina Carrello
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9zM7 9h2v9H7V9z" fill="currentColor"/>
+          </svg>
+          <span class="btn-label">Elimina carrello</span>
         </button>
       </div>
     </section>

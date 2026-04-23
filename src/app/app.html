@@ -37,4 +37,7 @@
     <circle cx="10" cy="19" r="1.7" />
     <circle cx="17" cy="19" r="1.7" />
   </svg>
+  @if (cartItemCount() > 0) {
+    <span class="floating-cart-badge">{{ cartItemCount() }}</span>
+  }
 </a>

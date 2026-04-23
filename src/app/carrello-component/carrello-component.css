@@ -58,9 +58,13 @@
   color: var(--color-smoke);
   border-radius: 12px;
   padding: 1.5rem;
-  margin-bottom: 2rem;
+  margin: 1.4rem 1.2rem 0.8rem;
   display: flex;
   gap: 2rem;
+}
+
+.cart-summary.bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .summary-item {
@@ -76,10 +80,11 @@
 }
 
 .cart-content {
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
   border: 1px solid #d1d5db;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
 }
 
 .status-message {
@@ -99,6 +104,11 @@
   font-weight: 600;
 }
 
+.status-message.success {
+  color: #0f766e;
+  font-weight: 600;
+}
+
 .status-message.empty {
   color: #999;
   font-style: italic;
@@ -108,6 +118,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
+  table-layout: fixed;
 }
 
 .cart-table thead {
@@ -152,12 +163,53 @@
   color: var(--color-red);
 }
 
+.qty-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
 .cart-table .qty-input {
-  width: 70px;
-  padding: 0.4rem 0.6rem;
+  width: 86px;
+  padding: 0.45rem 0.4rem;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 0.9rem;
+  text-align: center;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.item-thumb-wrap {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 56px;
+}
+
+.item-thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 56px;
+  max-height: 56px;
+  object-fit: contain;
+  object-position: center;
+  padding: 0.35rem;
 }
 
 .cart-table .qty-input:disabled {
@@ -177,51 +229,89 @@
 
 .cart-table .actions {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
-button[type='button'] {
-  padding: 0.4rem 0.8rem;
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0.45rem 0.75rem;
   border: 0;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
 }
 
-button[type='button']:disabled {
+.icon-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-button[type='button']:hover:not(:disabled) {
-  opacity: 0.85;
+.icon-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(17, 24, 39, 0.18);
 }
 
-.btn-update {
+.icon-save {
   background: var(--color-gold);
   color: var(--color-jet);
 }
 
-.btn-delete {
+.icon-delete {
   background: var(--color-red);
   color: white;
 }
 
+.icon-send {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.icon-plus,
+.icon-minus {
+  background: #e5e7eb;
+  color: #111827;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 0;
+  font-size: 1rem;
+}
+
 .cart-actions {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  margin-top: 0.3rem;
+  padding: 1.2rem 1.2rem 1.4rem;
   border-top: 1px solid #e5e7eb;
 }
 
-.cart-actions button {
-  flex: 1;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
+.order-feedback {
+  padding-top: 1rem;
+  padding-bottom: 0.2rem;
+}
+
+.btn-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (max-width: 768px) {
@@ -239,15 +329,32 @@ button[type='button']:hover:not(:disabled) {
     padding: 0.75rem 0.5rem;
   }
 
+  .item-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
   .cart-table .qty-input {
     width: 60px;
   }
 
-  .cart-table .actions {
-    flex-direction: column;
+  .qty-editor {
+    width: 100%;
+    justify-content: center;
   }
 
-  button[type='button'] {
+  .cart-actions {
+    justify-content: center;
+  }
+
+  .icon-delete {
     width: 100%;
+    border-radius: 12px;
+  }
+
+  .icon-send {
+    width: 100%;
+    border-radius: 12px;
   }
 }
