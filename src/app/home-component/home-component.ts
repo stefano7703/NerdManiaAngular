@@ -4,6 +4,7 @@ import { take } from 'rxjs';
 import { CatalogoDto } from '../Dto/CatalogoDto';
 import { CategoriaDto } from '../Dto/CategoriaDto';
 import { ProdottoDto } from '../Dto/ProdottoDto';
+import { AuthService } from '../Service/AuthService';
 import { CatalogoService } from '../Service/CatalogoService';
 import { ProdottoService } from '../Service/ProdottoService';
 
@@ -29,6 +30,7 @@ type CatalogoHighlight = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
+  readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly prodottoService = inject(ProdottoService);
   private readonly catalogoService = inject(CatalogoService);

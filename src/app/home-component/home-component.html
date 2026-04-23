@@ -4,10 +4,12 @@
 			<p class="hero-eyebrow">Nuove uscite e collezioni leggendarie</p>
 			<h2 id="home-title">{{ welcomeTitle }}: il tuo multiverso nerd</h2>
 			<p>{{ welcomeMessage }} Fumetti, manga, action figure e chicche da veri collezionisti.</p>
-			<div class="hero-actions">
-				<a class="hero-cta" routerLink="/login">Login</a>
-				<a class="hero-secondary" routerLink="/login">Registrati</a>
-			</div>
+			@if (!authService.isLoggedIn()) {
+				<div class="hero-actions">
+					<a class="hero-cta" routerLink="/login">Login</a>
+					<a class="hero-secondary" routerLink="/login">Registrati</a>
+				</div>
+			}
 		</div>
 		<div class="hero-burst" aria-hidden="true">
 			<span>Pow!</span>
@@ -42,7 +44,7 @@
 						<h4>{{ prodotto.nome }}</h4>
 						<p class="data-main">{{ prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ prodotto.descrizione }}</p>
-						<a routerLink="/catalogo" class="data-link">Vai alla scheda</a>
+						<a [routerLink]="['/prodotto', prodotto.id]" class="data-link">Vai alla scheda</a>
 					</article>
 				}
 			</div>
@@ -81,7 +83,7 @@
 						<h4>{{ highlight.prodotto.nome }}</h4>
 						<p class="data-main">{{ highlight.prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ highlight.prodotto.descrizione }}</p>
-						<a routerLink="/catalogo" class="data-link">Vai al catalogo</a>
+						<a [routerLink]="['/prodotto', highlight.prodotto.id]" class="data-link">Vai alla scheda</a>
 					</article>				</div>				}
 			</div>
 		}

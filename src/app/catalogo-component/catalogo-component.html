@@ -103,15 +103,32 @@
               <span class="product-price">€{{ item.prodotto.prezzo.toFixed(2) }}</span>
             </div>
 
-            <p class="product-description">{{ item.prodotto.descrizione || 'Nessuna descrizione disponibile' }}</p>
+            <p class="product-description">
+              {{ item.prodotto.descrizione || 'Nessuna descrizione disponibile' }}
+            </p>
 
             <div class="product-meta">
-              <span class="weight"><strong>Peso:</strong> {{ item.prodotto.peso.toFixed(2) }} kg</span>
+              <span class="weight">
+                <strong>Peso:</strong> {{ item.prodotto.peso.toFixed(2) }} kg
+              </span>
             </div>
 
-            <button type="button" class="btn-add-to-cart" (click)="openAddToCart(item.prodotto)">
-              Aggiungi al Carrello
-            </button>
+            <div class="product-actions">
+              <a
+                class="btn-details"
+                [routerLink]="['/prodotto', item.prodotto.id]"
+              >
+                Vai alla scheda
+              </a>
+
+              <button
+                type="button"
+                class="btn-add-to-cart"
+                (click)="openAddToCart(item.prodotto)"
+              >
+                Aggiungi al Carrello
+              </button>
+            </div>
           </article>
         }
       </div>
@@ -154,13 +171,12 @@
     </section>
   }
 
-  <!-- Modal per aggiungere al carrello -->
   @if (selectedProduct(); as product) {
     <div class="modal-overlay" (click)="closeAddToCart()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3>Aggiungi al Carrello</h3>
-          <button 
+          <button
             type="button"
             class="close-btn"
             (click)="closeAddToCart()"
@@ -169,16 +185,16 @@
             ✕
           </button>
         </div>
-        
+
         <div class="modal-body">
           <p class="product-info">
             <strong>{{ product.nome }}</strong><br>
             Prezzo: €{{ product.prezzo.toFixed(2) }}
           </p>
-          
+
           <label for="quantity">Quantità:</label>
           <div class="quantity-control">
-            <button 
+            <button
               type="button"
               class="qty-btn"
               (click)="decrementQuantity()"
@@ -186,15 +202,15 @@
             >
               −
             </button>
-            <input 
+            <input
               id="quantity"
-              type="number" 
+              type="number"
               [ngModel]="cartQuantity()"
               (ngModelChange)="cartQuantity.set($event)"
               min="1"
               class="qty-input"
             />
-            <button 
+            <button
               type="button"
               class="qty-btn"
               (click)="incrementQuantity()"
@@ -207,19 +223,19 @@
             Totale: <strong>€{{ (product.prezzo * cartQuantity()).toFixed(2) }}</strong>
           </p>
         </div>
-        
+
         <div class="modal-footer">
           @if (cartSuccess()) {
             <p class="cart-success">{{ cartSuccess() }}</p>
           }
-          <button 
+          <button
             type="button"
             class="btn-cancel"
             (click)="closeAddToCart()"
           >
             Annulla
           </button>
-          <button 
+          <button
             type="button"
             class="btn-confirm"
             (click)="confirmAddToCart()"
