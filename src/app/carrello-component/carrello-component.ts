@@ -26,6 +26,7 @@ type CartItem = {
 })
 export class CarrelloComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
+  private readonly ordineService = inject(ordineService);
 
   // State
   carrelli = signal<CarrelloDto[]>([]);
@@ -76,7 +77,7 @@ export class CarrelloComponent implements OnInit {
     const raw = localStorage.getItem('user');
     if (!raw) {
       return null;
-    }
+    } 
 
     try {
       const parsed = JSON.parse(raw) as UserDto;
