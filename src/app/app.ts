@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from './Service/AuthService';
-import { WishlistService } from './Service/WishlistService';
+
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
+import { WishlistService } from './Service/WishlistService';
 
 @Component({
   selector: 'app-root',
