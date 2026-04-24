@@ -19,7 +19,7 @@
     linear-gradient(135deg, rgba(0, 180, 216, 0.15), transparent 45%),
     linear-gradient(180deg, #253646 0%, var(--color-jet) 100%);
   border-bottom: 2px solid var(--color-gold);
-  overflow: visible;
+  overflow: hidden;
 }
 
 .brand {
@@ -52,7 +52,7 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
   gap: 0.35rem;
@@ -168,6 +168,156 @@
   line-height: 1;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
 }
+
+.floating-favorites-btn {
+  position: fixed;
+  right: 1.1rem;
+  bottom: calc(max(1.1rem, env(safe-area-inset-bottom)) + 76px);
+  z-index: 41;
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff5964 0%, #d72638 100%);
+  color: var(--color-smoke);
+  border: 3px solid var(--color-jet);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(255, 212, 0, 0.5);
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+.floating-favorites-btn:hover,
+.floating-favorites-btn:focus-visible {
+  transform: translateY(-2px) scale(1.04);
+  filter: saturate(1.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 212, 0, 0.75);
+  outline: none;
+}
+
+.floating-favorites-icon {
+  width: 27px;
+  height: 27px;
+  fill: currentColor;
+}
+
+.floating-favorites-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-red);
+  color: var(--color-smoke);
+  border: 2px solid var(--color-smoke);
+  font-size: 0.75rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+}
+
+.favorites-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(10, 17, 26, 0.5);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.favorites-modal {
+  width: min(460px, 100%);
+  max-height: min(72vh, 580px);
+  overflow: hidden;
+  border-radius: 14px;
+  border: 3px solid var(--color-jet);
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(255, 212, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+}
+
+.favorites-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 2px solid rgba(30, 42, 56, 0.16);
+}
+
+.favorites-modal-header h3 {
+  margin: 0;
+  font-family: 'Bangers', Impact, 'Arial Black', sans-serif;
+  font-size: 1.45rem;
+  letter-spacing: 0.04em;
+}
+
+.favorites-close {
+  border: 2px solid var(--color-jet);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--color-jet);
+  font-weight: 900;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+}
+
+.favorites-list {
+  padding: 0.65rem;
+  overflow: auto;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.favorite-item {
+  border: 2px solid rgba(30, 42, 56, 0.18);
+  border-radius: 10px;
+  padding: 0.65rem 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.favorite-link {
+  color: var(--color-jet);
+  text-decoration: none;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.favorite-name {
+  font-weight: 800;
+}
+
+.favorite-price {
+  color: var(--color-red);
+  font-weight: 900;
+  font-size: 0.86rem;
+}
+
+.favorite-remove {
+  border: 2px solid #b3261e;
+  border-radius: 8px;
+  background: #fff5f5;
+  color: #8b1f19;
+  font-weight: 800;
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+}
+
+.favorite-remove:hover,
+.favorite-remove:focus-visible {
+  background: #ffe7e7;
+  outline: none;
+}
 .logout-link {
   cursor: pointer;
 }
@@ -209,6 +359,13 @@
     height: 54px;
     right: 0.8rem;
     bottom: max(0.8rem, env(safe-area-inset-bottom));
+  }
+
+  .floating-favorites-btn {
+    width: 54px;
+    height: 54px;
+    right: 0.8rem;
+    bottom: calc(max(0.8rem, env(safe-area-inset-bottom)) + 68px);
   }
 
   .brand-logo {

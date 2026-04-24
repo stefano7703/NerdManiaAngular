@@ -29,6 +29,16 @@
 			<div class="cards-grid">
 				@for (prodotto of featuredProdotti(); track prodotto.id ?? prodotto.nome) {
 					<article class="data-card product-card">
+						<button
+							type="button"
+							class="favorite-btn"
+							[class.is-active]="isFavorite(prodotto)"
+							[attr.aria-pressed]="isFavorite(prodotto)"
+							[attr.aria-label]="isFavorite(prodotto) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+							(click)="toggleFavorite($event, prodotto)"
+						>
+							❤
+						</button>
 						<a
 							class="card-link-overlay"
 							[routerLink]="['/prodotto', prodotto.id]"
@@ -73,6 +83,16 @@
 					<a class="catalog-col-label" routerLink="/catalogo">{{ highlight.catalogoNome }}</a>
 				}
 				<article class="data-card product-card catalog-rotating-card">
+						<button
+							type="button"
+							class="favorite-btn"
+							[class.is-active]="isFavorite(highlight.prodotto)"
+							[attr.aria-pressed]="isFavorite(highlight.prodotto)"
+							[attr.aria-label]="isFavorite(highlight.prodotto) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+							(click)="toggleFavorite($event, highlight.prodotto)"
+						>
+							❤
+						</button>
 						<a
 							class="card-link-overlay"
 							[routerLink]="['/prodotto', highlight.prodotto.id]"

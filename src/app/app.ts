@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from './Service/AuthService';
+import { WishlistService } from './Service/WishlistService';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
@@ -16,6 +17,8 @@ import { NgOptimizedImage } from '@angular/common';
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('NerdManiaAngular');
   cartItemCount = signal(0);
+  isFavoritesPopupOpen = signal(false);
+  wishlistService: WishlistService;
 
   private readonly cartChangedListener = () => this.refreshCartItemCount();
   private routerSubscription?: Subscription;
@@ -23,9 +26,13 @@ export class App implements OnInit, OnDestroy {
 
   constructor(
     public authService: AuthService,
+    wishlistService: WishlistService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
-  ) {}
+  ) {
+    this.wishlistService = wishlistService;
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   // ---------------- INIT ----------------
   ngOnInit(): void {
@@ -34,6 +41,7 @@ export class App implements OnInit, OnDestroy {
       return;
     }
 
+    this.wishlistService.refreshForActiveUser();
     this.refreshCartItemCount();
 
     if (isPlatformBrowser(this.platformId)) {
@@ -43,6 +51,7 @@ export class App implements OnInit, OnDestroy {
 
     this.routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
+        this.wishlistService.refreshForActiveUser();
         this.refreshCartItemCount();
       }
     });
@@ -104,6 +113,23 @@ export class App implements OnInit, OnDestroy {
   // ---------------- LOGOUT ----------------
   logout(): void {
     this.authService.logout();
+    this.wishlistService.refreshForActiveUser();
     this.cartItemCount.set(0);
+    this.isFavoritesPopupOpen.set(false);
+  }
+
+  openFavoritesPopup(): void {
+    if (this.wishlistService.favoriteCount() <= 0) {
+      return;
+    }
+    this.isFavoritesPopupOpen.set(true);
+  }
+
+  closeFavoritesPopup(): void {
+    this.isFavoritesPopupOpen.set(false);
+  }
+
+  removeFavorite(productId: number): void {
+    this.wishlistService.removeFavorite(productId);
   }
 }
