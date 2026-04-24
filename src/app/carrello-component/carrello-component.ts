@@ -4,9 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
 import { CarrelloDto } from '../Dto/CarrelloDto';
 import { CarrelloService } from '../Service/CarrelloService';
-import { ordineService } from '../Service/ordineService';
 import { UserDto } from '../Dto/UserDto';
-import { OrdineDto } from '../Dto/OrdineDto';
 
 type CartItem = {
   productId: number;
@@ -26,7 +24,6 @@ type CartItem = {
 })
 export class CarrelloComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
-  private readonly ordineSrv = inject(ordineService);
 
   // State
   carrelli = signal<CarrelloDto[]>([]);
@@ -34,10 +31,6 @@ export class CarrelloComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   cartItems = signal<CartItem[]>([]);
-  orderError = signal<string | null>(null);
-  orderSuccess = signal<string | null>(null);
-  sendingOrder = signal(false);
-  orderConfirmOpen = signal(false);
   shippingAddress = signal('');
 
   // Derived state
@@ -69,8 +62,6 @@ export class CarrelloComponent implements OnInit {
     }
     return this.selectedCarrello()?.peso ?? 0;
   });
-
-  isShippingAddressValid = computed(() => this.shippingAddress().trim().length > 0);
 
   // Tracking modifications
   modifyingIds = signal<Set<number>>(new Set());
@@ -227,9 +218,6 @@ export class CarrelloComponent implements OnInit {
   }
 
   updateItemQuantita(productId: number, value: number): void {
-    this.orderError.set(null);
-    this.orderSuccess.set(null);
-
     const carrello = this.selectedCarrello();
     if (!carrello?.id) {
       return;
@@ -245,9 +233,6 @@ export class CarrelloComponent implements OnInit {
   }
 
   removeItem(productId: number): void {
-    this.orderError.set(null);
-    this.orderSuccess.set(null);
-
     const carrello = this.selectedCarrello();
     if (!carrello?.id) {
       return;
@@ -259,10 +244,6 @@ export class CarrelloComponent implements OnInit {
   }
 
   removeFromCart(): void {
-    this.orderError.set(null);
-    this.orderSuccess.set(null);
-    this.orderConfirmOpen.set(false);
-
     const carrello = this.selectedCarrello();
     if (!carrello?.id) return;
     const carrelloId = carrello.id;
@@ -289,121 +270,6 @@ export class CarrelloComponent implements OnInit {
           this.modifyingIds().delete(carrelloId);
         },
       });
-  }
-
-  submitOrder(): void {
-    this.orderError.set(null);
-    this.orderSuccess.set(null);
-    this.orderConfirmOpen.set(false);
-
-    const carrello = this.selectedCarrello();
-    const userId = this.getStoredUserId();
-    const items = this.cartItems();
-
-    if (!carrello?.id) {
-      this.orderError.set('Carrello non disponibile.');
-      return;
-    }
-
-    if (!userId) {
-      this.orderError.set('Devi effettuare il login per inviare l\'ordine.');
-      return;
-    }
-
-    if (items.length === 0) {
-      this.orderError.set('Aggiungi almeno un articolo prima di inviare l\'ordine.');
-      return;
-    }
-
-    const address = this.shippingAddress().trim();
-    if (!address) {
-      this.orderError.set('Inserisci un indirizzo di spedizione prima di inviare l\'ordine.');
-      return;
-    }
-
-    const ordinePayload = {
-      id: 0,
-      costoTotale: this.totalPrice(),
-      indirizzoSpedizione: address,
-      user: { id: userId },
-      spedizione: null,
-      prodotti: this.expandProductsForOrder(items),
-    } as unknown as OrdineDto;
-
-    this.sendingOrder.set(true);
-    this.ordineSrv.insert(ordinePayload)
-      .pipe(take(1))
-      .subscribe({
-        next: () => {
-          this.persistCartItems(carrello.id!, []);
-          this.syncCartTotalsFromItems(carrello, []);
-          this.shippingAddress.set('');
-          this.orderSuccess.set('Ordine inviato con successo.');
-          this.sendingOrder.set(false);
-        },
-        error: (err) => {
-          const status = Number(err?.status ?? 0);
-          if (status === 401) {
-            this.orderError.set('Sessione scaduta. Effettua nuovamente il login.');
-          } else if (status === 403) {
-            this.orderError.set('Non sei autorizzato a inviare l\'ordine.');
-          } else {
-            this.orderError.set(err?.message ?? 'Errore durante l\'invio dell\'ordine.');
-          }
-          this.sendingOrder.set(false);
-        },
-      });
-  }
-
-  requestOrderConfirmation(): void {
-    this.orderError.set(null);
-    this.orderSuccess.set(null);
-
-    const carrello = this.selectedCarrello();
-    const userId = this.getStoredUserId();
-    const items = this.cartItems();
-
-    if (!carrello?.id) {
-      this.orderError.set('Carrello non disponibile.');
-      return;
-    }
-
-    if (!userId) {
-      this.orderError.set('Devi effettuare il login per inviare l\'ordine.');
-      return;
-    }
-
-    if (items.length === 0) {
-      this.orderError.set('Aggiungi almeno un articolo prima di inviare l\'ordine.');
-      return;
-    }
-
-    if (!this.isShippingAddressValid()) {
-      this.orderError.set('Inserisci un indirizzo di spedizione prima di inviare l\'ordine.');
-      return;
-    }
-
-    this.orderConfirmOpen.set(true);
-  }
-
-  cancelOrderConfirmation(): void {
-    if (this.sendingOrder()) {
-      return;
-    }
-    this.orderConfirmOpen.set(false);
-  }
-
-  private expandProductsForOrder(items: CartItem[]): Array<{ id: number }> {
-    const result: Array<{ id: number }> = [];
-
-    for (const item of items) {
-      const qty = Math.max(0, Math.trunc(item.quantity));
-      for (let i = 0; i < qty; i += 1) {
-        result.push({ id: item.productId });
-      }
-    }
-
-    return result;
   }
 
   isModifying(id: number | undefined): boolean {
