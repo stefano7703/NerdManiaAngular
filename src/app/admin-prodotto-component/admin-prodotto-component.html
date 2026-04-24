@@ -1,0 +1,224 @@
+<main class="admin-shell">
+  <section class="admin-header">
+    <h1>Gestione Prodotti Admin</h1>
+    <p>Da qui puoi creare, modificare ed eliminare i prodotti.</p>
+  </section>
+
+  <section class="admin-toolbar">
+    <input
+      type="text"
+      placeholder="Cerca per nome, descrizione o categoria"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="onSearchChange($event)"
+      name="search"
+    />
+
+    <button type="button" class="btn-primary" (click)="newProduct()">
+      Nuovo prodotto
+    </button>
+  </section>
+
+  @if (error()) {
+    <p class="state error">{{ error() }}</p>
+  }
+
+  @if (success()) {
+    <p class="state success">{{ success() }}</p>
+  }
+
+  <section class="admin-layout">
+    <!-- LISTA -->
+    <div class="admin-list">
+      <h2>Lista prodotti</h2>
+
+      @if (loading()) {
+        <p class="state">Caricamento prodotti...</p>
+      } @else if (prodottiFiltrati().length === 0) {
+        <p class="state">Nessun prodotto trovato.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Prezzo</th>
+                <th>Categoria</th>
+                <th>Fragile</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (prodotto of prodottiFiltrati(); track prodotto.id ?? prodotto.nome) {
+                <tr>
+                  <td>{{ prodotto.id }}</td>
+                  <td>{{ prodotto.nome }}</td>
+                  <td>€{{ prodotto.prezzo }}</td>
+                  <td>{{ prodotto.categoria?.nome || '—' }}</td>
+                  <td>{{ prodotto.fragile ? 'Sì' : 'No' }}</td>
+
+                  <td class="actions-cell">
+                    <button
+                      type="button"
+                      class="btn-secondary"
+                      (click)="editProduct(prodotto)">
+                      Modifica
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-danger"
+                      (click)="deleteProduct(prodotto.id)">
+                      Elimina
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- FORM -->
+    <div class="admin-form">
+      <h2>
+        @if (isEditMode()) {
+          Modifica prodotto
+        } @else {
+          Nuovo prodotto
+        }
+      </h2>
+
+      <form (ngSubmit)="submitForm()">
+        <div class="form-grid">
+
+          <div class="form-item">
+            <label>Nome</label>
+            <input
+              type="text"
+              [ngModel]="formModel().nome"
+              (ngModelChange)="updateField('nome', $event); clearMessages()"
+              name="nome"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>Prezzo</label>
+            <input
+              type="number"
+              step="0.01"
+              [ngModel]="formModel().prezzo"
+              (ngModelChange)="updateField('prezzo', +$event); clearMessages()"
+              name="prezzo"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>Peso</label>
+            <input
+              type="number"
+              step="0.01"
+              [ngModel]="formModel().peso"
+              (ngModelChange)="updateField('peso', +$event); clearMessages()"
+              name="peso"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>Altezza</label>
+            <input
+              type="number"
+              step="0.01"
+              [ngModel]="formModel().altezza"
+              (ngModelChange)="updateField('altezza', +$event); clearMessages()"
+              name="altezza"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>Lunghezza</label>
+            <input
+              type="number"
+              step="0.01"
+              [ngModel]="formModel().lunghezza"
+              (ngModelChange)="updateField('lunghezza', +$event); clearMessages()"
+              name="lunghezza"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>Spessore</label>
+            <input
+              type="number"
+              step="0.01"
+              [ngModel]="formModel().spessore"
+              (ngModelChange)="updateField('spessore', +$event); clearMessages()"
+              name="spessore"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>ID Categoria</label>
+            <input
+              type="number"
+              [ngModel]="formModel().categoria?.id"
+              (ngModelChange)="updateCategoriaId(+$event); clearMessages()"
+              name="categoriaId"
+            />
+          </div>
+
+          <div class="form-item checkbox-item">
+            <label>
+              <input
+                type="checkbox"
+                [ngModel]="formModel().fragile"
+                (ngModelChange)="updateField('fragile', $event); clearMessages()"
+                name="fragile"
+              />
+              Fragile
+            </label>
+          </div>
+
+          <div class="form-item full-width">
+            <label>Immagine URL</label>
+            <input
+              type="text"
+              [ngModel]="formModel().immagineUrl"
+              (ngModelChange)="updateField('immagineUrl', $event); clearMessages()"
+              name="immagineUrl"
+            />
+          </div>
+
+          <div class="form-item full-width">
+            <label>Descrizione</label>
+            <textarea
+              rows="4"
+              [ngModel]="formModel().descrizione"
+              (ngModelChange)="updateField('descrizione', $event); clearMessages()"
+              name="descrizione"
+            ></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="newProduct()">
+            Reset
+          </button>
+
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              Salvataggio...
+            } @else if (isEditMode()) {
+              Aggiorna prodotto
+            } @else {
+              Crea prodotto
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
