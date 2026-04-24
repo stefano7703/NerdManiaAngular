@@ -19,13 +19,15 @@ export class App implements OnInit, OnDestroy {
 
   private readonly cartChangedListener = () => this.refreshCartItemCount();
   private routerSubscription?: Subscription;
-  private readonly isBrowser: boolean | undefined;
+  private readonly isBrowser: boolean;
 
   constructor(
     public authService: AuthService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: object
-  ) {}
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   // ---------------- INIT ----------------
   ngOnInit(): void {
