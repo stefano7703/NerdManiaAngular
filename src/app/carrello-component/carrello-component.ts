@@ -5,6 +5,7 @@ import { take } from 'rxjs';
 import { CarrelloDto } from '../Dto/CarrelloDto';
 import { CarrelloService } from '../Service/CarrelloService';
 import { UserDto } from '../Dto/UserDto';
+import { ordineService } from '../Service/ordineService';
 
 type CartItem = {
   productId: number;
@@ -24,6 +25,7 @@ type CartItem = {
 })
 export class CarrelloComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
+  private readonly ordineService = inject(ordineService);
 
   // State
   carrelli = signal<CarrelloDto[]>([]);
@@ -74,7 +76,7 @@ export class CarrelloComponent implements OnInit {
     const raw = localStorage.getItem('user');
     if (!raw) {
       return null;
-    }
+    } 
 
     try {
       const parsed = JSON.parse(raw) as UserDto;
@@ -275,4 +277,57 @@ export class CarrelloComponent implements OnInit {
   isModifying(id: number | undefined): boolean {
     return id !== undefined && this.modifyingIds().has(id);
   }
+
+  private expandProductsForOrder(items: CartItem[]): Array<{ id: number }> {
+    const result: Array<{ id: number }> = [];
+
+    for (const item of items) {
+      const qty = Math.max(0, Math.trunc(item.quantity));
+      for (let i = 0; i < qty; i += 1) {
+        result.push({ id: item.productId });
+      }
+    }
+
+    return result;
+  }
+  
+  
+  creaOrdine(): void {
+  const carrello = this.selectedCarrello();
+  const userId = this.getStoredUserId();
+const prodotti = this.cartItems().map(item => ({
+  id: item.productId
+}));
+
+  if (!carrello?.id || !userId) {
+    this.error.set('Dati non validi per creare l\'ordine');
+    return;
+  }
+
+  if (!this.shippingAddress().trim()) {
+    this.error.set('Inserisci un indirizzo di spedizione');
+    return;
+  }
+
+  const ordineDto = {
+    costoTotale: this.totalPrice(),
+    user: {
+      id: userId
+    },
+    indirizzoSpedizione: this.shippingAddress(),
+    prodotti:prodotti
+  };
+
+  this.ordineService.insert(ordineDto as any)
+    .pipe(take(1))
+    .subscribe({
+      next: () => {
+        alert('Ordine creato con successo!');
+        this.shippingAddress.set('');
+      },
+      error: (err) => {
+        this.error.set(err?.message ?? 'Errore creazione ordine');
+      }
+    });
+}
 }
