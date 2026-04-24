@@ -6,6 +6,7 @@ import { CarrelloDto } from '../Dto/CarrelloDto';
 import { CarrelloService } from '../Service/CarrelloService';
 import { UserDto } from '../Dto/UserDto';
 import { ordineService } from '../Service/ordineService';
+import { ProdottoDto } from '../Dto/ProdottoDto';
 
 type CartItem = {
   productId: number;
@@ -295,9 +296,11 @@ export class CarrelloComponent implements OnInit {
   creaOrdine(): void {
   const carrello = this.selectedCarrello();
   const userId = this.getStoredUserId();
-const prodotti = this.cartItems().map(item => ({
-  id: item.productId
-}));
+  const prodotti = this.cartItems().map(item =>
+  new ProdottoDto(
+    '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, item.productId
+  )
+);
 
   if (!carrello?.id || !userId) {
     this.error.set('Dati non validi per creare l\'ordine');
