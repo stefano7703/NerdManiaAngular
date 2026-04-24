@@ -13,8 +13,11 @@ import { LoginComponent } from './addOn/login-component/login-component';
 import { AuthGuard } from './Guard/AuthGuard';
 import { ProdottoDetailComponent } from './prodotto-detail-component/prodotto-detail-component';
 import { GestioneUtentiComponent } from './addOn/gestione-utenti-component/gestione-utenti-component';
+import { AdminProdottoComponent } from './admin-prodotto-component/admin-prodotto-component';
+import { AdminGuard } from './Guard/AdminGuard';
 
 export const routes: Routes = [
+  {path: 'admin/prodotti', component: AdminProdottoComponent, canActivate: [AdminGuard]},
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'carrello', component: CarrelloComponent },
@@ -28,7 +31,9 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: AddUserComponent },
+  
   {path: 'gestione-utenti', component: GestioneUtentiComponent},
+  
   {
     path: 'user',
     component: UserComponent,
