@@ -19,12 +19,6 @@ export class ordineService extends AbstractService<OrdineDto>{
         return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/findByUserUsername?username='+ username);
     }
 
-    /*
-    inviaEmailOrdine(id:number): Observable<OrdineDto> {
-        return this.http.post<OrdineDto>(this.baseUrl + '/' + this.type + '/inviaEmailOrdine?id='+ id);
-    }
-    */
-
   findAllByOrderByCostoTotaleDesc(): Observable<OrdineDto[]> {
     return this.http.get<OrdineDto[]>(this.baseUrl + '/' + this.type + '/findAllByOrderByCostoTotaleDesc');
   }

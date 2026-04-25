@@ -35,6 +35,7 @@ export class UserComponent implements OnInit {
     )
   );
 
+  ordineAperto: number | null = null;
 
 
   checkResult = signal<{ message: string; exists: boolean | null }>({
@@ -56,6 +57,10 @@ export class UserComponent implements OnInit {
     if (loggedUser) {
       this.user.set(loggedUser);
     }
+  }
+
+  toggleSpedizione(id: number) {
+  this.ordineAperto = this.ordineAperto === id ? null : id;
   }
 
   logout() {

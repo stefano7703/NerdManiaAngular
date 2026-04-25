@@ -165,6 +165,58 @@
 
         <!-- FOOTER -->
         <div class="order-footer">
+            <!-- BOTTONE SPEDIZIONE -->
+          <div class="order-actions">
+            <button
+              class="spedizione-btn"
+              (click)="toggleSpedizione(ordine.id)"
+            >
+              {{ ordineAperto === ordine.id ? 'Nascondi spedizione ▲' : 'Mostra spedizione ▼' }}
+            </button>
+          </div>
+
+          <!-- DETTAGLI SPEDIZIONE -->
+          <div
+            class="spedizione-box"
+            *ngIf="ordineAperto === ordine.id"
+          >
+
+            <h4>🚚 Dettagli spedizione</h4>
+
+            <div class="spedizione-grid">
+
+              <div class="spedizione-item">
+                <span>Altezza</span>
+                <p>{{ ordine.spedizione.altezza }} cm</p>
+              </div>
+
+              <div class="spedizione-item">
+                <span>Lunghezza</span>
+                <p>{{ ordine.spedizione.lunghezza }} cm</p>
+              </div>
+
+              <div class="spedizione-item">
+                <span>Spessore</span>
+                <p>{{ ordine.spedizione.spessore }} cm</p>
+              </div>
+
+              <div class="spedizione-item">
+                <span>Peso</span>
+                <p>{{ ordine.spedizione.peso }} kg</p>
+              </div>
+
+              <div class="spedizione-item">
+                <span>Fragile</span>
+                <p
+                  [ngClass]="ordine.spedizione.fragile ? 'fragile-yes' : 'fragile-no'"
+                >
+                  {{ ordine.spedizione.fragile ? 'Sì ⚠️' : 'No ✔️' }}
+                </p>
+              </div>
+
+            </div>
+
+          </div>
 
           Totale:
           <strong>€{{ ordine.costoTotale }}</strong>
