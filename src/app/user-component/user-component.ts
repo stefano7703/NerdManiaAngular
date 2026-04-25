@@ -37,9 +37,6 @@ export class UserComponent implements OnInit {
 
   ordineAperto: number | null = null;
 
-  ordineAperto: number | null = null;
-
-
 
   checkResult = signal<{ message: string; exists: boolean | null }>({
     message: '',
