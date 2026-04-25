@@ -12,6 +12,7 @@ import { UserDto } from '../Dto/UserDto';
 import { CatalogoService } from '../Service/CatalogoService';
 import { ProdottoService } from '../Service/ProdottoService';
 import { CarrelloService } from '../Service/CarrelloService';
+import { WishlistService } from '../Service/WishlistService';
 
 type ProdottoView = {
   prodotto: ProdottoDto;
@@ -43,6 +44,7 @@ export class CatalogoComponent implements OnInit {
   private readonly prodottoService = inject(ProdottoService);
   private readonly catalogoService = inject(CatalogoService);
   private readonly carrelloService = inject(CarrelloService);
+  readonly wishlistService = inject(WishlistService);
   private readonly route = inject(ActivatedRoute);
   private readonly pageSize = 8;
 
@@ -418,6 +420,16 @@ export class CatalogoComponent implements OnInit {
       return;
     }
     target.style.display = 'none';
+  }
+
+  toggleFavorite(event: Event, product: ProdottoDto): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.wishlistService.toggleFavorite(product);
+  }
+
+  isFavorite(product: ProdottoDto): boolean {
+    return this.wishlistService.isFavorite(product);
   }
 
   closeAddToCart(): void {
