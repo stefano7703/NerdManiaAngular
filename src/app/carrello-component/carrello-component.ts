@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
@@ -51,7 +51,6 @@ export class CarrelloComponent implements OnInit {
   totalPrice = computed(() => {
     if (this.cartItems().length > 0) {
       const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
-      const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
       return Number(sum.toFixed(2));
     }
     return this.selectedCarrello()?.prezzoTotale ?? 0;
@@ -67,7 +66,6 @@ export class CarrelloComponent implements OnInit {
 
   totalWeight = computed(() => {
     if (this.cartItems().length > 0) {
-      const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitWeight, 0);
       const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitWeight, 0);
       return Number(sum.toFixed(3));
     }
@@ -181,14 +179,12 @@ export class CarrelloComponent implements OnInit {
             .pipe(take(1))
             .subscribe({
               next: (createdCart) => {
-              next: (createdCart) => {
                 if (createdCart?.id) {
                   this.setCurrentCart(createdCart);
                 }
                 onDone();
               },
               error: () => {
-                this.error.set('Carrello creato ma non recuperabile al momento');
                 this.error.set('Carrello creato ma non recuperabile al momento');
                 onDone();
               },
