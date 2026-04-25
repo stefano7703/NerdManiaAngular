@@ -37,16 +37,19 @@ export class UserComponent implements OnInit {
 
   ordineAperto: number | null = null;
 
-  isLogged = signal(false);
+  ordineAperto: number | null = null;
+
+
 
   checkResult = signal<{ message: string; exists: boolean | null }>({
     message: '',
     exists: null,
   });
 
+
   constructor(
     private service: userService,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router
   ) {}
 
@@ -56,9 +59,7 @@ export class UserComponent implements OnInit {
 
     if (loggedUser) {
       this.user.set(loggedUser);
-      this.isLogged.set(true);
     }
-
   }
 
   toggleSpedizione(id: number) {
@@ -70,91 +71,12 @@ export class UserComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  /*
-  cercaPerNome(nome: string) {
-    if (!nome) return;
-
-    this.service
-      .findByNomeContainingIgnoreCase(nome)
-      .subscribe((data) => {
-        this.users.set(data);
-      });
+  isLogged() {
+    return this.authService.isLoggedIn();
   }
 
-  filtraPerCartaFedelta(possiedeCarta: boolean) {
-
-    const call = possiedeCarta
-      ? this.service.findByCartaFedeltaTrue()
-      : this.service.findByCartaFedeltaFalse();
-
-    call.subscribe((data) => {
-      this.users.set(data);
-    });
-  }
-
-  verificaUsername(username: string) {
-
-    if (!username) return;
-
-    this.service.exiexistsByUsername(username).subscribe({
-      next: (exists) => {
-        this.checkResult.set({
-          exists: exists,
-          message: exists
-            ? 'Username già occupato'
-            : 'Username disponibile',
-        });
-      },
-
-      error: () => {
-        this.checkResult.set({
-          exists: true,
-          message: 'Errore di connessione al server',
-        });
-      }
-    });
-
-  }
-
-  verificaEmail(email: string) {
-
-    this.service.exiexistsByEmail(email).subscribe((exists) => {
-
-      this.checkResult.set({
-        exists,
-        message: exists
-          ? 'Email già registrata'
-          : 'Email disponibile',
-      });
-
-    });
-
-  }
-
-  reset() {
-    this.users.set([]);
-    this.checkResult.set({
-      message: '',
-      exists: null
-    });
-  }
-
-
-  openAddUser() {
-    this.showAddUser.set(true);
-  }
-
-  closeAddUser() {
-    this.showAddUser.set(false);
-  }
-
-  onUserAdded(user: UserDto) {
-
-    console.log('Utente aggiunto:', user);
-
-    this.showAddUser.set(false);
-
-  }
-    */
+  goLogin() {
+  this.router.navigate(['/login']);
+}
 
 }

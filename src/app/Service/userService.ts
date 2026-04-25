@@ -22,6 +22,16 @@ export class userService extends AbstractService<UserDto> {
     );
   }
 
+  findByCognomeContainingIgnoreCase(cognome: string): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(
+      `${this.baseProjectUrl}/findByCognomeContainingIgnoreCase?cognome=${cognome}`,
+    );
+  }
+
+  findByNomeContainingIgnoreCaseAndCognomeContainingIgnoreCase(nome: string, cognome: string): Observable<UserDto[]>{
+    return this.http.get<UserDto[]>(`${this.baseProjectUrl}/findByNomeContainingIgnoreCaseAndCognomeContainingIgnoreCase?nome=${nome}&cognome=${cognome}`);
+  }
+
   findByCartaFedeltaTrue(): Observable<UserDto[]> {
     return this.http.get<UserDto[]>(`${this.baseProjectUrl}/findByCartaFedeltaTrue`);
   }

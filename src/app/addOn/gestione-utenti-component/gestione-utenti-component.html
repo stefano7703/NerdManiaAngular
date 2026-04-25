@@ -69,12 +69,15 @@
         </span>
 
         <small>
-          Trova utenti per nome
+          Inserisci nome, cognome o entrambi
         </small>
 
-        <input type="text" placeholder="Nome utente" #nomeInput (keyup.enter)="cercaPerNome(nomeInput.value)" />
+        <input type="text"
+        placeholder="Nome o Cognome oppure Nome Cognome"
+        #searchInput
+        (keyup.enter)="cercaUtente(searchInput.value)" />
 
-        <button class="hero-secondary" (click)="cercaPerNome(nomeInput.value)">
+        <button class="hero-secondary-2" (click)="cercaUtente(searchInput.value)">
 
           Cerca
 
@@ -82,31 +85,6 @@
 
       </div>
 
-      <!-- FILTRA CARTA FEDELTA -->
-
-      <div class="quick-card">
-
-        <span>
-          Carta fedeltà
-        </span>
-
-        <small>
-          Filtra utenti
-        </small>
-
-        <button class="hero-secondary" (click)="filtraPerCartaFedelta(true)">
-
-          Con carta
-
-        </button>
-
-        <button class="hero-secondary" (click)="filtraPerCartaFedelta(false)">
-
-          Senza carta
-
-        </button>
-
-      </div>
 
       <!-- VERIFICA USERNAME -->
 
@@ -123,7 +101,7 @@
         <input type="text" placeholder="Username" #usernameInput
           (keyup.enter)="verificaUsername(usernameInput.value)" />
 
-        <button class="hero-secondary" (click)="verificaUsername(usernameInput.value)">
+        <button class="hero-secondary-2" (click)="verificaUsername(usernameInput.value)">
 
           Verifica
 
@@ -148,6 +126,18 @@
     <h3>
       Utenti trovati ({{ users().length }})
     </h3>
+
+    <button class="hero-cta" (click)="filtraPerCartaFedelta(true)">
+
+          Con carta
+
+        </button>
+
+        <button class="hero-cta" (click)="filtraPerCartaFedelta(false)">
+
+          Senza carta
+
+        </button>
 
     <div class="cards-grid" *ngIf="users().length > 0; else noUsers">
 
