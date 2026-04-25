@@ -16,6 +16,7 @@ import { CarrelloService } from '../Service/CarrelloService';
 import { UserDto } from '../Dto/UserDto';
 import { ordineService } from '../Service/ordineService';
 import { ProdottoDto } from '../Dto/ProdottoDto';
+import { userService } from '../Service/userService';
 
 // ================= TYPES =================
 
@@ -44,6 +45,7 @@ export class CarrelloComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
   private readonly ordineService = inject(ordineService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly userService = inject(userService);
 
   // ================= STATE =================
 
@@ -61,15 +63,12 @@ export class CarrelloComponent implements OnInit {
   selectedCarrello = computed(() => {
     const id = this.selectedCarrelloId();
     if (id === null) return null;
-    return this.carrelli().find(c => c.id === id) ?? null;
+    return this.carrelli().find((c) => c.id === id) ?? null;
   });
 
   totalPrice = computed(() => {
     if (this.cartItems().length > 0) {
-      const sum = this.cartItems().reduce(
-        (acc, item) => acc + item.quantity * item.unitPrice,
-        0
-      );
+      const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
       return Number(sum.toFixed(2));
     }
     return this.selectedCarrello()?.prezzoTotale ?? 0;
@@ -77,20 +76,14 @@ export class CarrelloComponent implements OnInit {
 
   totalItems = computed(() => {
     if (this.cartItems().length > 0) {
-      return this.cartItems().reduce(
-        (acc, item) => acc + item.quantity,
-        0
-      );
+      return this.cartItems().reduce((acc, item) => acc + item.quantity, 0);
     }
     return this.selectedCarrello()?.quantita ?? 0;
   });
 
   totalWeight = computed(() => {
     if (this.cartItems().length > 0) {
-      const sum = this.cartItems().reduce(
-        (acc, item) => acc + item.quantity * item.unitWeight,
-        0
-      );
+      const sum = this.cartItems().reduce((acc, item) => acc + item.quantity * item.unitWeight, 0);
       return Number(sum.toFixed(3));
     }
     return this.selectedCarrello()?.peso ?? 0;
@@ -167,7 +160,7 @@ export class CarrelloComponent implements OnInit {
       .findByUser(userRef)
       .pipe(take(1))
       .subscribe({
-        next: cart => {
+        next: (cart) => {
           if (cart?.id) {
             this.setCurrentCart(cart);
             this.loading.set(false);
@@ -201,16 +194,14 @@ export class CarrelloComponent implements OnInit {
             .findByUser(userRef)
             .pipe(take(1))
             .subscribe({
-              next: createdCart => {
+              next: (createdCart) => {
                 if (createdCart?.id) {
                   this.setCurrentCart(createdCart);
                 }
                 onDone();
               },
               error: () => {
-                this.error.set(
-                  'Carrello creato ma non recuperabile al momento'
-                );
+                this.error.set('Carrello creato ma non recuperabile al momento');
                 onDone();
               },
             });
@@ -240,9 +231,7 @@ export class CarrelloComponent implements OnInit {
       return;
     }
 
-    const raw = this.getLocalStorage(
-      this.cartItemsStorageKey(cartId)
-    );
+    const raw = this.getLocalStorage(this.cartItemsStorageKey(cartId));
 
     if (!raw) {
       this.cartItems.set([]);
@@ -252,67 +241,35 @@ export class CarrelloComponent implements OnInit {
     try {
       const parsed = JSON.parse(raw);
 
-      this.cartItems.set(
-        Array.isArray(parsed) ? (parsed as CartItem[]) : []
-      );
+      this.cartItems.set(Array.isArray(parsed) ? (parsed as CartItem[]) : []);
     } catch {
       this.cartItems.set([]);
     }
   }
 
-  private persistCartItems(
-    cartId: number,
-    items: CartItem[]
-  ): void {
-    this.setLocalStorage(
-      this.cartItemsStorageKey(cartId),
-      JSON.stringify(items)
-    );
+  private persistCartItems(cartId: number, items: CartItem[]): void {
+    this.setLocalStorage(this.cartItemsStorageKey(cartId), JSON.stringify(items));
 
     this.cartItems.set(items);
     this.dispatchCartChanged();
   }
 
-  private syncCartTotalsFromItems(
-    cart: CarrelloDto,
-    items: CartItem[]
-  ): void {
+  private syncCartTotalsFromItems(cart: CarrelloDto, items: CartItem[]): void {
     if (!cart.id) return;
 
-    const quantita = items.reduce(
-      (acc, item) => acc + item.quantity,
-      0
-    );
+    const quantita = items.reduce((acc, item) => acc + item.quantity, 0);
 
     const prezzoTotale = Number(
-      items
-        .reduce(
-          (acc, item) =>
-            acc + item.quantity * item.unitPrice,
-          0
-        )
-        .toFixed(2)
+      items.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0).toFixed(2),
     );
 
     const peso = Number(
-      items
-        .reduce(
-          (acc, item) =>
-            acc + item.quantity * item.unitWeight,
-          0
-        )
-        .toFixed(3)
+      items.reduce((acc, item) => acc + item.quantity * item.unitWeight, 0).toFixed(3),
     );
 
     const userId = cart.userId ?? cart.user?.id ?? null;
 
-    const updated = new CarrelloDto(
-      prezzoTotale,
-      quantita,
-      peso,
-      userId,
-      cart.id
-    );
+    const updated = new CarrelloDto(prezzoTotale, quantita, peso, userId, cart.id);
 
     this.modifyingIds().add(cart.id);
 
@@ -321,8 +278,8 @@ export class CarrelloComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.carrelli.update(current =>
-            current.map(c =>
+          this.carrelli.update((current) =>
+            current.map((c) =>
               c.id === cart.id
                 ? {
                     ...c,
@@ -330,16 +287,14 @@ export class CarrelloComponent implements OnInit {
                     prezzoTotale,
                     peso,
                   }
-                : c
-            )
+                : c,
+            ),
           );
 
           this.modifyingIds().delete(cart.id!);
         },
-        error: err => {
-          this.error.set(
-            err?.message ?? 'Errore aggiornamento carrello'
-          );
+        error: (err) => {
+          this.error.set(err?.message ?? 'Errore aggiornamento carrello');
 
           this.modifyingIds().delete(cart.id!);
         },
@@ -348,10 +303,7 @@ export class CarrelloComponent implements OnInit {
 
   // ================= ACTIONS =================
 
-  updateItemQuantita(
-    productId: number,
-    value: number
-  ): void {
+  updateItemQuantita(productId: number, value: number): void {
     const carrello = this.selectedCarrello();
 
     if (!carrello?.id) return;
@@ -359,12 +311,8 @@ export class CarrelloComponent implements OnInit {
     const nextQty = Math.max(0, Math.trunc(value));
 
     const nextItems = this.cartItems()
-      .map(item =>
-        item.productId === productId
-          ? { ...item, quantity: nextQty }
-          : item
-      )
-      .filter(item => item.quantity > 0);
+      .map((item) => (item.productId === productId ? { ...item, quantity: nextQty } : item))
+      .filter((item) => item.quantity > 0);
 
     this.persistCartItems(carrello.id, nextItems);
     this.syncCartTotalsFromItems(carrello, nextItems);
@@ -375,9 +323,7 @@ export class CarrelloComponent implements OnInit {
 
     if (!carrello?.id) return;
 
-    const nextItems = this.cartItems().filter(
-      item => item.productId !== productId
-    );
+    const nextItems = this.cartItems().filter((item) => item.productId !== productId);
 
     this.persistCartItems(carrello.id, nextItems);
     this.syncCartTotalsFromItems(carrello, nextItems);
@@ -392,9 +338,7 @@ export class CarrelloComponent implements OnInit {
     const userId = this.getStoredUserId();
 
     if (!userId) {
-      this.error.set(
-        'Utente non valido, effettua nuovamente il login'
-      );
+      this.error.set('Utente non valido, effettua nuovamente il login');
       return;
     }
 
@@ -406,9 +350,7 @@ export class CarrelloComponent implements OnInit {
       .subscribe({
         next: () => {
           this.removeLocalStorage('cartId');
-          this.removeLocalStorage(
-            this.cartItemsStorageKey(carrelloId)
-          );
+          this.removeLocalStorage(this.cartItemsStorageKey(carrelloId));
 
           this.dispatchCartChanged();
 
@@ -416,10 +358,8 @@ export class CarrelloComponent implements OnInit {
             this.modifyingIds().delete(carrelloId);
           });
         },
-        error: err => {
-          this.error.set(
-            err?.message ?? 'Errore eliminazione'
-          );
+        error: (err) => {
+          this.error.set(err?.message ?? 'Errore eliminazione');
 
           this.modifyingIds().delete(carrelloId);
         },
@@ -427,9 +367,7 @@ export class CarrelloComponent implements OnInit {
   }
 
   isModifying(id: number | undefined): boolean {
-    return (
-      id !== undefined && this.modifyingIds().has(id)
-    );
+    return id !== undefined && this.modifyingIds().has(id);
   }
 
   // ================= ORDINE =================
@@ -439,34 +377,17 @@ export class CarrelloComponent implements OnInit {
     const userId = this.getStoredUserId();
 
     if (!carrello?.id || !userId) {
-      this.error.set(
-        'Dati non validi per creare l\'ordine'
-      );
+      this.error.set("Dati non validi per creare l'ordine");
       return;
     }
 
     if (!this.shippingAddress().trim()) {
-      this.error.set(
-        'Inserisci un indirizzo di spedizione'
-      );
+      this.error.set('Inserisci un indirizzo di spedizione');
       return;
     }
 
     const prodotti = this.cartItems().map(
-      item =>
-        new ProdottoDto(
-          '',
-          0,
-          0,
-          '',
-          {} as any,
-          0,
-          0,
-          false,
-          0,
-          undefined,
-          item.productId
-        )
+      (item) => new ProdottoDto('', 0, 0, '', {} as any, 0, 0, false, 0, undefined, item.productId),
     );
 
     const ordineDto = {
@@ -489,16 +410,22 @@ export class CarrelloComponent implements OnInit {
 
           if (carrello.id) {
             this.persistCartItems(carrello.id, []);
-            this.syncCartTotalsFromItems(
-              carrello,
-              []
-            );
+            this.syncCartTotalsFromItems(carrello, []);
           }
+          console.log(this.userService.findById(userId));
+          this.userService
+            .findById(userId)
+            .pipe(take(1))
+            .subscribe({
+              next: (updatedUser) => {
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+
+                window.dispatchEvent(new Event('user-updated'));
+              },
+            });
         },
-        error: err => {
-          this.error.set(
-            err?.message ?? 'Errore creazione ordine'
-          );
+        error: (err) => {
+          this.error.set(err?.message ?? 'Errore creazione ordine');
         },
       });
   }
