@@ -1,1 +1,227 @@
-<p>user-component works!</p>
+<main class="home-shell" *ngIf="isLogged()">
+
+  <section class="hero">
+
+    <div>
+
+      <p class="hero-eyebrow">
+        Area personale NerdMania
+      </p>
+
+      <h2>
+        {{ user().nome }} {{ user().cognome }}
+      </h2>
+
+      <p>
+        Username:
+        <strong>{{ user().username }}</strong>
+      </p>
+
+      <p>
+        Email:
+        <strong>{{ user().email }}</strong>
+      </p>
+
+      <div class="hero-actions">
+
+        <button
+          class="hero-cta"
+          (click)="logout()"
+        >
+          Logout
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- IMMAGINE PROFILO -->
+
+    <div class="profile-image-wrapper">
+
+      <img
+        src="assets/user.png"
+        alt="Profilo utente"
+        class="profile-image"
+      />
+
+    </div>
+
+  </section>
+
+  <!-- DATI UTENTE -->
+
+  <section class="data-section">
+
+    <h3>I tuoi dati</h3>
+
+    <div class="cards-grid">
+
+      <div class="data-card">
+
+        <p class="card-kicker">
+          Carta fedeltà
+        </p>
+
+        <h4>Stato</h4>
+
+        <p class="data-main">
+
+          {{
+            user().cartaFedelta
+              ? 'Attiva'
+              : 'Non attiva'
+          }}
+
+        </p>
+
+        <p class="data-sub">
+          Accumula punti sugli acquisti
+        </p>
+
+      </div>
+
+      <div class="data-card">
+
+        <p class="card-kicker">
+          Ordini
+        </p>
+
+        <h4>Numero ordini</h4>
+
+        <p class="data-main">
+
+          {{
+            user().ordini?.length || 0
+          }}
+
+        </p>
+
+        <p class="data-sub">
+          Storico acquisti effettuati
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- LISTA ORDINI -->
+  <section class="orders-section" *ngIf="user().ordini?.length">
+
+    <h3>I tuoi ordini</h3>
+
+    <div class="orders-list">
+
+      <div
+        class="order-card"
+        *ngFor="let ordine of user().ordini"
+      >
+
+        <!-- HEADER ORDINE -->
+        <div class="order-header">
+
+          <div>
+            <p class="order-id">
+              Ordine #{{ ordine.id }}
+            </p>
+
+            <p class="order-address">
+              {{ ordine.indirizzoSpedizione }}
+            </p>
+          </div>
+        </div>
+
+        <!-- PRODOTTI -->
+        <div class="order-products">
+
+          <div
+            class="product-row"
+            *ngFor="let prodotto of ordine.prodotti"
+          >
+
+            <img
+              [src]="prodotto.immagineUrl || 'assets/no-image.png'"
+              class="product-img"
+              alt="{{ prodotto.nome }}"
+            />
+
+            <div class="product-info">
+
+              <p class="product-name">
+                {{ prodotto.nome }}
+              </p>
+
+              <p class="product-meta">
+                €{{ prodotto.prezzo }}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="order-footer">
+
+          Totale:
+          <strong>€{{ ordine.costoTotale }}</strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<!-- NON LOGGATO -->
+
+<main
+  class="home-shell"
+  *ngIf="!isLogged()"
+>
+
+  <section class="hero">
+
+    <div>
+
+      <p class="hero-eyebrow">
+        Accesso richiesto
+      </p>
+
+      <h2>
+        Devi effettuare il login
+      </h2>
+
+      <p>
+        Accedi per visualizzare il tuo profilo.
+      </p>
+
+      <div class="hero-actions">
+
+        <button
+          class="hero-cta"
+          routerLink="/login"
+        >
+          Vai al login
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="hero-burst">
+
+      <span>Login</span>
+      <small>Required</small>
+
+    </div>
+
+  </section>
+
+</main>

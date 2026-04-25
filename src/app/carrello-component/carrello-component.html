@@ -1,0 +1,123 @@
+<main class="cart-container">
+  <section class="cart-header">
+    <h1>Il Mio Carrello</h1>
+  </section>
+
+  @if (loading()) {
+    <section class="cart-content">
+      <p class="status-message loading">Caricamento carrello in corso...</p>
+    </section>
+  } @else if (error()) {
+    <section class="cart-content">
+      <p class="status-message error">Errore: {{ error() }}</p>
+    </section>
+  } @else if (carrelli().length === 0) {
+    <section class="cart-content">
+      <p class="status-message empty">Il carrello è vuoto</p>
+    </section>
+  } @else {
+    <section class="cart-content">
+      @if (cartItems().length === 0) {
+        <p class="status-message empty">Nessun articolo nel carrello.</p>
+      } @else {
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>Articolo</th>
+              <th>Prezzo</th>
+              <th>Quantità</th>
+              <th>Subtotale</th>
+              <th>Azione</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of cartItems(); track item.productId) {
+              <tr>
+                <td>
+                  <div class="item-info">
+                    @if (item.immagineUrl?.trim()) {
+                      <div class="item-thumb-wrap">
+                        <img class="item-thumb" [src]="item.immagineUrl" [alt]="item.nome" />
+                      </div>
+                    }
+                    <div>
+                      <strong>{{ item.nome }}</strong>
+                    </div>
+                  </div>
+                </td>
+                <td>€{{ item.unitPrice.toFixed(2) }}</td>
+                <td>
+                  <input
+                    type="number"
+                    class="qty-input"
+                    [ngModel]="item.quantity"
+                    (ngModelChange)="updateItemQuantita(item.productId, $event)"
+                    min="0"
+                    [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
+                  />
+                </td>
+                <td class="price">€{{ (item.unitPrice * item.quantity).toFixed(2) }}</td>
+                <td class="actions">
+                  <button
+                    type="button"
+                    class="icon-btn icon-delete"
+                    (click)="removeItem(item.productId)"
+                    [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
+                    aria-label="Rimuovi articolo dal carrello"
+                  >
+                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                      <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9zM7 9h2v9H7V9z" fill="currentColor"/>
+                    </svg>
+                    <span class="sr-only">Rimuovi</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <section class="cart-summary bottom">
+        <div class="summary-item">
+          <strong>Quantità totale</strong>
+          <span class="summary-value">{{ totalItems() }}</span>
+        </div>
+        <div class="summary-item">
+          <strong>Peso totale</strong>
+          <span class="summary-value">{{ totalWeight().toFixed(2) }} kg</span>
+        </div>
+        <div class="summary-item">
+          <strong>Prezzo totale</strong>
+          <span class="summary-value">€{{ totalPrice().toFixed(2) }}</span>
+        </div>
+      </section>
+
+      <section class="shipping-section" aria-label="Indirizzo di spedizione">
+        <label for="shippingAddress" class="shipping-label">Indirizzo di spedizione</label>
+        <input
+          id="shippingAddress"
+          type="text"
+          class="shipping-input"
+          placeholder="Inserisci via, numero civico, CAP, città"
+          [ngModel]="shippingAddress()"
+          (ngModelChange)="shippingAddress.set($event)"
+        />
+      </section>
+
+      <div class="cart-actions">
+        <button 
+          type="button"
+          class="icon-btn icon-delete"
+          (click)="removeFromCart()"
+          [disabled]="modifyingIds().has(selectedCarrello()!.id!)"
+          aria-label="Elimina carrello"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9zM7 9h2v9H7V9z" fill="currentColor"/>
+          </svg>
+          <span class="btn-label">Elimina carrello</span>
+        </button>
+      </div>
+    </section>
+  }
+</main>

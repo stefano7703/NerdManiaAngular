@@ -1,1 +1,73 @@
-<p>ordine-component works!</p>
+<div class="container">
+
+  <h1 class="title">📦 Gestione Ordini</h1>
+
+  <!-- SEARCH BAR ID -->
+  <div class="search-box">
+    <input type="text" placeholder="Cerca per Username" #username>
+    <button (click)="findByUserUsername(username.value)">Cerca</button>
+  </div>
+
+  <hr>
+
+  <!-- LISTA ORDINI -->
+  <div class="grid">
+    @for (ordine of ListOrdini; track ordine.id) {
+      <div class="card">
+        <p><strong>ID:</strong> {{ordine.id}}</p>
+        <p><strong>Costo:</strong> €{{ordine.costoTotale}}</p>
+        <p><strong>Indirizzo:</strong> {{ordine.indirizzoSpedizione}}</p>
+
+              <!-- LISTA PRODOTTI -->
+      <div class="prodotti">
+        <p><strong>Prodotti:</strong></p>
+
+        @for (prodotto of ordine.prodotti; track prodotto.id) {
+          <div class="prodotto">
+            <p>Nome:{{prodotto.nome}}</p>
+            <p>Prezzo:€{{prodotto.prezzo}}</p>
+            <p>Descrizione:{{prodotto.descrizione}}</p>
+            <p>Peso: {{prodotto.peso}}</p>
+          </div>
+        }
+      </div>
+      </div>
+    }
+  </div>
+
+  <hr>
+  <!-- FILTRI-->
+
+  <div class="filters">
+
+    <div class="filter">
+      <input placeholder="Ordine per costo decrescente">
+      <button (click)="findAllByOrderByCostoTotaleDesc()">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input placeholder="Ordina per costo crescente">
+      <button (click)="findAllByOrderByCostoTotaleAsc()">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Indirizzo" #indirizzo>
+      <button (click)="findByIndirizzoSpedizioneContainingIgnoreCase(indirizzo.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Costo >" #prezzo>
+      <button (click)="findByCostoTotaleGreaterThan(+prezzo.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="Costo <" #prezzo1>
+      <button (click)="findByCostoTotaleLessThan(+prezzo1.value)">Filtro</button>
+    </div>
+
+    <div class="filter">
+      <input type="text" placeholder="ProdottoId" #prodottoID>
+      <button (click)="findByProdottiId(+prodottoID.value)">Filtro</button>
+    </div>
+  </div>
+</div>

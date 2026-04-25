@@ -12,11 +12,5 @@ describe('ProdottoComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProdottoComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 });

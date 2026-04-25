@@ -1,1 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito+Sans:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --color-gold:       #FFD400;
+  --color-jet:        #1E2A38;
+  --color-red:        #E63946;
+  --color-turquoise:  #00B4D8;
+  --color-smoke:      #F5F5F5;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Nunito Sans', 'Trebuchet MS', sans-serif;
+  background: var(--color-smoke);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(0, 180, 216, 0.08), transparent 24%),
+    radial-gradient(circle at 80% 70%, rgba(230, 57, 70, 0.05), transparent 26%);
+  color: var(--color-jet);
+}
