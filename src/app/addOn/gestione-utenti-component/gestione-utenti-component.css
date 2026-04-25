@@ -63,6 +63,7 @@
 .hero-cta {
 	border: 0;
 	border-radius: 10px;
+  margin-left: 10px;
 	padding: 0.72rem 1.3rem;
 	font-weight: 900;
 	text-transform: uppercase;
@@ -90,6 +91,24 @@
 	border: 2px solid var(--color-turquoise);
 	color: var(--color-smoke);
 	background: rgba(0, 180, 216, 0.2);
+}
+
+.hero-secondary-2{
+  color: var(--color-jet);
+  text-decoration: none;
+	border-radius: 10px;
+	padding: 0.56rem 1rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	border: 2px solid var(--color-turquoise);
+	background: rgba(0, 180, 216, 0.2);
+}
+
+.hero-secondary-2:hover,
+.hero-secondary-2:focus-visible {
+	background: var(--color-turquoise);
+	color: var(--color-smoke);
 }
 
 .hero-secondary:hover,
@@ -459,6 +478,7 @@ input {
 }
 
 /* BUTTON SPACING */
+
 
 .quick-card button {
 	margin-top: 0.5rem;

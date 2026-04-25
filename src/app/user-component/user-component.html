@@ -1,4 +1,4 @@
-<main class="home-shell" *ngIf="isLogged()">
+<main class="home-shell" *ngIf="authService.isLoggedIn()">
 
   <section class="hero">
 
@@ -183,7 +183,7 @@
 
 <main
   class="home-shell"
-  *ngIf="!isLogged()"
+  *ngIf="!authService.isLoggedIn()"
 >
 
   <section class="hero">
@@ -204,23 +204,14 @@
 
       <div class="hero-actions">
 
-        <button
-          class="hero-cta"
-          routerLink="/login"
-        >
-          Vai al login
-        </button>
+        <button class="hero-cta" type="button" (click)="goLogin()">
+  Vai al login
+</button>
 
       </div>
 
     </div>
 
-    <div class="hero-burst">
-
-      <span>Login</span>
-      <small>Required</small>
-
-    </div>
 
   </section>
 
