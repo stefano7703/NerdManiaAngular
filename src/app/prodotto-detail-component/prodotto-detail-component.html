@@ -1,0 +1,117 @@
+<main class="product-detail-shell">
+  @if (loading()) {
+    <p class="state">Caricamento prodotto in corso...</p>
+  } @else if (error()) {
+    <section class="detail-state-box error">
+      <h2>Oops!</h2>
+      <p>{{ error() }}</p>
+      <button type="button" class="action-secondary" (click)="goBack()">Torna al catalogo</button>
+    </section>
+  } @else if (prodotto(); as item) {
+    <section class="detail-hero">
+      <a class="back-link" routerLink="/catalogo">← Torna al catalogo</a>
+
+      <div class="detail-card">
+        <div class="detail-media">
+          @if (item.immagineUrl?.trim()) {
+            <div class="detail-image-wrap">
+              <img
+                class="detail-image"
+                [src]="item.immagineUrl"
+                [alt]="'Immagine di ' + item.nome"
+                loading="lazy"
+                (error)="onImageError($event)"
+              />
+            </div>
+          } @else {
+            <div class="detail-image-placeholder">Nessuna immagine disponibile</div>
+          }
+        </div>
+
+        <div class="detail-content">
+          <p class="detail-kicker">
+            {{ item.categoria.nome || 'Categoria non disponibile' }}
+          </p>
+
+          <h1>{{ item.nome }}</h1>
+
+          <p class="detail-price">€{{ item.prezzo.toFixed(2) }}</p>
+
+          <p class="detail-description">
+            {{ item.descrizione || 'Nessuna descrizione disponibile.' }}
+          </p>
+
+          <section class="detail-specs">
+            <h3>Specifiche prodotto</h3>
+
+            <div class="specs-grid">
+              <div class="spec-card">
+                <span class="spec-label">Peso</span>
+                <span class="spec-value">{{ item.peso }}</span>
+              </div>
+
+              <div class="spec-card">
+                <span class="spec-label">Altezza</span>
+                <span class="spec-value">{{ item.altezza }}</span>
+              </div>
+
+              <div class="spec-card">
+                <span class="spec-label">Lunghezza</span>
+                <span class="spec-value">{{ item.lunghezza }}</span>
+              </div>
+
+              <div class="spec-card">
+                <span class="spec-label">Spessore</span>
+                <span class="spec-value">{{ item.spessore }}</span>
+              </div>
+
+              <div class="spec-card">
+                <span class="spec-label">Fragile</span>
+                <span class="spec-value">{{ item.fragile ? 'Sì' : 'No' }}</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="cart-box">
+            <h3>Aggiungi al carrello</h3>
+
+            <div class="quantity-block">
+              <label for="qty-input">Quantità</label>
+              <div class="quantity-controls">
+                <button type="button" class="qty-btn" (click)="decrementQuantity()">−</button>
+                <input id="qty-input" type="number" [value]="quantita()" readonly />
+                <button type="button" class="qty-btn" (click)="incrementQuantity()">+</button>
+              </div>
+            </div>
+
+            <p class="detail-total">
+              Totale: <strong>€{{ (item.prezzo * quantita()).toFixed(2) }}</strong>
+            </p>
+
+            <div class="detail-actions">
+              <button type="button" class="action-primary" (click)="addToCart()" [disabled]="addingToCart()">
+                @if (addingToCart()) {
+                  Aggiungendo...
+                } @else {
+                  Aggiungi al carrello
+                }
+              </button>
+
+              <button type="button" class="action-secondary" (click)="goBack()">
+                Continua lo shopping
+              </button>
+            </div>
+
+            @if (cartError()) {
+              <p class="cart-feedback error">{{ cartError() }}</p>
+            }
+
+            @if (cartSuccess()) {
+              <p class="cart-feedback success">{{ cartSuccess() }}</p>
+            }
+          </section>
+        </div>
+      </div>
+    </section>
+  }
+</main>

@@ -104,6 +104,11 @@
   font-weight: 600;
 }
 
+.status-message.success {
+  color: #0f766e;
+  font-weight: 600;
+}
+
 .status-message.empty {
   color: #999;
   font-style: italic;
@@ -276,9 +281,40 @@
 .cart-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 0.7rem;
   margin-top: 0.3rem;
   padding: 1.2rem 1.2rem 1.4rem;
   border-top: 1px solid #e5e7eb;
+}
+
+.shipping-section {
+  padding: 0.8rem 1.2rem 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.shipping-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-jet);
+}
+
+.shipping-input {
+  width: 100%;
+  max-width: 700px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  color: #111827;
+  background: #ffffff;
+}
+
+.shipping-input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(245, 208, 66, 0.25);
 }
 
 .btn-label {
@@ -330,6 +366,10 @@
 
   .cart-actions {
     justify-content: center;
+  }
+
+  .shipping-section {
+    padding: 0.8rem 0.9rem 0.2rem;
   }
 
   .icon-delete {

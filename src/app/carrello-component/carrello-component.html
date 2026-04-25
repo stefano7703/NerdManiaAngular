@@ -92,6 +92,18 @@
         </div>
       </section>
 
+      <section class="shipping-section" aria-label="Indirizzo di spedizione">
+        <label for="shippingAddress" class="shipping-label">Indirizzo di spedizione</label>
+        <input
+          id="shippingAddress"
+          type="text"
+          class="shipping-input"
+          placeholder="Inserisci via, numero civico, CAP, città"
+          [ngModel]="shippingAddress()"
+          (ngModelChange)="shippingAddress.set($event)"
+        />
+      </section>
+
       <div class="cart-actions">
         <button 
           type="button"

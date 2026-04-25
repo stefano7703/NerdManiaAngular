@@ -4,8 +4,10 @@ import { take } from 'rxjs';
 import { CatalogoDto } from '../Dto/CatalogoDto';
 import { CategoriaDto } from '../Dto/CategoriaDto';
 import { ProdottoDto } from '../Dto/ProdottoDto';
+import { AuthService } from '../Service/AuthService';
 import { CatalogoService } from '../Service/CatalogoService';
 import { ProdottoService } from '../Service/ProdottoService';
+import { WishlistService } from '../Service/WishlistService';
 
 type CatalogoGroup = {
   catalogoKey: string;
@@ -29,6 +31,8 @@ type CatalogoHighlight = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
+  readonly authService = inject(AuthService);
+  readonly wishlistService = inject(WishlistService);
   private readonly router = inject(Router);
   private readonly prodottoService = inject(ProdottoService);
   private readonly catalogoService = inject(CatalogoService);
@@ -118,6 +122,16 @@ export class HomeComponent implements OnInit {
       return;
     }
     target.style.display = 'none';
+  }
+
+  toggleFavorite(event: Event, product: ProdottoDto): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.wishlistService.toggleFavorite(product);
+  }
+
+  isFavorite(product: ProdottoDto): boolean {
+    return this.wishlistService.isFavorite(product);
   }
 
   private loadData(): void {

@@ -16,7 +16,7 @@ export abstract class AbstractService<DTO> implements Service<DTO> {
   }
 
     getAll(): Observable<DTO[]> {
-      return this.http.get<DTO[]>(this.baseUrl + '/' + this.type + '/getAll');
+      return this.http.get<DTO[]>(this.baseUrl + '/' + this.type + '/getall');
     }
 
     read(id: number): Observable<DTO> {

@@ -4,10 +4,12 @@
 			<p class="hero-eyebrow">Nuove uscite e collezioni leggendarie</p>
 			<h2 id="home-title">{{ welcomeTitle }}: il tuo multiverso nerd</h2>
 			<p>{{ welcomeMessage }} Fumetti, manga, action figure e chicche da veri collezionisti.</p>
-			<div class="hero-actions">
-				<a class="hero-cta" routerLink="/login">Login</a>
-				<a class="hero-secondary" routerLink="/login">Registrati</a>
-			</div>
+			@if (!authService.isLoggedIn()) {
+				<div class="hero-actions">
+					<a class="hero-cta" routerLink="/login">Login</a>
+					<a class="hero-secondary" routerLink="/login">Registrati</a>
+				</div>
+			}
 		</div>
 		<div class="hero-burst" aria-hidden="true">
 			<span>Pow!</span>
@@ -27,6 +29,21 @@
 			<div class="cards-grid">
 				@for (prodotto of featuredProdotti(); track prodotto.id ?? prodotto.nome) {
 					<article class="data-card product-card">
+						<button
+							type="button"
+							class="favorite-btn"
+							[class.is-active]="isFavorite(prodotto)"
+							[attr.aria-pressed]="isFavorite(prodotto)"
+							[attr.aria-label]="isFavorite(prodotto) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+							(click)="toggleFavorite($event, prodotto)"
+						>
+							❤
+						</button>
+						<a
+							class="card-link-overlay"
+							[routerLink]="['/prodotto', prodotto.id]"
+							[attr.aria-label]="'Apri la scheda di ' + prodotto.nome"
+						></a>
 						<p class="card-kicker">Top item</p>
 						@if (prodotto.immagineUrl?.trim()) {
 							<div class="product-image-wrap">
@@ -42,7 +59,6 @@
 						<h4>{{ prodotto.nome }}</h4>
 						<p class="data-main">{{ prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ prodotto.descrizione }}</p>
-						<a routerLink="/catalogo" class="data-link">Vai alla scheda</a>
 					</article>
 				}
 			</div>
@@ -67,6 +83,21 @@
 					<a class="catalog-col-label" routerLink="/catalogo">{{ highlight.catalogoNome }}</a>
 				}
 				<article class="data-card product-card catalog-rotating-card">
+						<button
+							type="button"
+							class="favorite-btn"
+							[class.is-active]="isFavorite(highlight.prodotto)"
+							[attr.aria-pressed]="isFavorite(highlight.prodotto)"
+							[attr.aria-label]="isFavorite(highlight.prodotto) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+							(click)="toggleFavorite($event, highlight.prodotto)"
+						>
+							❤
+						</button>
+						<a
+							class="card-link-overlay"
+							[routerLink]="['/prodotto', highlight.prodotto.id]"
+							[attr.aria-label]="'Apri la scheda di ' + highlight.prodotto.nome"
+						></a>
 						@if (highlight.prodotto.immagineUrl?.trim()) {
 							<div class="product-image-wrap">
 								<img
@@ -81,7 +112,6 @@
 						<h4>{{ highlight.prodotto.nome }}</h4>
 						<p class="data-main">{{ highlight.prodotto.prezzo }} EUR</p>
 						<p class="data-sub">{{ highlight.prodotto.descrizione }}</p>
-						<a routerLink="/catalogo" class="data-link">Vai al catalogo</a>
 					</article>				</div>				}
 			</div>
 		}
