@@ -187,30 +187,30 @@
 
               <div class="spedizione-item">
                 <span>Altezza</span>
-                <p>{{ ordine.spedizione?.altezza }} cm</p>
+                <p>{{ ordine.spedizione.altezza }} cm</p>
               </div>
 
               <div class="spedizione-item">
                 <span>Lunghezza</span>
-                <p>{{ ordine.spedizione?.lunghezza }} cm</p>
+                <p>{{ ordine.spedizione.lunghezza }} cm</p>
               </div>
 
               <div class="spedizione-item">
                 <span>Spessore</span>
-                <p>{{ ordine.spedizione?.spessore }} cm</p>
+                <p>{{ ordine.spedizione.spessore }} cm</p>
               </div>
 
               <div class="spedizione-item">
                 <span>Peso</span>
-                <p>{{ ordine.spedizione?.peso }} kg</p>
+                <p>{{ ordine.spedizione.peso }} kg</p>
               </div>
 
               <div class="spedizione-item">
                 <span>Fragile</span>
                 <p
-                  [ngClass]="ordine.spedizione?.fragile ? 'fragile-yes' : 'fragile-no'"
+                  [ngClass]="ordine.spedizione.fragile ? 'fragile-yes' : 'fragile-no'"
                 >
-                  {{ ordine.spedizione?.fragile ? 'Sì ⚠️' : 'No ✔️' }}
+                  {{ ordine.spedizione.fragile ? 'Sì ⚠️' : 'No ✔️' }}
                 </p>
               </div>
 
