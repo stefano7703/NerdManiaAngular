@@ -6,6 +6,8 @@ import { CarrelloDto } from '../Dto/CarrelloDto';
 import { AddUserComponent } from '../addOn/add-user-component/add-user-component';
 import { AuthService } from '../Service/AuthService';
 import { Router } from '@angular/router';
+import { PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-user-component',
@@ -15,43 +17,37 @@ import { Router } from '@angular/router';
   styleUrl: './user-component.css',
 })
 export class UserComponent implements OnInit {
-
   showAddUser = signal(false);
 
   users = signal<UserDto[]>([]);
+  private platformId = inject(PLATFORM_ID);
 
   user = signal<UserDto>(
-    new UserDto(
-      0,
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      false,
-      new CarrelloDto(0, 0, 0),
-      null
-    )
+    new UserDto(0, '', '', '', '', '', '', false, new CarrelloDto(0, 0, 0), null),
   );
 
   ordineAperto: number | null = null;
-
 
   checkResult = signal<{ message: string; exists: boolean | null }>({
     message: '',
     exists: null,
   });
 
-
   constructor(
     private service: userService,
     public authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
+    this.loadUser();
 
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('user-updated', () => this.loadUser());
+    }
+  }
+
+  private loadUser() {
     const loggedUser = this.authService.getUser();
 
     if (loggedUser) {
@@ -60,7 +56,7 @@ export class UserComponent implements OnInit {
   }
 
   toggleSpedizione(id: number) {
-  this.ordineAperto = this.ordineAperto === id ? null : id;
+    this.ordineAperto = this.ordineAperto === id ? null : id;
   }
 
   logout() {
@@ -73,7 +69,6 @@ export class UserComponent implements OnInit {
   }
 
   goLogin() {
-  this.router.navigate(['/login']);
-}
-
+    this.router.navigate(['/login']);
+  }
 }
