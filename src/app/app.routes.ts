@@ -24,7 +24,7 @@ export const routes: Routes = [
   { path: 'catalogo', component: CatalogoComponent },
   { path: 'magazzino', component: MagazzinoComponent, canActivate: [AdminGuard] },
   { path: 'ordine', component: OrdineComponent, canActivate: [AdminGuard] },
-  { path: 'prodotto/:id', component: ProdottoDetailComponent, canActivate: [AdminGuard] },
+  { path: 'prodotto/:id', component: ProdottoDetailComponent },
   { path: 'prodotto', component: ProdottoComponent },
   { path: 'spedizione', component: SpedizioneComponent,canActivate: [AdminGuard] },
   { path: 'categoria', component: CategoriaComponent },
