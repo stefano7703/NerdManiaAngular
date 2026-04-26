@@ -71,4 +71,18 @@ export class UserComponent implements OnInit {
   goLogin() {
     this.router.navigate(['/login']);
   }
+
+  getProdottiConQuantita(prodotti: any[]) {
+  const map = new Map<number, any>();
+
+  prodotti.forEach(p => {
+    if (map.has(p.id)) {
+      map.get(p.id).quantita++;
+    } else {
+      map.set(p.id, { ...p, quantita: 1 });
+    }
+  });
+
+  return Array.from(map.values());
+  }
 }
