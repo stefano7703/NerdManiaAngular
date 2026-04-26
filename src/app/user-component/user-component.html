@@ -126,10 +126,6 @@
             <p class="order-id">
               Ordine #{{ ordine.id }}
             </p>
-
-            <p class="order-address">
-              {{ ordine.indirizzoSpedizione }}
-            </p>
           </div>
         </div>
 
@@ -138,17 +134,24 @@
 
           <div
             class="product-row"
-            *ngFor="let prodotto of ordine.prodotti"
+            *ngFor="let prodotto of getProdottiConQuantita(ordine.prodotti)"
           >
 
-            <img
-              [src]="prodotto.immagineUrl || 'assets/no-image.png'"
-              class="product-img"
-              alt="{{ prodotto.nome }}"
-            />
+            <div class="product-img-wrapper">
+
+              <img
+                [src]="prodotto.immagineUrl || 'assets/no-image.png'"
+                class="product-img"
+                alt="{{ prodotto.nome }}"
+              />
+
+              <span class="qty-badge">
+                x{{ prodotto.quantita }}
+              </span>
+
+            </div>
 
             <div class="product-info">
-
               <p class="product-name">
                 {{ prodotto.nome }}
               </p>
@@ -177,12 +180,16 @@
 
           <!-- DETTAGLI SPEDIZIONE -->
           <div
-            class="spedizione-box"
-            *ngIf="ordineAperto === ordine.id"
+            class="spedizione-box" *ngIf="ordineAperto === ordine.id"
           >
 
             <h4>🚚 Dettagli spedizione</h4>
 
+            <div class="spedizione-address">
+              <span>Indirizzo di spedizione</span>
+              <p>{{ ordine.indirizzoSpedizione }}</p>
+            </div>
+            
             <div class="spedizione-grid">
 
               <div class="spedizione-item">

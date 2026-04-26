@@ -303,11 +303,12 @@ export class CarrelloComponent implements OnInit {
   creaOrdine(): void {
   const carrello = this.selectedCarrello();
   const userId = this.getStoredUserId();
-  const prodotti = this.cartItems().map(item =>
-  new ProdottoDto(
-    '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, item.productId
-  )
-);
+  const prodotti = this.expandProductsForOrder(this.cartItems())
+  .map(p =>
+    new ProdottoDto(
+      '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, p.id
+    )
+  );
 
   if (!carrello?.id || !userId) {
     this.error.set('Dati non validi per creare l\'ordine');
