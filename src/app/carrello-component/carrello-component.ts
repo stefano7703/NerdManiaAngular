@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
@@ -7,6 +7,9 @@ import { CarrelloService } from '../Service/CarrelloService';
 import { UserDto } from '../Dto/UserDto';
 import { ordineService } from '../Service/ordineService';
 import { ProdottoDto } from '../Dto/ProdottoDto';
+import { userService } from '../Service/userService';
+
+// ================= TYPES =================
 
 type CartItem = {
   productId: number;
@@ -27,6 +30,8 @@ type CartItem = {
 export class CarrelloComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
   private readonly ordineService = inject(ordineService);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly userService = inject(userService);
 
   // State
   carrelli = signal<CarrelloDto[]>([]);
@@ -40,7 +45,7 @@ export class CarrelloComponent implements OnInit {
   selectedCarrello = computed(() => {
     const id = this.selectedCarrelloId();
     if (id === null) return null;
-    return this.carrelli().find(c => c.id === id) ?? null;
+    return this.carrelli().find((c) => c.id === id) ?? null;
   });
 
   totalPrice = computed(() => {
@@ -53,6 +58,7 @@ export class CarrelloComponent implements OnInit {
 
   totalItems = computed(() => {
     if (this.cartItems().length > 0) {
+      return this.cartItems().reduce((acc, item) => acc + item.quantity, 0);
       return this.cartItems().reduce((acc, item) => acc + item.quantity, 0);
     }
     return this.selectedCarrello()?.quantita ?? 0;
@@ -77,7 +83,7 @@ export class CarrelloComponent implements OnInit {
     const raw = localStorage.getItem('user');
     if (!raw) {
       return null;
-    } 
+    }
 
     try {
       const parsed = JSON.parse(raw) as UserDto;
@@ -253,6 +259,7 @@ export class CarrelloComponent implements OnInit {
     const userId = this.getStoredUserId();
     if (!userId) {
       this.error.set('Utente non valido, effettua nuovamente il login');
+      this.error.set('Utente non valido, effettua nuovamente il login');
       return;
     }
 
@@ -291,8 +298,8 @@ export class CarrelloComponent implements OnInit {
 
     return result;
   }
-  
-  
+
+
   creaOrdine(): void {
   const carrello = this.selectedCarrello();
   const userId = this.getStoredUserId();
@@ -321,16 +328,34 @@ export class CarrelloComponent implements OnInit {
     prodotti:prodotti
   };
 
-  this.ordineService.insert(ordineDto as any)
-    .pipe(take(1))
-    .subscribe({
-      next: () => {
-        alert('Ordine creato con successo!');
-        this.shippingAddress.set('');
-      },
-      error: (err) => {
-        this.error.set(err?.message ?? 'Errore creazione ordine');
-      }
-    });
-}
+    this.ordineService
+      .insert(ordineDto as any)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          alert('Ordine creato con successo!');
+
+          this.shippingAddress.set('');
+
+          if (carrello.id) {
+            this.persistCartItems(carrello.id, []);
+            this.syncCartTotalsFromItems(carrello, []);
+          }
+          console.log(this.userService.findById(userId));
+          this.userService
+            .findById(userId)
+            .pipe(take(1))
+            .subscribe({
+              next: (updatedUser) => {
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+
+                window.dispatchEvent(new Event('user-updated'));
+              },
+            });
+        },
+        error: (err) => {
+          this.error.set(err?.message ?? 'Errore creazione ordine');
+        },
+      });
+  }
 }

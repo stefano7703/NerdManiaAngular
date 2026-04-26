@@ -6,6 +6,8 @@ import { CarrelloDto } from '../Dto/CarrelloDto';
 import { AddUserComponent } from '../addOn/add-user-component/add-user-component';
 import { AuthService } from '../Service/AuthService';
 import { Router } from '@angular/router';
+import { PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-user-component',
@@ -15,29 +17,16 @@ import { Router } from '@angular/router';
   styleUrl: './user-component.css',
 })
 export class UserComponent implements OnInit {
-
   showAddUser = signal(false);
 
   users = signal<UserDto[]>([]);
+  private platformId = inject(PLATFORM_ID);
 
   user = signal<UserDto>(
-    new UserDto(
-      0,
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      false,
-      new CarrelloDto(0, 0, 0),
-      null
-    )
+    new UserDto(0, '', '', '', '', '', '', false, new CarrelloDto(0, 0, 0), null),
   );
 
   ordineAperto: number | null = null;
-
-  isLogged = signal(false);
 
   checkResult = signal<{ message: string; exists: boolean | null }>({
     message: '',
@@ -46,23 +35,28 @@ export class UserComponent implements OnInit {
 
   constructor(
     private service: userService,
-    private authService: AuthService,
-    private router: Router
+    public authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
+    this.loadUser();
 
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('user-updated', () => this.loadUser());
+    }
+  }
+
+  private loadUser() {
     const loggedUser = this.authService.getUser();
 
     if (loggedUser) {
       this.user.set(loggedUser);
-      this.isLogged.set(true);
     }
-
   }
 
   toggleSpedizione(id: number) {
-  this.ordineAperto = this.ordineAperto === id ? null : id;
+    this.ordineAperto = this.ordineAperto === id ? null : id;
   }
 
   logout() {
@@ -70,91 +64,11 @@ export class UserComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  /*
-  cercaPerNome(nome: string) {
-    if (!nome) return;
-
-    this.service
-      .findByNomeContainingIgnoreCase(nome)
-      .subscribe((data) => {
-        this.users.set(data);
-      });
+  isLogged() {
+    return this.authService.isLoggedIn();
   }
 
-  filtraPerCartaFedelta(possiedeCarta: boolean) {
-
-    const call = possiedeCarta
-      ? this.service.findByCartaFedeltaTrue()
-      : this.service.findByCartaFedeltaFalse();
-
-    call.subscribe((data) => {
-      this.users.set(data);
-    });
+  goLogin() {
+    this.router.navigate(['/login']);
   }
-
-  verificaUsername(username: string) {
-
-    if (!username) return;
-
-    this.service.exiexistsByUsername(username).subscribe({
-      next: (exists) => {
-        this.checkResult.set({
-          exists: exists,
-          message: exists
-            ? 'Username già occupato'
-            : 'Username disponibile',
-        });
-      },
-
-      error: () => {
-        this.checkResult.set({
-          exists: true,
-          message: 'Errore di connessione al server',
-        });
-      }
-    });
-
-  }
-
-  verificaEmail(email: string) {
-
-    this.service.exiexistsByEmail(email).subscribe((exists) => {
-
-      this.checkResult.set({
-        exists,
-        message: exists
-          ? 'Email già registrata'
-          : 'Email disponibile',
-      });
-
-    });
-
-  }
-
-  reset() {
-    this.users.set([]);
-    this.checkResult.set({
-      message: '',
-      exists: null
-    });
-  }
-
-
-  openAddUser() {
-    this.showAddUser.set(true);
-  }
-
-  closeAddUser() {
-    this.showAddUser.set(false);
-  }
-
-  onUserAdded(user: UserDto) {
-
-    console.log('Utente aggiunto:', user);
-
-    this.showAddUser.set(false);
-
-  }
-    */
-
 }
