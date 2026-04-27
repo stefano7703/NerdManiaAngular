@@ -17,11 +17,10 @@
      Catalogo
   </a>
 
-  <a
-    [routerLink]="authService.isLoggedIn() ? '/user' : '/login'"
-    routerLinkActive="is-active">
-    Profilo
-  </a>
+  <a [routerLink]="(authService.loggedIn$ | async) ? '/user' : '/login'"
+  routerLinkActive="is-active">
+  Profilo
+</a>
 
   <!-- SEZIONI SOLO ADMIN -->
 
