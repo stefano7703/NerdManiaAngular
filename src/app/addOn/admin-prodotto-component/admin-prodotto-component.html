@@ -47,32 +47,8 @@
   <section class="admin-layout">
     <!-- LISTA -->
     <div class="admin-list">
-  <h2>Lista prodotti</h2>
+      <h2>Lista prodotti</h2>
 
-<<<<<<< HEAD:src/app/addOn/admin-prodotto-component/admin-prodotto-component.html
-  @if (loading()) {
-    <p class="state">Caricamento prodotti...</p>
-  } @else if (prodottiFiltrati().length === 0) {
-    <p class="state">Nessun prodotto trovato.</p>
-  } @else {
-    <div class="card-grid">
-      @for (prodotto of prodottiFiltrati(); track prodotto.id ?? prodotto.nome) {
-        <div class="product-card">
-          <img
-            [src]="prodotto.immagineUrl || 'https://via.placeholder.com/200'"
-            [alt]="prodotto.nome"
-            class="product-img"
-          />
-
-          <div class="product-info">
-            <h3>{{ prodotto.nome }}</h3>
-            <p class="price">€{{ prodotto.prezzo }}</p>
-            <p class="category">{{ prodotto.categoria.nome || '—' }}</p>
-            <p class="fragile">
-              {{ prodotto.fragile ? 'Fragile' : 'Non fragile' }}
-            </p>
-          </div>
-=======
       @if (loading()) {
         <p class="state">Caricamento prodotti...</p>
       } @else if (prodottiFiltrati().length === 0) {
@@ -104,23 +80,26 @@
                   <td>€{{ prodotto.prezzo }}</td>
                   <td>{{ prodotto.categoria.nome || '—' }}</td>
                   <td>{{ prodotto.fragile ? 'Sì' : 'No' }}</td>
->>>>>>> 390d7de (mod. paginazione prodotti):src/app/admin-prodotto-component/admin-prodotto-component.html
 
-          <div class="product-actions">
-            <button
-              type="button"
-              class="btn-secondary"
-              (click)="editProduct(prodotto)">
-              Modifica
-            </button>
+                  <td class="actions-cell">
+                    <button
+                      type="button"
+                      class="btn-secondary"
+                      (click)="editProduct(prodotto)">
+                      Modifica
+                    </button>
 
-            <button
-              type="button"
-              class="btn-danger"
-              (click)="deleteProduct(prodotto.id)">
-              Elimina
-            </button>
-          </div>
+                    <button
+                      type="button"
+                      class="btn-danger"
+                      (click)="deleteProduct(prodotto.id)">
+                      Elimina
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
 
         @if (totalPages() > 1) {
@@ -160,8 +139,6 @@
         }
       }
     </div>
-  }
-</div>
 
     <!-- FORM -->
     <div class="admin-form">
