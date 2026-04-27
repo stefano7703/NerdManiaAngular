@@ -7,8 +7,7 @@ import { MagazzinoDto } from '../Dto/MagazzinoDto';
   providedIn: 'root',
 })
 export class MagazzinoService {
-
-  private apiUrl = 'http://localhost:8080/api/magazzini';
+  private apiUrl = 'http://localhost:8080/Magazzino';
 
   constructor(private http: HttpClient) {}
 
@@ -39,24 +38,26 @@ export class MagazzinoService {
 
   findMagazziniConScorteBasse(soglia: number): Observable<MagazzinoDto[]> {
     const params = new HttpParams().set('soglia', soglia);
-    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/scorte-basse`, { params });
+    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/findMagazziniConScorteBasse`, { params });
   }
 
   findMagazziniConScorteAlte(soglia: number): Observable<MagazzinoDto[]> {
     const params = new HttpParams().set('soglia', soglia);
-    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/scorte-alte`, { params });
+    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/findMagazziniConScorteAlte`, { params });
   }
 
   findByCodice(codice: string): Observable<MagazzinoDto> {
-    return this.http.get<MagazzinoDto>(`${this.apiUrl}/codice/${codice}`);
+    const params = new HttpParams().set('codice', codice);
+    return this.http.get<MagazzinoDto>(`${this.apiUrl}/findByCodice`, { params });
   }
 
   findMagazziniByProdottoId(prodottoId: number): Observable<MagazzinoDto[]> {
-    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/prodotto/${prodottoId}`);
+    const params = new HttpParams().set('prodottoId', prodottoId);
+    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/findMagazziniByProdottoId`, { params });
   }
 
-  findMagazziniByNomeProdotto(nomeProdotto: string): Observable<MagazzinoDto[]> {
-    const params = new HttpParams().set('nomeProdotto', nomeProdotto);
-    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/nome-prodotto`, { params });
+  findMagazziniByNomeProdotto(nome: string): Observable<MagazzinoDto[]> {
+    const params = new HttpParams().set('nome', nome);
+    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/findMagazziniByNomeProdotto`, { params });
   }
 }

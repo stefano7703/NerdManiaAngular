@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
-import { ProdottoDto } from '../Dto/ProdottoDto';
-import { CategoriaDto } from '../Dto/CategoriaDto';
-import { ProdottoService } from '../Service/ProdottoService';
+import { ProdottoDto } from '../../Dto/ProdottoDto';
+import { CategoriaDto } from '../../Dto/CategoriaDto';
+import { ProdottoService } from '../../Service/ProdottoService';
 
 @Component({
   selector: 'app-admin-prodotto',
