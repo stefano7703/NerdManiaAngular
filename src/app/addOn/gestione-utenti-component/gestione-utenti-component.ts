@@ -195,6 +195,7 @@ export class GestioneUtentiComponent implements OnInit {
 
   confirmDelete() {
   if (!this.selectedUserToDelete?.id) return;
+  console.log("ID da eliminare:", this.selectedUserToDelete.id);
 
   this.service.delete(this.selectedUserToDelete.id).subscribe({
     next: () => {
