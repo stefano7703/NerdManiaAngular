@@ -1,0 +1,212 @@
+<main class="admin-shell">
+  <section class="admin-header hero-admin">
+    <div>
+      <p class="hero-kicker">PANNELLO AMMINISTRATORE</p>
+      <h1>Gestione Magazzini</h1>
+      <p>Cerca, crea, modifica ed elimina i magazzini e gestisci le quantità.</p>
+
+      <div class="hero-actions">
+        <button type="button" class="btn-primary" (click)="newMagazzino()">
+          Aggiungi magazzino
+        </button>
+
+        <button type="button" class="btn-secondary" (click)="newMagazzino()">
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-badge">
+      <strong>ADMIN</strong>
+      <span>GESTIONE MAGAZZINI</span>
+    </div>
+  </section>
+
+  <section class="admin-toolbar">
+    <input
+      type="text"
+      placeholder="Cerca per nome, indirizzo, codice o ID prodotto"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="onSearchChange($event)"
+      name="search"
+    />
+
+    <div class="movement-box">
+      <label>Movimento quantità</label>
+      <input
+        type="number"
+        min="1"
+        [ngModel]="movimentoQuantita()"
+        (ngModelChange)="movimentoQuantita.set(+$event)"
+        name="movimentoQuantita"
+      />
+    </div>
+
+    <button type="button" class="btn-primary" (click)="newMagazzino()">
+      Nuovo magazzino
+    </button>
+  </section>
+
+  @if (error()) {
+    <p class="state error">{{ error() }}</p>
+  }
+
+  @if (success()) {
+    <p class="state success">{{ success() }}</p>
+  }
+
+  <section class="admin-layout">
+    <div class="admin-list">
+      <h2>Lista magazzini</h2>
+
+      @if (loading()) {
+        <p class="state">Caricamento magazzini...</p>
+      } @else if (magazziniFiltrati().length === 0) {
+        <p class="state">Nessun magazzino trovato.</p>
+      } @else {
+        <div class="card-grid">
+          @for (magazzino of magazziniFiltrati(); track magazzino.id ?? magazzino.codice) {
+            <div class="warehouse-card">
+              <div class="warehouse-info">
+                <h3>{{ magazzino.nome }}</h3>
+                <p><strong>Codice:</strong> {{ magazzino.codice }}</p>
+                <p><strong>Indirizzo:</strong> {{ magazzino.indirizzo }}</p>
+
+                <p class="quantity">
+                  Quantità: <span>{{ magazzino.quantita }}</span>
+                </p>
+
+                <p class="products">
+                  Prodotti ID:
+                  @if (magazzino.prodottiId?.length) {
+                    {{ magazzino.prodottiId.join(', ') }}
+                  } @else {
+                    —
+                  }
+                </p>
+              </div>
+
+              <div class="quantity-actions">
+                <button
+                  type="button"
+                  class="btn-primary"
+                  (click)="aumentaQuantita(magazzino)"
+                >
+                  + Quantità
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-danger"
+                  (click)="diminuisciQuantita(magazzino)"
+                >
+                  - Quantità
+                </button>
+              </div>
+
+              <div class="warehouse-actions">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="editMagazzino(magazzino)"
+                >
+                  Modifica
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-danger"
+                  (click)="deleteMagazzino(magazzino.id)"
+                >
+                  Elimina
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="admin-form">
+      <h2>
+        @if (isEditMode()) {
+          Modifica magazzino
+        } @else {
+          Nuovo magazzino
+        }
+      </h2>
+
+      <form (ngSubmit)="submitForm()">
+        <div class="form-grid">
+          <div class="form-item">
+            <label>Nome</label>
+            <input
+              type="text"
+              [ngModel]="formModel().nome"
+              (ngModelChange)="updateField('nome', $event); clearMessages()"
+              name="nome"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>Codice</label>
+            <input
+              type="text"
+              [ngModel]="formModel().codice"
+              (ngModelChange)="updateField('codice', $event); clearMessages()"
+              name="codice"
+            />
+          </div>
+
+          <div class="form-item">
+            <label>Quantità</label>
+            <input
+              type="number"
+              min="0"
+              [ngModel]="formModel().quantita"
+              (ngModelChange)="updateField('quantita', +$event); clearMessages()"
+              name="quantita"
+            />
+          </div>
+
+          <div class="form-item full-width">
+            <label>Indirizzo</label>
+            <input
+              type="text"
+              [ngModel]="formModel().indirizzo"
+              (ngModelChange)="updateField('indirizzo', $event); clearMessages()"
+              name="indirizzo"
+            />
+          </div>
+
+          <div class="form-item full-width">
+            <label>ID prodotti</label>
+            <input
+              type="text"
+              placeholder="Esempio: 1, 2, 3"
+              [ngModel]="formModel().prodottiId.join(', ')"
+              (ngModelChange)="updateProdottiId($event); clearMessages()"
+              name="prodottiId"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="newMagazzino()">
+            Reset
+          </button>
+
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              Salvataggio...
+            } @else if (isEditMode()) {
+              Aggiorna magazzino
+            } @else {
+              Crea magazzino
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>

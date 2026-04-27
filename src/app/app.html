@@ -26,15 +26,28 @@
 
   <ng-container *ngIf="authService.isAdmin()">
 
-    <a routerLink="/gestione-utenti"
-       routerLinkActive="is-active">
-       Gestione utenti
-    </a>
+  <a routerLink="/gestione-utenti"
+     routerLinkActive="is-active">
+     Gestione utenti
+  </a>
 
-    <a routerLink="/admin/prodotti">Gestione Prodotti</a>
+  <a routerLink="/admin/prodotti" routerLinkActive="is-active">
+    Gestione Prodotti
+  </a>
 
-  </ng-container>
+  <a routerLink="/admin/magazzini" routerLinkActive="is-active">
+  Gestione Magazzini
+</a>
 
+  <a routerLink="/admin/ordini" routerLinkActive="is-active">
+    Gestione ordini
+  </a>
+
+  <a routerLink="/admin/spedizioni" routerLinkActive="is-active">
+    Gestione spedizioni
+  </a>
+
+</ng-container>
   <!-- LOGOUT -->
 
   <ng-container *ngIf="authService.loggedIn$ | async">
