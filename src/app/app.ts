@@ -82,13 +82,38 @@ export class App implements OnInit, OnDestroy {
 
     if (!isPlatformBrowser(this.platformId)) return;
 
+    const user = this.authService.getUser();
+    const userId = Number(user?.id);
+    if (isNaN(userId) || userId <= 0) {
+      this.cartItemCount.set(0);
+      return;
+    }
+
+    const scopedCartId = localStorage.getItem(`cartId:user:${userId}`);
+    if (scopedCartId) {
+      localStorage.setItem('cartId', scopedCartId);
+    }
+
     const cartId = localStorage.getItem('cartId');
     if (!cartId) {
       this.cartItemCount.set(0);
       return;
     }
 
-    const raw = localStorage.getItem(`cart-items:${cartId}`);
+    const parsedCartId = Number(cartId);
+    if (isNaN(parsedCartId) || parsedCartId <= 0) {
+      this.cartItemCount.set(0);
+      return;
+    }
+
+    let raw = localStorage.getItem(`cart-items:user:${userId}:${parsedCartId}`);
+    if (!raw) {
+      raw = localStorage.getItem(`cart-items:${parsedCartId}`);
+      if (raw) {
+        localStorage.setItem(`cart-items:user:${userId}:${parsedCartId}`, raw);
+      }
+    }
+
     if (!raw) {
       this.cartItemCount.set(0);
       return;
@@ -128,6 +153,16 @@ export class App implements OnInit, OnDestroy {
 
   closeFavoritesPopup(): void {
     this.isFavoritesPopupOpen.set(false);
+  }
+
+  openFavoriteProduct(productId: number): void {
+    const normalizedId = Number(productId);
+    if (isNaN(normalizedId) || normalizedId <= 0) {
+      return;
+    }
+
+    this.closeFavoritesPopup();
+    this.router.navigate(['/prodotto', normalizedId]);
   }
 
   removeFavorite(productId: number): void {

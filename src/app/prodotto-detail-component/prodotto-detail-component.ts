@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { take } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { CarrelloDto } from '../Dto/CarrelloDto';
 import { ProdottoDto } from '../Dto/ProdottoDto';
 import { UserDto } from '../Dto/UserDto';
@@ -24,7 +24,7 @@ type StoredCartItem = {
   templateUrl: './prodotto-detail-component.html',
   styleUrls: ['./prodotto-detail-component.css'],
 })
-export class ProdottoDetailComponent implements OnInit {
+export class ProdottoDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly prodottoService = inject(ProdottoService);
@@ -38,16 +38,54 @@ export class ProdottoDetailComponent implements OnInit {
   addingToCart = signal(false);
   cartError = signal<string | null>(null);
   cartSuccess = signal<string | null>(null);
+  private routeSubscription?: Subscription;
+
+  private cartIdStorageKey(userId: number): string {
+    return `cartId:user:${userId}`;
+  }
+
+  private persistCartIdForUser(userId: number, cartId: number): void {
+    localStorage.setItem(this.cartIdStorageKey(userId), String(cartId));
+    localStorage.setItem('cartId', String(cartId));
+  }
+
+  private readCartIdForUser(userId: number): number | null {
+    const value = localStorage.getItem(this.cartIdStorageKey(userId));
+    if (!value) {
+      return null;
+    }
+
+    const parsed = Number(value);
+    return !isNaN(parsed) && parsed > 0 ? parsed : null;
+  }
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    const id = Number(idParam);
+    this.routeSubscription = this.route.paramMap.subscribe((params) => {
+      const idParam = params.get('id');
+      const id = Number(idParam);
 
-    if (!idParam || isNaN(id) || id <= 0) {
-      this.error.set('ID prodotto non valido.');
-      this.loading.set(false);
-      return;
-    }
+      this.quantita.set(1);
+      this.cartError.set(null);
+      this.cartSuccess.set(null);
+
+      if (!idParam || isNaN(id) || id <= 0) {
+        this.prodotto.set(null);
+        this.error.set('ID prodotto non valido.');
+        this.loading.set(false);
+        return;
+      }
+
+      this.loadProduct(id);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.routeSubscription?.unsubscribe();
+  }
+
+  private loadProduct(id: number): void {
+    this.loading.set(true);
+    this.error.set(null);
 
     this.prodottoService.findById(id).pipe(take(1)).subscribe({
       next: (item) => {
@@ -56,6 +94,7 @@ export class ProdottoDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Errore caricamento prodotto:', err);
+        this.prodotto.set(null);
         this.error.set('Impossibile caricare il prodotto.');
         this.loading.set(false);
       }
@@ -129,7 +168,7 @@ export class ProdottoDetailComponent implements OnInit {
         const match = (items ?? []).find((cart) => (cart.userId ?? cart.user?.id) === userId && (cart.id ?? 0) > 0);
         if (match?.id) {
           if (this.isBrowser) {
-            localStorage.setItem('cartId', String(match.id));
+            this.persistCartIdForUser(userId, match.id);
           }
           onFound(match.id);
           return;
@@ -148,23 +187,20 @@ export class ProdottoDetailComponent implements OnInit {
       return;
     }
 
-    const cartIdStr = localStorage.getItem('cartId');
-    if (cartIdStr) {
-      const parsed = Number(cartIdStr);
-      if (!isNaN(parsed) && parsed > 0) {
-        onSuccess(parsed);
-        return;
-      }
-    }
-
     const user = this.getStoredUser();
     if (!user?.id) {
       onFailure('Devi effettuare il login per aggiungere prodotti al carrello');
       return;
     }
 
+    const storedCartId = this.readCartIdForUser(user.id);
+    if (storedCartId) {
+      onSuccess(storedCartId);
+      return;
+    }
+
     if (user.carrello?.id && user.carrello.id > 0) {
-      localStorage.setItem('cartId', String(user.carrello.id));
+      this.persistCartIdForUser(user.id, user.carrello.id);
       onSuccess(user.carrello.id);
       return;
     }
@@ -172,7 +208,7 @@ export class ProdottoDetailComponent implements OnInit {
     this.carrelloService.findByUser(user).pipe(take(1)).subscribe({
       next: (cart) => {
         if (cart?.id !== undefined && cart.id !== null && cart.id > 0) {
-          localStorage.setItem('cartId', String(cart.id));
+          this.persistCartIdForUser(user.id!, cart.id);
           onSuccess(cart.id);
           return;
         }
@@ -203,7 +239,7 @@ export class ProdottoDetailComponent implements OnInit {
           next: (savedCart: CarrelloDto) => {
             if (savedCart?.id !== undefined && savedCart.id !== null && savedCart.id > 0) {
               if (this.isBrowser) {
-                localStorage.setItem('cartId', String(savedCart.id));
+                this.persistCartIdForUser(user.id!, savedCart.id);
               }
               onSuccess(savedCart.id);
               return;
@@ -226,7 +262,11 @@ export class ProdottoDetailComponent implements OnInit {
     });
   }
 
-  private cartItemsStorageKey(cartId: number): string {
+  private cartItemsStorageKey(cartId: number, userId: number): string {
+    return `cart-items:user:${userId}:${cartId}`;
+  }
+
+  private legacyCartItemsStorageKey(cartId: number): string {
     return `cart-items:${cartId}`;
   }
 
@@ -235,7 +275,19 @@ export class ProdottoDetailComponent implements OnInit {
       return [];
     }
 
-    const raw = localStorage.getItem(this.cartItemsStorageKey(cartId));
+    const userId = this.getStoredUser()?.id;
+    if (!userId) {
+      return [];
+    }
+
+    let raw = localStorage.getItem(this.cartItemsStorageKey(cartId, userId));
+    if (!raw) {
+      raw = localStorage.getItem(this.legacyCartItemsStorageKey(cartId));
+      if (raw) {
+        localStorage.setItem(this.cartItemsStorageKey(cartId, userId), raw);
+      }
+    }
+
     if (!raw) {
       return [];
     }
@@ -253,7 +305,12 @@ export class ProdottoDetailComponent implements OnInit {
       return;
     }
 
-    localStorage.setItem(this.cartItemsStorageKey(cartId), JSON.stringify(items));
+    const userId = this.getStoredUser()?.id;
+    if (!userId) {
+      return;
+    }
+
+    localStorage.setItem(this.cartItemsStorageKey(cartId, userId), JSON.stringify(items));
     window.dispatchEvent(new CustomEvent('cart-items-changed'));
   }
 
@@ -318,6 +375,10 @@ export class ProdottoDetailComponent implements OnInit {
         const status = Number(err?.status ?? 0);
         if (allowRetry && (status === 403 || status === 404)) {
           if (this.isBrowser) {
+            const userId = this.getStoredUser()?.id;
+            if (userId) {
+              localStorage.removeItem(this.cartIdStorageKey(userId));
+            }
             localStorage.removeItem('cartId');
           }
           this.resolveCartId(

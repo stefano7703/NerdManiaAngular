@@ -94,27 +94,47 @@ export class CarrelloComponent implements OnInit {
     }
   }
 
+  private cartIdStorageKey(userId: number): string {
+    return `cartId:user:${userId}`;
+  }
+
+  private legacyCartItemsStorageKey(cartId: number): string {
+    return `cart-items:${cartId}`;
+  }
+
   private setCurrentCart(cart: CarrelloDto): void {
     this.carrelli.set([cart]);
     this.selectedCarrelloId.set(cart.id ?? null);
     this.loadCartItemsForCurrentCart(cart.id ?? null);
+    const userId = this.getStoredUserId();
     if (cart.id) {
       localStorage.setItem('cartId', String(cart.id));
+      if (userId) {
+        localStorage.setItem(this.cartIdStorageKey(userId), String(cart.id));
+      }
     }
     window.dispatchEvent(new CustomEvent('cart-items-changed'));
   }
 
-  private cartItemsStorageKey(cartId: number): string {
-    return `cart-items:${cartId}`;
+  private cartItemsStorageKey(cartId: number, userId: number): string {
+    return `cart-items:user:${userId}:${cartId}`;
   }
 
   private loadCartItemsForCurrentCart(cartId: number | null): void {
-    if (!cartId) {
+    const userId = this.getStoredUserId();
+    if (!cartId || !userId) {
       this.cartItems.set([]);
       return;
     }
 
-    const raw = localStorage.getItem(this.cartItemsStorageKey(cartId));
+    let raw = localStorage.getItem(this.cartItemsStorageKey(cartId, userId));
+    if (!raw) {
+      raw = localStorage.getItem(this.legacyCartItemsStorageKey(cartId));
+      if (raw) {
+        localStorage.setItem(this.cartItemsStorageKey(cartId, userId), raw);
+      }
+    }
+
     if (!raw) {
       this.cartItems.set([]);
       return;
@@ -129,7 +149,14 @@ export class CarrelloComponent implements OnInit {
   }
 
   private persistCartItems(cartId: number, items: CartItem[]): void {
-    localStorage.setItem(this.cartItemsStorageKey(cartId), JSON.stringify(items));
+    const userId = this.getStoredUserId();
+    if (!userId) {
+      this.cartItems.set(items);
+      window.dispatchEvent(new CustomEvent('cart-items-changed'));
+      return;
+    }
+
+    localStorage.setItem(this.cartItemsStorageKey(cartId, userId), JSON.stringify(items));
     this.cartItems.set(items);
     window.dispatchEvent(new CustomEvent('cart-items-changed'));
   }
@@ -269,7 +296,9 @@ export class CarrelloComponent implements OnInit {
       .subscribe({
         next: () => {
           localStorage.removeItem('cartId');
-          localStorage.removeItem(this.cartItemsStorageKey(carrelloId));
+          localStorage.removeItem(this.legacyCartItemsStorageKey(carrelloId));
+          localStorage.removeItem(this.cartIdStorageKey(userId));
+          localStorage.removeItem(this.cartItemsStorageKey(carrelloId, userId));
           window.dispatchEvent(new CustomEvent('cart-items-changed'));
           this.createUserCart(userId, () => {
             this.modifyingIds().delete(carrelloId);
