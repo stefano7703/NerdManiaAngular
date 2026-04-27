@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
 
@@ -397,10 +397,6 @@ export class CarrelloComponent implements OnInit {
       this.error.set('Inserisci un indirizzo di spedizione');
       return;
     }
-
-    const prodotti = this.cartItems().map(
-      (item) => new ProdottoDto('', 0, 0, '', {} as any, 0, 0, false, 0, undefined, item.productId),
-    );
 
     const ordineDto = {
       costoTotale: this.totalPrice(),
