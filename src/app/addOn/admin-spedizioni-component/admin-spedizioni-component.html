@@ -178,7 +178,7 @@
             @for (spedizione of spedizioniPaginate(); track spedizione.id) {
               <tr>
                 <td>{{ spedizione.id }}</td>
-                <td>#{{ spedizione.ordine?.id || '—' }}</td>
+                <td>#{{ spedizione.ordine.id || '—' }}</td>
                 <td>{{ spedizione.peso }} kg</td>
                 <td>{{ spedizione.altezza }} cm</td>
                 <td>{{ spedizione.lunghezza }} cm</td>
@@ -232,7 +232,7 @@
 
                         <article class="detail-card">
                           <span>Ordine collegato</span>
-                          <strong>#{{ spedizione.ordine?.id || '—' }}</strong>
+                          <strong>#{{ spedizione.ordine.id || '—' }}</strong>
                         </article>
                       </div>
 
@@ -250,7 +250,7 @@
 
                           <p>
                             <strong>Utente:</strong>
-                            {{ spedizione.ordine.user?.username || spedizione.ordine.user?.email || '—' }}
+                            {{ spedizione.ordine.user.username || spedizione.ordine.user.email || '—' }}
                           </p>
                         </div>
                       }
