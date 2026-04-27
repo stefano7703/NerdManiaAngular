@@ -1,53 +1,20 @@
-<div class="home-shell">
+<main class="admin-shell">
 
   <!-- HERO -->
-
-  <section class="hero">
-
+  <section class="admin-header hero-admin">
     <div>
-
-      <p class="hero-eyebrow">
-        Pannello amministratore
-      </p>
-
-      <h2>
-        Gestione utenti
-      </h2>
-
-      <p>
-        Cerca, filtra e gestisci gli utenti registrati nel sistema.
-      </p>
-
+      <p class="hero-kicker">PANNELLO AMMINISTRATORE</p>
+      <h1>Gestione utenti</h1>
+      <p>Cerca, filtra e gestisci gli utenti registrati nel sistema.</p>
       <div class="hero-actions">
-
-        <button class="hero-cta" (click)="openAddUser()">
-
-          Aggiungi utente
-
-        </button>
-
-        <button class="hero-secondary" (click)="reset()">
-
-          Reset
-
-        </button>
-
+        <button class="hero-cta" (click)="openAddUser()">Aggiungi utente</button>
+        <button class="hero-secondary" (click)="reset()">Reset</button>
       </div>
-
     </div>
-
-    <div class="hero-burst">
-
-      <span>
-        ADMIN
-      </span>
-
-      <small>
-        gestione utenti
-      </small>
-
+    <div class="admin-badge">
+      <strong>ADMIN</strong>
+      <span>UTENTI</span>
     </div>
-
   </section>
 
   <!-- AZIONI RAPIDE -->
@@ -230,7 +197,7 @@
   </app-add-user-component>
   -->
 
-</div>
+</main>
 
   <!-- DELETE POPUP -->
 <div class="popup-overlay" *ngIf="showDeletePopup()">

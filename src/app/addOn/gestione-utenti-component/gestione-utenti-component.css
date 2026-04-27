@@ -2,7 +2,7 @@
 	display: block;
 }
 
-.home-shell {
+.admin-shell {
 	max-width: 1160px;
 	margin: 0 auto;
 	padding: 1.8rem 1rem 3rem;
@@ -13,43 +13,74 @@
 		var(--color-smoke);
 }
 
-.hero {
+.admin-header {
 	border: 3px solid var(--color-jet);
 	border-radius: 18px;
 	padding: 1.5rem 1.4rem;
 	background:
-		linear-gradient(132deg, rgba(255, 212, 0, 0.2), transparent 56%),
-		linear-gradient(176deg, rgba(0, 180, 216, 0.17), transparent 75%),
-		var(--color-jet);
-	color: var(--color-smoke);
+		linear-gradient(132deg, rgba(255, 212, 0, 0.15), transparent 60%),
+		linear-gradient(176deg, rgba(0, 180, 216, 0.15), transparent 70%),
+		#ffffff;
+	color: var(--color-jet);
 	box-shadow: 6px 7px 0 var(--color-jet);
-	display: grid;
-	grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
-	gap: 1.1rem;
 }
 
-.hero h2 {
-	margin: 0.3rem 0 0.75rem;
+.hero-admin {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 2rem;
+}
+
+.hero-kicker {
+	margin: 0 0 0.35rem;
+	color: var(--color-turquoise);
+	font-weight: 900;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.hero-admin h1 {
+	margin: 0 0 0.4rem;
 	font-family: 'Bangers', Impact, 'Arial Black', sans-serif;
-	letter-spacing: 0.02em;
-	font-size: clamp(2.2rem, 5vw, 3.15rem);
-	line-height: 0.96;
+	letter-spacing: 0.03em;
+	font-size: clamp(2rem, 4vw, 3rem);
 	color: var(--color-gold);
+	text-shadow: 3px 3px 0 #000;
+}
+
+.admin-header p {
+	margin: 0;
+}
+
+.admin-badge {
+	width: 170px;
+	height: 170px;
+	background: var(--color-red);
+	color: #fff;
+	clip-path: polygon(
+		50% 0%, 61% 23%, 85% 13%, 77% 38%,
+		100% 50%, 77% 62%, 85% 87%, 61% 77%,
+		50% 100%, 39% 77%, 15% 87%, 23% 62%,
+		0% 50%, 23% 38%, 15% 13%, 39% 23%
+	);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	flex-shrink: 0;
+}
+
+.admin-badge strong {
+	font-family: 'Bangers', Impact, 'Arial Black', sans-serif;
+	font-size: 2.5rem;
 	text-shadow: 2px 2px 0 #000;
 }
 
-.hero-eyebrow {
-	margin: 0;
+.admin-badge span {
+	font-size: 0.7rem;
 	font-weight: 900;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	font-size: 0.78rem;
-	color: var(--color-turquoise);
-}
-
-.hero p {
-	margin: 0;
-	opacity: 0.94;
 }
 
 .hero-actions {
@@ -89,7 +120,7 @@
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	border: 2px solid var(--color-turquoise);
-	color: var(--color-smoke);
+	color: var(--color-jet);
 	background: rgba(0, 180, 216, 0.2);
 }
 
@@ -115,36 +146,6 @@
 .hero-secondary:focus-visible {
 	background: var(--color-turquoise);
 	color: var(--color-jet);
-}
-
-.hero-burst {
-	justify-self: center;
-	align-self: center;
-	width: 170px;
-	aspect-ratio: 1;
-	clip-path: polygon(50% 0%, 61% 16%, 79% 6%, 76% 25%, 97% 23%, 85% 40%, 100% 50%, 84% 60%, 97% 78%, 76% 75%, 80% 94%, 61% 84%, 50% 100%, 39% 84%, 20% 94%, 24% 75%, 3% 78%, 16% 60%, 0% 50%, 15% 40%, 3% 23%, 24% 25%, 21% 6%, 39% 16%);
-	background: var(--color-red);
-	color: var(--color-smoke);
-	border: 3px solid var(--color-smoke);
-	display: grid;
-	place-items: center;
-	text-align: center;
-	padding: 1rem;
-	box-shadow: 0 0 0 4px var(--color-jet), 0 0 0 7px var(--color-red);
-}
-
-.hero-burst span {
-	font-family: 'Bangers', Impact, 'Arial Black', sans-serif;
-	font-size: 2.35rem;
-	line-height: 0.9;
-	letter-spacing: 0.04em;
-}
-
-.hero-burst small {
-	margin-top: 0.35rem;
-	font-weight: 800;
-	font-size: 0.66rem;
-	text-transform: uppercase;
 }
 
 .quick-links,
