@@ -18,7 +18,8 @@
   </a>
 
   <a
-    [routerLink]="authService.isLoggedIn() ? '/user' : '/login'">
+    [routerLink]="authService.isLoggedIn() ? '/user' : '/login'"
+    routerLinkActive="is-active">
     Profilo
   </a>
 
@@ -85,3 +86,58 @@
     <span class="floating-cart-badge">{{ cartItemCount() }}</span>
   }
 </a>
+
+@if (wishlistService.favoriteCount() > 0) {
+  <button
+    type="button"
+    class="floating-favorites-btn"
+    aria-label="Apri prodotti preferiti"
+    title="Apri preferiti"
+    (click)="openFavoritesPopup()"
+  >
+    <svg viewBox="0 0 24 24" class="floating-favorites-icon" aria-hidden="true">
+      <path d="M12 21s-6.6-4.4-9-8.3C1.4 10.2 2 6.8 4.7 5.3c2.1-1.2 4.7-0.7 6.3 1.2 1.6-1.9 4.2-2.4 6.3-1.2 2.7 1.5 3.3 4.9 1.7 7.4C18.6 16.6 12 21 12 21z" />
+    </svg>
+    <span class="floating-favorites-badge">{{ wishlistService.favoriteCount() }}</span>
+  </button>
+}
+
+@if (isFavoritesPopupOpen()) {
+  <div class="favorites-modal-overlay" (click)="closeFavoritesPopup()">
+    <section
+      class="favorites-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Prodotti preferiti"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="favorites-modal-header">
+        <h3>Preferiti</h3>
+        <button type="button" class="favorites-close" (click)="closeFavoritesPopup()" aria-label="Chiudi preferiti">✕</button>
+      </header>
+
+      <div class="favorites-list">
+        @for (item of wishlistService.favorites(); track item.id) {
+          <article class="favorite-item">
+            <a
+              class="favorite-link"
+              [routerLink]="['/prodotto', item.id]"
+              (click)="closeFavoritesPopup()"
+            >
+              <span class="favorite-name">{{ item.nome }}</span>
+              <span class="favorite-price">€{{ item.prezzo.toFixed(2) }}</span>
+            </a>
+            <button
+              type="button"
+              class="favorite-remove"
+              aria-label="Rimuovi dai preferiti"
+              (click)="removeFavorite(item.id)"
+            >
+              Rimuovi
+            </button>
+          </article>
+        }
+      </div>
+    </section>
+  </div>
+}

@@ -193,7 +193,8 @@
   flex-direction: column;
   position: relative;
   cursor: pointer;
-  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 4px 4px 0 var(--color-jet);
+  transition: transform 130ms ease, box-shadow 130ms ease, background 130ms ease;
 }
 
 .card-link-overlay {
@@ -203,9 +204,37 @@
   z-index: 5;
 }
 
-.product-card:focus-within {
-  outline: 3px solid var(--color-turquoise);
-  outline-offset: 2px;
+.favorite-btn {
+  position: absolute;
+  top: 0.62rem;
+  right: 0.62rem;
+  z-index: 7;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 2px solid var(--color-jet);
+  background: rgba(255, 255, 255, 0.96);
+  color: #8b939c;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.favorite-btn:hover,
+.favorite-btn:focus-visible {
+  transform: translateY(-1px);
+  background: #fff2f2;
+  color: var(--color-red);
+  outline: none;
+}
+
+.favorite-btn.is-active {
+  background: #ffe6e6;
+  color: var(--color-red);
+  border-color: #b3261e;
 }
 
 .product-image-wrap {
@@ -225,8 +254,9 @@
 }
 
 .product-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--color-red);
+  background: linear-gradient(180deg, #fff 0%, rgba(0, 180, 216, 0.08) 100%);
 }
 
 .product-header {

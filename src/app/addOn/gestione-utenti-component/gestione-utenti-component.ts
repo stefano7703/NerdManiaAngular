@@ -32,15 +32,65 @@ export class GestioneUtentiComponent implements OnInit {
     this.caricaTuttiUtenti();
   }
 
-  cercaPerNome(nome: string) {
-    if (!nome) return;
+ cercaUtente(testo: string) {
 
-    this.service.findByNomeContainingIgnoreCase(nome).subscribe((data) => {
-      console.log('RISPOSTA:', data);
-
-      this.users.set(data);
-    });
+  if (!testo) {
+    this.users.set([]);   // importante
+    return;
   }
+
+  const parole = testo.trim().split(/\s+/);
+
+  // UNA PAROLA
+  if (parole.length === 1) {
+
+    const valore = parole[0];
+
+    this.service
+      .findByNomeContainingIgnoreCase(valore)
+      .subscribe((data) => {
+
+        if (data && data.length > 0) {
+
+          this.users.set(data);
+
+        } else {
+
+          this.service
+            .findByCognomeContainingIgnoreCase(valore)
+            .subscribe((data2) => {
+
+              this.users.set(data2 ?? []); // sempre aggiorna
+
+            });
+
+        }
+
+      });
+
+  }
+
+  // NOME + COGNOME
+  else {
+
+    const nome = parole[0];
+    const cognome = parole.slice(1).join(" ");
+
+    this.service
+      .findByNomeContainingIgnoreCaseAndCognomeContainingIgnoreCase(
+        nome,
+        cognome
+      )
+      .subscribe((data) => {
+
+        this.users.set(data ?? []); // sempre aggiorna
+
+      });
+
+  }
+
+}
+
 
   filtraPerCartaFedelta(possiedeCarta: boolean) {
     const call = possiedeCarta

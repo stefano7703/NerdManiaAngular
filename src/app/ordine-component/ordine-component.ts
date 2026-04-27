@@ -3,6 +3,7 @@ import { OrdineDto } from '../Dto/OrdineDto';
 import { OrdineService } from '../Service/ordineService';
 import { CommonModule } from '@angular/common';
 
+
 @Component({
   selector: 'app-ordine',
   imports: [CommonModule],

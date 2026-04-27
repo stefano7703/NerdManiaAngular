@@ -81,6 +81,16 @@
       <div class="products-grid">
         @for (item of prodottiPaginati(); track item.prodotto.id ?? item.prodotto.nome) {
           <article class="product-card">
+            <button
+              type="button"
+              class="favorite-btn"
+              [class.is-active]="isFavorite(item.prodotto)"
+              [attr.aria-pressed]="isFavorite(item.prodotto)"
+              [attr.aria-label]="isFavorite(item.prodotto) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+              (click)="toggleFavorite($event, item.prodotto)"
+            >
+              ❤
+            </button>
             <a
               class="card-link-overlay"
               [routerLink]="['/prodotto', item.prodotto.id]"

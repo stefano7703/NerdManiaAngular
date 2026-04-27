@@ -16,9 +16,28 @@ export class userService extends AbstractService<UserDto> {
     this.baseProjectUrl = this.baseUrl + '/' + this.type;
   }
 
+  findById(id: number): Observable<UserDto> {
+    return this.http.get<UserDto>(`${this.baseProjectUrl}/findById?id=${id}`);
+  }
+
   findByNomeContainingIgnoreCase(nome: string): Observable<UserDto[]> {
     return this.http.get<UserDto[]>(
       `${this.baseProjectUrl}/findByNomeContainingIgnoreCase?nome=${nome}`,
+    );
+  }
+
+  findByCognomeContainingIgnoreCase(cognome: string): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(
+      `${this.baseProjectUrl}/findByCognomeContainingIgnoreCase?cognome=${cognome}`,
+    );
+  }
+
+  findByNomeContainingIgnoreCaseAndCognomeContainingIgnoreCase(
+    nome: string,
+    cognome: string,
+  ): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(
+      `${this.baseProjectUrl}/findByNomeContainingIgnoreCaseAndCognomeContainingIgnoreCase?nome=${nome}&cognome=${cognome}`,
     );
   }
 
