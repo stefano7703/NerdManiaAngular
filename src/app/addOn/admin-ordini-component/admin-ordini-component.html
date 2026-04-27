@@ -45,7 +45,7 @@
           <td>{{ ordine.id }}</td>
 
           <td>
-            {{ ordine.user?.email || ordine.user?.username || '—' }}
+            {{ ordine.user.email || ordine.user.username || '—' }}
           </td>
 
           <td>€{{ ordine.costoTotale }}</td>
@@ -57,7 +57,7 @@
           </td>
 
           <td>
-            {{ ordine.spedizione?.id || '—' }}
+            {{ ordine.spedizione.id || '—' }}
           </td>
         </tr>
       }

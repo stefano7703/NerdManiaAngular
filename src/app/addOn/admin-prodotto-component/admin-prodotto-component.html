@@ -66,7 +66,7 @@
           <div class="product-info">
             <h3>{{ prodotto.nome }}</h3>
             <p class="price">€{{ prodotto.prezzo }}</p>
-            <p class="category">{{ prodotto.categoria?.nome || '—' }}</p>
+            <p class="category">{{ prodotto.categoria.nome || '—' }}</p>
             <p class="fragile">
               {{ prodotto.fragile ? 'Fragile' : 'Non fragile' }}
             </p>
@@ -175,7 +175,7 @@
             <label>ID Categoria</label>
             <input
               type="number"
-              [ngModel]="formModel().categoria?.id"
+              [ngModel]="formModel().categoria.id"
               (ngModelChange)="updateCategoriaId(+$event); clearMessages()"
               name="categoriaId"
             />
