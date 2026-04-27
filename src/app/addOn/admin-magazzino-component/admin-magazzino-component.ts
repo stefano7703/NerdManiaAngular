@@ -39,8 +39,7 @@ export class AdminMagazzinoComponent implements OnInit {
     return this.magazzini().filter((m) =>
       m.nome?.toLowerCase().includes(term) ||
       m.indirizzo?.toLowerCase().includes(term) ||
-      m.codice?.toLowerCase().includes(term) ||
-      m.prodottiId?.join(',').includes(term)
+      m.codice?.toLowerCase().includes(term)
     );
   });
 
@@ -49,7 +48,12 @@ export class AdminMagazzinoComponent implements OnInit {
   }
 
   private createEmptyMagazzino(): MagazzinoDto {
-    return new MagazzinoDto('', '', '', 0, []);
+    return {
+  nome: '',
+  indirizzo: '',
+  codice: '',
+  quantita: 0
+} as MagazzinoDto;
   }
 
   loadMagazzini(): void {
@@ -88,11 +92,10 @@ export class AdminMagazzinoComponent implements OnInit {
     this.error.set(null);
 
     this.formModel.set({
-      ...magazzino,
-      prodottiId: [...(magazzino.prodottiId ?? [])]
-    });
+  ...magazzino
+});
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
   }
 
   deleteMagazzino(id?: number): void {
@@ -153,7 +156,7 @@ export class AdminMagazzinoComponent implements OnInit {
     this.saving.set(true);
 
     const request$ = this.isEditMode() && this.selectedMagazzinoId()
-      ? this.magazzinoService.update(this.selectedMagazzinoId()!, model)
+      ? this.magazzinoService.update(model)
       : this.magazzinoService.create(model);
 
     request$.pipe(take(1)).subscribe({
@@ -189,7 +192,7 @@ export class AdminMagazzinoComponent implements OnInit {
       quantita: magazzino.quantita + quantita
     };
 
-    this.magazzinoService.update(magazzino.id!, updated).pipe(take(1)).subscribe({
+    this.magazzinoService.update(updated).pipe(take(1)).subscribe({
       next: () => {
         this.success.set('Quantità aumentata con successo.');
         this.error.set(null);
@@ -220,7 +223,7 @@ export class AdminMagazzinoComponent implements OnInit {
       quantita: magazzino.quantita - quantita
     };
 
-    this.magazzinoService.update(magazzino.id!, updated).pipe(take(1)).subscribe({
+    this.magazzinoService.update(updated).pipe(take(1)).subscribe({
       next: () => {
         this.success.set('Quantità diminuita con successo.');
         this.error.set(null);
@@ -239,7 +242,7 @@ export class AdminMagazzinoComponent implements OnInit {
       [field]: value
     }));
   }
-
+  /*
   updateProdottiId(value: string): void {
     const ids = value
       .split(',')
@@ -251,7 +254,7 @@ export class AdminMagazzinoComponent implements OnInit {
       prodottiId: ids
     }));
   }
-
+  */
   clearMessages(): void {
     this.error.set(null);
     this.success.set(null);

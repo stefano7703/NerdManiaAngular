@@ -12,24 +12,27 @@ export class MagazzinoService {
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<MagazzinoDto[]> {
-    return this.http.get<MagazzinoDto[]>(this.apiUrl);
+    return this.http.get<MagazzinoDto[]>(`${this.apiUrl}/getall`);
   }
 
   getById(id: number): Observable<MagazzinoDto> {
-    return this.http.get<MagazzinoDto>(`${this.apiUrl}/${id}`);
+    return this.http.get<MagazzinoDto>(`${this.apiUrl}/read?id=${id}`);
   }
 
   create(magazzino: MagazzinoDto): Observable<MagazzinoDto> {
-    return this.http.post<MagazzinoDto>(this.apiUrl, magazzino);
+    return this.http.post<MagazzinoDto>(`${this.apiUrl}/insert`, magazzino);
   }
 
-  update(id: number, magazzino: MagazzinoDto): Observable<MagazzinoDto> {
-    return this.http.put<MagazzinoDto>(`${this.apiUrl}/${id}`, magazzino);
-  }
-
+  update(magazzino: MagazzinoDto): Observable<MagazzinoDto> {
+  return this.http.put<MagazzinoDto>(
+    `${this.apiUrl}/update`,
+    magazzino
+  );
+}
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/delete?id=${id}`);
   }
+
 
   search(keyword: string): Observable<MagazzinoDto[]> {
     const params = new HttpParams().set('keyword', keyword);
