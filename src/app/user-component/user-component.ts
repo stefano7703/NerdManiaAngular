@@ -1,13 +1,11 @@
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { userService } from '../Service/userService';
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { AuthService } from '../Service/AuthService';
 import { UserDto } from '../Dto/UserDto';
 import { CarrelloDto } from '../Dto/CarrelloDto';
-import { AddUserComponent } from '../addOn/add-user-component/add-user-component';
-import { AuthService } from '../Service/AuthService';
-import { Router } from '@angular/router';
-import { PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-user-component',
@@ -17,26 +15,21 @@ import { isPlatformBrowser } from '@angular/common';
   styleUrl: './user-component.css',
 })
 export class UserComponent implements OnInit {
-  showAddUser = signal(false);
-
-  users = signal<UserDto[]>([]);
   private platformId = inject(PLATFORM_ID);
 
   user = signal<UserDto>(
-    new UserDto(0, '', '', '', '', '', '', false, new CarrelloDto(0, 0, 0), null),
+    new UserDto(0, '', '', '', '', '', '', false, new CarrelloDto(0, 0, 0), null)
   );
 
   ordineAperto: number | null = null;
 
-  checkResult = signal<{ message: string; exists: boolean | null }>({
-    message: '',
-    exists: null,
-  });
+  // 🔥 QUI STA LA CHIAVE PER NON BLOCCARE
+  prodottiPerOrdine = new Map<number, any[]>();
 
   constructor(
     private service: userService,
     public authService: AuthService,
-    private router: Router,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -47,42 +40,55 @@ export class UserComponent implements OnInit {
     }
   }
 
-  private loadUser() {
+  private loadUser(): void {
     const loggedUser = this.authService.getUser();
 
     if (loggedUser) {
       this.user.set(loggedUser);
+      this.preparaProdottiOrdini(loggedUser);
     }
   }
 
-  toggleSpedizione(id: number) {
+  // 🔥 PRECALCOLO (evita loop infinito)
+  private preparaProdottiOrdini(user: UserDto): void {
+    this.prodottiPerOrdine.clear();
+
+    user.ordini?.forEach((ordine: any) => {
+      this.prodottiPerOrdine.set(
+        ordine.id,
+        this.getProdottiConQuantita(ordine.prodotti || [])
+      );
+    });
+  }
+
+  private getProdottiConQuantita(prodotti: any[]): any[] {
+    const map = new Map<number, any>();
+
+    prodotti.forEach((p) => {
+      if (map.has(p.id)) {
+        map.get(p.id).quantita++;
+      } else {
+        map.set(p.id, { ...p, quantita: 1 });
+      }
+    });
+
+    return Array.from(map.values());
+  }
+
+  toggleSpedizione(id: number): void {
     this.ordineAperto = this.ordineAperto === id ? null : id;
   }
 
-  logout() {
+  logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  isLogged() {
+  isLogged(): boolean {
     return this.authService.isLoggedIn();
   }
 
-  goLogin() {
+  goLogin(): void {
     this.router.navigate(['/login']);
-  }
-
-  getProdottiConQuantita(prodotti: any[]) {
-  const map = new Map<number, any>();
-
-  prodotti.forEach(p => {
-    if (map.has(p.id)) {
-      map.get(p.id).quantita++;
-    } else {
-      map.set(p.id, { ...p, quantita: 1 });
-    }
-  });
-
-  return Array.from(map.values());
   }
 }
