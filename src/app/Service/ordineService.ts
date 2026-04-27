@@ -34,6 +34,12 @@ export class OrdineService extends AbstractService<OrdineDto> {
     );
   }
 
+  findById(id: number): Observable<OrdineDto> {
+  return this.http.get<OrdineDto>(
+    this.baseUrl + '/' + this.type + '/read?id=' + id
+  );
+}
+
   findAllByOrderByCostoTotaleDesc(): Observable<OrdineDto[]> {
     return this.http.get<OrdineDto[]>(
       this.baseUrl + '/' + this.type + '/findAllByOrderByCostoTotaleDesc'
