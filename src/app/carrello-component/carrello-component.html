@@ -108,7 +108,7 @@
           <button 
             type="button"
             class="btn-primary"
-            (click)="creaOrdine()"
+            (click)="openOrderPopup()"
             [disabled]="modifyingIds().size > 0"
           >
             Conferma ordine
@@ -128,5 +128,78 @@
         </button>
       </div>
     </section>
+  }
+
+  @if (orderPopupOpen()) {
+    <div class="order-modal-overlay" (click)="closeOrderPopup()">
+      <section
+        class="order-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="orderPopupTitle"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="order-modal-header">
+          <h2 id="orderPopupTitle">Conferma ordine</h2>
+          <button
+            type="button"
+            class="order-modal-close"
+            (click)="closeOrderPopup()"
+            [disabled]="orderPopupState() === 'loading'"
+            aria-label="Chiudi popup ordine"
+          >
+            ✕
+          </button>
+        </header>
+
+        <div class="order-modal-body">
+          @if (orderPopupState() === 'confirm') {
+            <p class="order-modal-text">
+              Stai per confermare un ordine da <strong>€{{ totalPrice().toFixed(2) }}</strong>
+              con spedizione a: <strong>{{ shippingAddress().trim() || 'indirizzo non impostato' }}</strong>.
+            </p>
+          } @else if (orderPopupState() === 'loading') {
+            <div class="order-modal-status loading" role="status" aria-live="polite">
+              <span class="order-spinner" aria-hidden="true"></span>
+              <span>Conferma ordine in corso...</span>
+            </div>
+          } @else if (orderPopupState() === 'success') {
+            <p class="order-modal-status success" role="status" aria-live="polite">
+              {{ orderPopupMessage() || 'Ordine creato con successo!' }}
+            </p>
+          } @else {
+            <p class="order-modal-status error" role="alert">
+              {{ orderPopupMessage() || 'Errore creazione ordine' }}
+            </p>
+          }
+        </div>
+
+        <footer class="order-modal-footer">
+          @if (orderPopupState() === 'confirm') {
+            <button type="button" class="order-btn order-btn-secondary" (click)="closeOrderPopup()">
+              Annulla
+            </button>
+            <button type="button" class="order-btn order-btn-primary" (click)="creaOrdine()">
+              Conferma
+            </button>
+          } @else if (orderPopupState() === 'loading') {
+            <button type="button" class="order-btn order-btn-secondary" disabled>
+              Attendere...
+            </button>
+          } @else if (orderPopupState() === 'success') {
+            <button type="button" class="order-btn order-btn-primary" (click)="closeOrderPopup()">
+              Chiudi
+            </button>
+          } @else {
+            <button type="button" class="order-btn order-btn-secondary" (click)="closeOrderPopup()">
+              Annulla
+            </button>
+            <button type="button" class="order-btn order-btn-primary" (click)="creaOrdine()">
+              Riprova
+            </button>
+          }
+        </footer>
+      </section>
+    </div>
   }
 </main>

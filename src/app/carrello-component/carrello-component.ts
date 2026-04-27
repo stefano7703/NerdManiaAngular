@@ -40,6 +40,9 @@ export class CarrelloComponent implements OnInit {
   error = signal<string | null>(null);
   cartItems = signal<CartItem[]>([]);
   shippingAddress = signal('');
+  orderPopupOpen = signal(false);
+  orderPopupState = signal<'confirm' | 'loading' | 'success' | 'error'>('confirm');
+  orderPopupMessage = signal<string | null>(null);
 
   // Derived state
   selectedCarrello = computed(() => {
@@ -315,6 +318,19 @@ export class CarrelloComponent implements OnInit {
     return id !== undefined && this.modifyingIds().has(id);
   }
 
+  openOrderPopup(): void {
+    this.orderPopupOpen.set(true);
+    this.orderPopupState.set('confirm');
+    this.orderPopupMessage.set(null);
+  }
+
+  closeOrderPopup(): void {
+    if (this.orderPopupState() === 'loading') {
+      return;
+    }
+    this.orderPopupOpen.set(false);
+  }
+
   private expandProductsForOrder(items: CartItem[]): Array<{ id: number }> {
     const result: Array<{ id: number }> = [];
 
@@ -330,40 +346,46 @@ export class CarrelloComponent implements OnInit {
 
 
   creaOrdine(): void {
-  const carrello = this.selectedCarrello();
-  const userId = this.getStoredUserId();
-  const prodotti = this.expandProductsForOrder(this.cartItems())
-  .map(p =>
-    new ProdottoDto(
-      '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, p.id
-    )
-  );
+    const carrello = this.selectedCarrello();
+    const userId = this.getStoredUserId();
+    const prodotti = this.expandProductsForOrder(this.cartItems())
+      .map((p) =>
+        new ProdottoDto(
+          '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, p.id,
+        ),
+      );
 
-  if (!carrello?.id || !userId) {
-    this.error.set('Dati non validi per creare l\'ordine');
-    return;
-  }
+    this.orderPopupState.set('loading');
+    this.orderPopupMessage.set(null);
 
-  if (!this.shippingAddress().trim()) {
-    this.error.set('Inserisci un indirizzo di spedizione');
-    return;
-  }
+    if (!carrello?.id || !userId) {
+      this.orderPopupState.set('error');
+      this.orderPopupMessage.set('Dati non validi per creare l\'ordine');
+      return;
+    }
 
-  const ordineDto = {
-    costoTotale: this.totalPrice(),
-    user: {
-      id: userId
-    },
-    indirizzoSpedizione: this.shippingAddress(),
-    prodotti:prodotti
-  };
+    if (!this.shippingAddress().trim()) {
+      this.orderPopupState.set('error');
+      this.orderPopupMessage.set('Inserisci un indirizzo di spedizione');
+      return;
+    }
+
+    const ordineDto = {
+      costoTotale: this.totalPrice(),
+      user: {
+        id: userId,
+      },
+      indirizzoSpedizione: this.shippingAddress(),
+      prodotti,
+    };
 
     this.ordineService
       .insert(ordineDto as any)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          alert('Ordine creato con successo!');
+          this.orderPopupState.set('success');
+          this.orderPopupMessage.set('Ordine creato con successo!');
 
           this.shippingAddress.set('');
 
@@ -371,20 +393,20 @@ export class CarrelloComponent implements OnInit {
             this.persistCartItems(carrello.id, []);
             this.syncCartTotalsFromItems(carrello, []);
           }
-          console.log(this.userService.findById(userId));
+
           this.userService
             .findById(userId)
             .pipe(take(1))
             .subscribe({
               next: (updatedUser) => {
                 localStorage.setItem('user', JSON.stringify(updatedUser));
-
                 window.dispatchEvent(new Event('user-updated'));
               },
             });
         },
         error: (err) => {
-          this.error.set(err?.message ?? 'Errore creazione ordine');
+          this.orderPopupState.set('error');
+          this.orderPopupMessage.set(err?.message ?? 'Errore creazione ordine');
         },
       });
   }
