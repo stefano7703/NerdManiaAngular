@@ -182,7 +182,7 @@ export class AdminProdottoComponent implements OnInit {
         ? { ...product.categoria }
         : ({ id: 0, nome: '', catalogo: undefined as any, prodotti: [] } as CategoriaDto)
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
   }
 
   deleteProduct(id?: number): void {

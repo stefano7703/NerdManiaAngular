@@ -3,12 +3,109 @@
     <div>
       <p class="hero-kicker">PANNELLO AMMINISTRATORE</p>
       <h1>Gestione Ordini</h1>
-      <p>Visualizza tutti gli ordini effettuati dagli utenti con i rispettivi prodotti.</p>
+      <p>Visualizza e filtra tutti gli ordini effettuati dagli utenti.</p>
     </div>
 
     <div class="admin-badge">
       <strong>ADMIN</strong>
       <span>ORDINI</span>
+    </div>
+  </section>
+
+  <section class="admin-filters">
+    <h2>Filtri ordini</h2>
+
+    <div class="filters-grid">
+      <div class="filter-item">
+        <label>Username utente</label>
+        <input
+          type="text"
+          placeholder="Es. admin"
+          [ngModel]="filtroUsername()"
+          (ngModelChange)="filtroUsername.set($event)"
+          name="filtroUsername"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraPerUsername()">
+          Cerca username
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>Indirizzo spedizione</label>
+        <input
+          type="text"
+          placeholder="Es. Roma"
+          [ngModel]="filtroIndirizzo()"
+          (ngModelChange)="filtroIndirizzo.set($event)"
+          name="filtroIndirizzo"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraPerIndirizzo()">
+          Cerca indirizzo
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>Costo maggiore di</label>
+        <input
+          type="number"
+          placeholder="Es. 100"
+          [ngModel]="filtroCostoMaggiore()"
+          (ngModelChange)="filtroCostoMaggiore.set(+$event)"
+          name="filtroCostoMaggiore"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraCostoMaggiore()">
+          Filtra maggiore
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>Costo minore di</label>
+        <input
+          type="number"
+          placeholder="Es. 500"
+          [ngModel]="filtroCostoMinore()"
+          (ngModelChange)="filtroCostoMinore.set(+$event)"
+          name="filtroCostoMinore"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraCostoMinore()">
+          Filtra minore
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>ID prodotto</label>
+        <input
+          type="number"
+          placeholder="Es. 3"
+          [ngModel]="filtroProdottoId()"
+          (ngModelChange)="filtroProdottoId.set(+$event)"
+          name="filtroProdottoId"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraPerProdottoId()">
+          Cerca prodotto
+        </button>
+      </div>
+
+      <div class="filter-item filter-actions">
+        <label>Ordinamento</label>
+
+        <button type="button" class="btn-secondary" (click)="ordinaCostoCrescente()">
+          Totale crescente
+        </button>
+
+        <button type="button" class="btn-secondary" (click)="ordinaCostoDecrescente()">
+          Totale decrescente
+        </button>
+
+        <button type="button" class="btn-danger" (click)="resetFiltri()">
+          Reset filtri
+        </button>
+      </div>
     </div>
   </section>
 
@@ -22,6 +119,11 @@
 
   <section class="admin-list">
     <h2>Lista ordini</h2>
+
+    <p class="filter-current">
+      Filtro attivo:
+      <strong>{{ filtroAttivo() }}</strong>
+    </p>
 
     @if (!loading() && ordini().length === 0) {
       <p class="state">Nessun ordine trovato.</p>
