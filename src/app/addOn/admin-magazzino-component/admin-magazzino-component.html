@@ -25,7 +25,7 @@
   <section class="admin-toolbar">
     <input
       type="text"
-      placeholder="Cerca per nome, indirizzo, codice o ID prodotto"
+      placeholder="Cerca per nome, indirizzo o codice"
       [ngModel]="searchTerm()"
       (ngModelChange)="onSearchChange($event)"
       name="search"
@@ -69,21 +69,23 @@
             <div class="warehouse-card">
               <div class="warehouse-info">
                 <h3>{{ magazzino.nome }}</h3>
-                <p><strong>Codice:</strong> {{ magazzino.codice }}</p>
-                <p><strong>Indirizzo:</strong> {{ magazzino.indirizzo }}</p>
+
+                <p>
+                  <strong>Codice:</strong>
+                  {{ magazzino.codice }}
+                </p>
+
+                <p>
+                  <strong>Indirizzo:</strong>
+                  {{ magazzino.indirizzo }}
+                </p>
 
                 <p class="quantity">
-                  Quantità: <span>{{ magazzino.quantita }}</span>
+                  Quantità:
+                  <span>{{ magazzino.quantita }}</span>
                 </p>
 
-                <p class="products">
-                  Prodotti ID:
-                  @if (magazzino.prodottiId.length) {
-                    {{ magazzino.prodottiId.join(', ') }}
-                  } @else {
-                    —
-                  }
-                </p>
+                
               </div>
 
               <div class="quantity-actions">
@@ -179,16 +181,7 @@
             />
           </div>
 
-          <div class="form-item full-width">
-            <label>ID prodotti</label>
-            <input
-              type="text"
-              placeholder="Esempio: 1, 2, 3"
-              [ngModel]="formModel().prodottiId.join(', ')"
-              (ngModelChange)="updateProdottiId($event); clearMessages()"
-              name="prodottiId"
-            />
-          </div>
+        
         </div>
 
         <div class="form-actions">

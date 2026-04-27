@@ -19,6 +19,14 @@ export class AdminOrdiniComponent implements OnInit {
 
   ordineAperto = signal<number | null>(null);
 
+  filtroUsername = signal('');
+  filtroIndirizzo = signal('');
+  filtroCostoMaggiore = signal<number | null>(null);
+  filtroCostoMinore = signal<number | null>(null);
+  filtroProdottoId = signal<number | null>(null);
+
+  filtroAttivo = signal('Tutti gli ordini');
+
   paginaOrdini = signal(1);
   ordiniPerPagina = signal(5);
 
@@ -52,7 +60,8 @@ export class AdminOrdiniComponent implements OnInit {
     this.ordineService.getAll().subscribe({
       next: (data: OrdineDto[]) => {
         this.ordini.set(data ?? []);
-        this.paginaOrdini.set(1);
+        this.filtroAttivo.set('Tutti gli ordini');
+        this.resetPaginazione();
         this.loading.set(false);
       },
       error: (err: unknown) => {
@@ -61,6 +70,124 @@ export class AdminOrdiniComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  filtraPerUsername(): void {
+    const username = this.filtroUsername().trim();
+
+    if (!username) {
+      this.error.set('Inserisci uno username da cercare.');
+      return;
+    }
+
+    this.eseguiFiltro(
+      this.ordineService.findByUserUsername(username),
+      `Username: ${username}`
+    );
+  }
+
+  filtraPerIndirizzo(): void {
+    const indirizzo = this.filtroIndirizzo().trim();
+
+    if (!indirizzo) {
+      this.error.set('Inserisci un indirizzo da cercare.');
+      return;
+    }
+
+    this.eseguiFiltro(
+      this.ordineService.findByIndirizzoSpedizioneContainingIgnoreCase(indirizzo),
+      `Indirizzo: ${indirizzo}`
+    );
+  }
+
+  filtraCostoMaggiore(): void {
+    const prezzo = this.filtroCostoMaggiore();
+
+    if (prezzo === null || prezzo < 0) {
+      this.error.set('Inserisci un costo valido.');
+      return;
+    }
+
+    this.eseguiFiltro(
+      this.ordineService.findByCostoTotaleGreaterThan(prezzo),
+      `Costo maggiore di €${prezzo}`
+    );
+  }
+
+  filtraCostoMinore(): void {
+    const prezzo = this.filtroCostoMinore();
+
+    if (prezzo === null || prezzo < 0) {
+      this.error.set('Inserisci un costo valido.');
+      return;
+    }
+
+    this.eseguiFiltro(
+      this.ordineService.findByCostoTotaleLessThan(prezzo),
+      `Costo minore di €${prezzo}`
+    );
+  }
+
+  filtraPerProdottoId(): void {
+    const prodottoId = this.filtroProdottoId();
+
+    if (prodottoId === null || prodottoId <= 0) {
+      this.error.set('Inserisci un ID prodotto valido.');
+      return;
+    }
+
+    this.eseguiFiltro(
+      this.ordineService.findByProdottiId(prodottoId),
+      `ID prodotto: ${prodottoId}`
+    );
+  }
+
+  ordinaCostoCrescente(): void {
+    this.eseguiFiltro(
+      this.ordineService.findAllByOrderByCostoTotaleAsc(),
+      'Totale crescente'
+    );
+  }
+
+  ordinaCostoDecrescente(): void {
+    this.eseguiFiltro(
+      this.ordineService.findAllByOrderByCostoTotaleDesc(),
+      'Totale decrescente'
+    );
+  }
+
+  resetFiltri(): void {
+    this.filtroUsername.set('');
+    this.filtroIndirizzo.set('');
+    this.filtroCostoMaggiore.set(null);
+    this.filtroCostoMinore.set(null);
+    this.filtroProdottoId.set(null);
+    this.loadOrdini();
+  }
+
+  private eseguiFiltro(request$: any, label: string): void {
+    this.loading.set(true);
+    this.error.set(null);
+    this.ordineAperto.set(null);
+
+    request$.subscribe({
+      next: (data: OrdineDto[]) => {
+        this.ordini.set(data ?? []);
+        this.filtroAttivo.set(label);
+        this.resetPaginazione();
+        this.loading.set(false);
+      },
+      error: (err: unknown) => {
+        console.error('Errore filtro ordini:', err);
+        this.error.set('Errore durante il filtro degli ordini.');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private resetPaginazione(): void {
+    this.paginaOrdini.set(1);
+    this.ordineAperto.set(null);
   }
 
   toggleDettagliOrdine(id: number): void {
@@ -86,8 +213,7 @@ export class AdminOrdiniComponent implements OnInit {
 
   cambiaOrdiniPerPagina(value: number): void {
     this.ordiniPerPagina.set(value);
-    this.paginaOrdini.set(1);
-    this.ordineAperto.set(null);
+    this.resetPaginazione();
   }
 
   getProdottiConQuantita(prodotti: any[] = []): any[] {
