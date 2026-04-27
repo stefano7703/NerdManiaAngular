@@ -59,26 +59,11 @@
             @for (ordine of ordiniPaginati(); track ordine.id) {
               <tr>
                 <td>{{ ordine.id }}</td>
-
-                <td>
-                  {{ ordine.user.username || '—' }}
-                </td>
-
-                <td>
-                  {{ ordine.user.email || '—' }}
-                </td>
-
-                <td>
-                  €{{ ordine.costoTotale }}
-                </td>
-
-                <td>
-                  {{ ordine.indirizzoSpedizione }}
-                </td>
-
-                <td>
-                  {{ ordine.prodotti.length }}
-                </td>
+                <td>{{ ordine.user.username || '—' }}</td>
+                <td>{{ ordine.user.email || '—' }}</td>
+                <td>€{{ ordine.costoTotale }}</td>
+                <td>{{ ordine.indirizzoSpedizione }}</td>
+                <td>{{ ordine.prodotti.length }}</td>
 
                 <td>
                   <button
@@ -111,10 +96,7 @@
 
                               <div class="product-info">
                                 <h3>{{ prodotto.nome }}</h3>
-
-                                <p class="price">
-                                  €{{ prodotto.prezzo }}
-                                </p>
+                                <p class="price">€{{ prodotto.prezzo }}</p>
 
                                 <p>
                                   Quantità:
@@ -161,30 +143,32 @@
         </table>
       </div>
 
-      <div class="pagination">
+      <div class="catalog-pagination">
         <button
           type="button"
-          class="btn-secondary"
+          class="pagination-btn"
           [disabled]="paginaOrdini() === 1"
           (click)="paginaPrecedenteOrdini()"
         >
           Precedente
         </button>
 
-        @for (pagina of pagineOrdini(); track pagina) {
-          <button
-            type="button"
-            class="btn-secondary"
-            [class.is-active]="paginaOrdini() === pagina"
-            (click)="vaiPaginaOrdini(pagina)"
-          >
-            {{ pagina }}
-          </button>
-        }
+        <div class="pagination-pages">
+          @for (pagina of pagineOrdini(); track pagina) {
+            <button
+              type="button"
+              class="pagination-page"
+              [class.active]="paginaOrdini() === pagina"
+              (click)="vaiPaginaOrdini(pagina)"
+            >
+              {{ pagina }}
+            </button>
+          }
+        </div>
 
         <button
           type="button"
-          class="btn-secondary"
+          class="pagination-btn"
           [disabled]="paginaOrdini() === totalePagineOrdini()"
           (click)="paginaSuccessivaOrdini()"
         >
