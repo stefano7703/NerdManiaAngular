@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrdineDto } from '../../Dto/OrdineDto';
-import { OrdineService } from '../../Service/OrdineService';
+import { OrdineService } from '../../Service/ordineService';
 
 @Component({
   selector: 'app-admin-ordini-component',
