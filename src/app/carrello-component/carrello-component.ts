@@ -5,7 +5,7 @@ import { take } from 'rxjs';
 import { CarrelloDto } from '../Dto/CarrelloDto';
 import { CarrelloService } from '../Service/CarrelloService';
 import { UserDto } from '../Dto/UserDto';
-import { ordineService } from '../Service/ordineService';
+import { OrdineService } from '../Service/ordineService';
 import { ProdottoDto } from '../Dto/ProdottoDto';
 import { userService } from '../Service/userService';
 
@@ -29,7 +29,7 @@ type CartItem = {
 })
 export class CarrelloComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
-  private readonly ordineService = inject(ordineService);
+  private readonly ordineService = inject(OrdineService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly userService = inject(userService);
 
