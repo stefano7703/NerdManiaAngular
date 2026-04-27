@@ -18,9 +18,10 @@
   border-radius: 18px;
   padding: 1.3rem 1.4rem;
   background:
-    linear-gradient(132deg, rgba(255, 212, 0, 0.2), transparent 56%),
-    linear-gradient(176deg, rgba(0, 180, 216, 0.17), transparent 75%),
+    linear-gradient(132deg, rgba(255, 212, 0, 0.15), transparent 60%),
+    linear-gradient(176deg, rgba(0, 180, 216, 0.15), transparent 70%),
     #ffffff;
+  color: var(--color-jet);
   box-shadow: 6px 7px 0 var(--color-jet);
 }
 
