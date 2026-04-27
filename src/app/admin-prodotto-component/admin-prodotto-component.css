@@ -80,6 +80,11 @@
   overflow-x: auto;
 }
 
+.products-count {
+  margin: 0 0 0.85rem;
+  font-weight: 700;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -102,6 +107,42 @@ th {
   display: flex;
   gap: 0.6rem;
   flex-wrap: wrap;
+}
+
+.pagination {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-number-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.btn-page,
+.btn-page-number {
+  border: 2px solid var(--color-jet);
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  font-weight: 700;
+  background: #fff;
+  color: var(--color-jet);
+  cursor: pointer;
+}
+
+.btn-page:disabled,
+.btn-page-number:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-page-number.active {
+  background: var(--color-gold);
 }
 
 .form-grid {

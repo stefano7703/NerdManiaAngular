@@ -287,10 +287,28 @@
 }
 
 .favorite-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
   color: var(--color-jet);
   text-decoration: none;
   display: grid;
   gap: 0.18rem;
+  flex: 1;
+}
+
+.favorite-link:hover .favorite-name,
+.favorite-link:focus-visible .favorite-name {
+  text-decoration: underline;
+}
+
+.favorite-link:focus-visible {
+  outline: 2px solid rgba(30, 42, 56, 0.35);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .favorite-name {

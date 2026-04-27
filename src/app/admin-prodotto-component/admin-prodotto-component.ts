@@ -15,6 +15,7 @@ import { ProdottoService } from '../Service/ProdottoService';
 })
 export class AdminProdottoComponent implements OnInit {
   private readonly prodottoService = inject(ProdottoService);
+  private readonly pageSize = 5;
 
   prodotti = signal<ProdottoDto[]>([]);
   loading = signal(false);
@@ -23,6 +24,7 @@ export class AdminProdottoComponent implements OnInit {
   success = signal<string | null>(null);
 
   searchTerm = signal('');
+  currentPage = signal(1);
 
   isEditMode = signal(false);
   selectedProductId = signal<number | null>(null);
@@ -40,6 +42,54 @@ export class AdminProdottoComponent implements OnInit {
       p.descrizione?.toLowerCase().includes(term) ||
       p.categoria?.nome?.toLowerCase().includes(term)
     );
+  });
+
+  totalItems = computed(() => this.prodottiFiltrati().length);
+
+  totalPages = computed(() => {
+    const total = this.totalItems();
+    if (total === 0) {
+      return 0;
+    }
+    return Math.ceil(total / this.pageSize);
+  });
+
+  safeCurrentPage = computed(() => {
+    const total = this.totalPages();
+    if (total === 0) {
+      return 1;
+    }
+    return Math.min(this.currentPage(), total);
+  });
+
+  prodottiPaginati = computed(() => {
+    const items = this.prodottiFiltrati();
+    if (items.length === 0) {
+      return [];
+    }
+
+    const page = this.safeCurrentPage();
+    const start = (page - 1) * this.pageSize;
+    return items.slice(start, start + this.pageSize);
+  });
+
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    return Array.from({ length: total }, (_, index) => index + 1);
+  });
+
+  visibleRangeStart = computed(() => {
+    if (this.totalItems() === 0) {
+      return 0;
+    }
+    return (this.safeCurrentPage() - 1) * this.pageSize + 1;
+  });
+
+  visibleRangeEnd = computed(() => {
+    if (this.totalItems() === 0) {
+      return 0;
+    }
+    return Math.min(this.safeCurrentPage() * this.pageSize, this.totalItems());
   });
 
   ngOnInit(): void {
@@ -74,6 +124,7 @@ export class AdminProdottoComponent implements OnInit {
     this.prodottoService.getAll().pipe(take(1)).subscribe({
       next: (items) => {
         this.prodotti.set(items ?? []);
+        this.currentPage.set(1);
         this.loading.set(false);
       },
       error: (err) => {
@@ -86,6 +137,29 @@ export class AdminProdottoComponent implements OnInit {
 
   onSearchChange(value: string): void {
     this.searchTerm.set(value);
+    this.currentPage.set(1);
+  }
+
+  previousPage(): void {
+    const current = this.safeCurrentPage();
+    if (current > 1) {
+      this.currentPage.set(current - 1);
+    }
+  }
+
+  nextPage(): void {
+    const current = this.safeCurrentPage();
+    const total = this.totalPages();
+    if (current < total) {
+      this.currentPage.set(current + 1);
+    }
+  }
+
+  goToPage(page: number): void {
+    const total = this.totalPages();
+    if (page >= 1 && page <= total) {
+      this.currentPage.set(page);
+    }
   }
 
   newProduct(): void {
