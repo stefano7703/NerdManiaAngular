@@ -1,8 +1,26 @@
 <main class="admin-shell">
-  <section class="admin-header">
-    <h1>Gestione Prodotti Admin</h1>
-    <p>Da qui puoi creare, modificare ed eliminare i prodotti.</p>
-  </section>
+  <section class="admin-header hero-admin">
+  <div>
+    <p class="hero-kicker">PANNELLO AMMINISTRATORE</p>
+    <h1>Gestione Prodotti</h1>
+    <p>Cerca, crea, modifica ed elimina i prodotti del catalogo.</p>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-primary" (click)="newProduct()">
+        Aggiungi prodotto
+      </button>
+
+      <button type="button" class="btn-secondary" (click)="newProduct()">
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <div class="admin-badge">
+    <strong>ADMIN</strong>
+    <span>GESTIONE PRODOTTI</span>
+  </div>
+</section>
 
   <section class="admin-toolbar">
     <input
@@ -29,57 +47,51 @@
   <section class="admin-layout">
     <!-- LISTA -->
     <div class="admin-list">
-      <h2>Lista prodotti</h2>
+  <h2>Lista prodotti</h2>
 
-      @if (loading()) {
-        <p class="state">Caricamento prodotti...</p>
-      } @else if (prodottiFiltrati().length === 0) {
-        <p class="state">Nessun prodotto trovato.</p>
-      } @else {
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Prezzo</th>
-                <th>Categoria</th>
-                <th>Fragile</th>
-                <th>Azioni</th>
-              </tr>
-            </thead>
+  @if (loading()) {
+    <p class="state">Caricamento prodotti...</p>
+  } @else if (prodottiFiltrati().length === 0) {
+    <p class="state">Nessun prodotto trovato.</p>
+  } @else {
+    <div class="card-grid">
+      @for (prodotto of prodottiFiltrati(); track prodotto.id ?? prodotto.nome) {
+        <div class="product-card">
+          <img
+            [src]="prodotto.immagineUrl || 'https://via.placeholder.com/200'"
+            [alt]="prodotto.nome"
+            class="product-img"
+          />
 
-            <tbody>
-              @for (prodotto of prodottiFiltrati(); track prodotto.id ?? prodotto.nome) {
-                <tr>
-                  <td>{{ prodotto.id }}</td>
-                  <td>{{ prodotto.nome }}</td>
-                  <td>€{{ prodotto.prezzo }}</td>
-                  <td>{{ prodotto.categoria.nome || '—' }}</td>
-                  <td>{{ prodotto.fragile ? 'Sì' : 'No' }}</td>
+          <div class="product-info">
+            <h3>{{ prodotto.nome }}</h3>
+            <p class="price">€{{ prodotto.prezzo }}</p>
+            <p class="category">{{ prodotto.categoria.nome || '—' }}</p>
+            <p class="fragile">
+              {{ prodotto.fragile ? 'Fragile' : 'Non fragile' }}
+            </p>
+          </div>
 
-                  <td class="actions-cell">
-                    <button
-                      type="button"
-                      class="btn-secondary"
-                      (click)="editProduct(prodotto)">
-                      Modifica
-                    </button>
+          <div class="product-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="editProduct(prodotto)">
+              Modifica
+            </button>
 
-                    <button
-                      type="button"
-                      class="btn-danger"
-                      (click)="deleteProduct(prodotto.id)">
-                      Elimina
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+            <button
+              type="button"
+              class="btn-danger"
+              (click)="deleteProduct(prodotto.id)">
+              Elimina
+            </button>
+          </div>
         </div>
       }
     </div>
+  }
+</div>
 
     <!-- FORM -->
     <div class="admin-form">

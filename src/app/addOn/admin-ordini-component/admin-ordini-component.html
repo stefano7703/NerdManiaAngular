@@ -1,0 +1,200 @@
+<main class="admin-shell">
+  <section class="admin-header hero-admin">
+    <div>
+      <p class="hero-kicker">PANNELLO AMMINISTRATORE</p>
+      <h1>Gestione Ordini</h1>
+      <p>Visualizza tutti gli ordini effettuati dagli utenti con i rispettivi prodotti.</p>
+    </div>
+
+    <div class="admin-badge">
+      <strong>ADMIN</strong>
+      <span>ORDINI</span>
+    </div>
+  </section>
+
+  @if (loading()) {
+    <p class="state">Caricamento ordini...</p>
+  }
+
+  @if (error()) {
+    <p class="state error">{{ error() }}</p>
+  }
+
+  <section class="admin-list">
+    <h2>Lista ordini</h2>
+
+    @if (!loading() && ordini().length === 0) {
+      <p class="state">Nessun ordine trovato.</p>
+    } @else {
+      <div class="admin-toolbar">
+        <label>
+          Ordini per pagina:
+          <select
+            [ngModel]="ordiniPerPagina()"
+            (ngModelChange)="cambiaOrdiniPerPagina(+$event)"
+            name="ordiniPerPagina"
+          >
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Utente</th>
+              <th>Email</th>
+              <th>Totale</th>
+              <th>Indirizzo</th>
+              <th>N. Prodotti</th>
+              <th>Dettagli</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (ordine of ordiniPaginati(); track ordine.id) {
+              <tr>
+                <td>{{ ordine.id }}</td>
+
+                <td>
+                  {{ ordine.user.username || '—' }}
+                </td>
+
+                <td>
+                  {{ ordine.user.email || '—' }}
+                </td>
+
+                <td>
+                  €{{ ordine.costoTotale }}
+                </td>
+
+                <td>
+                  {{ ordine.indirizzoSpedizione }}
+                </td>
+
+                <td>
+                  {{ ordine.prodotti.length }}
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="toggleDettagliOrdine(ordine.id)"
+                  >
+                    {{ ordineAperto() === ordine.id ? 'Nascondi' : 'Visualizza prodotti' }}
+                  </button>
+                </td>
+              </tr>
+
+              @if (ordineAperto() === ordine.id) {
+                <tr>
+                  <td colspan="7">
+                    <section class="order-details">
+                      <h3>Prodotti ordine #{{ ordine.id }}</h3>
+
+                      @if (!ordine.prodotti || ordine.prodotti.length === 0) {
+                        <p class="state">Nessun prodotto associato a questo ordine.</p>
+                      } @else {
+                        <div class="card-grid">
+                          @for (prodotto of getProdottiConQuantita(ordine.prodotti); track prodotto.id) {
+                            <article class="product-card">
+                              <img
+                                class="product-img"
+                                [src]="prodotto.immagineUrl || 'assets/no-image.png'"
+                                [alt]="prodotto.nome"
+                              />
+
+                              <div class="product-info">
+                                <h3>{{ prodotto.nome }}</h3>
+
+                                <p class="price">
+                                  €{{ prodotto.prezzo }}
+                                </p>
+
+                                <p>
+                                  Quantità:
+                                  <strong>{{ prodotto.quantita }}</strong>
+                                </p>
+
+                                <p class="category">
+                                  {{ prodotto.categoria?.nome || 'Categoria non disponibile' }}
+                                </p>
+
+                                <p>
+                                  {{ prodotto.descrizione || 'Nessuna descrizione disponibile.' }}
+                                </p>
+                              </div>
+                            </article>
+                          }
+                        </div>
+                      }
+
+                      <div class="order-footer">
+                        <p>
+                          <strong>Totale ordine:</strong>
+                          €{{ ordine.costoTotale }}
+                        </p>
+
+                        <p>
+                          <strong>Indirizzo spedizione:</strong>
+                          {{ ordine.indirizzoSpedizione }}
+                        </p>
+
+                        @if (ordine.spedizione) {
+                          <p>
+                            <strong>ID spedizione:</strong>
+                            {{ ordine.spedizione.id }}
+                          </p>
+                        }
+                      </div>
+                    </section>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="paginaOrdini() === 1"
+          (click)="paginaPrecedenteOrdini()"
+        >
+          Precedente
+        </button>
+
+        @for (pagina of pagineOrdini(); track pagina) {
+          <button
+            type="button"
+            class="btn-secondary"
+            [class.is-active]="paginaOrdini() === pagina"
+            (click)="vaiPaginaOrdini(pagina)"
+          >
+            {{ pagina }}
+          </button>
+        }
+
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="paginaOrdini() === totalePagineOrdini()"
+          (click)="paginaSuccessivaOrdini()"
+        >
+          Successiva
+        </button>
+      </div>
+
+      <p class="state">
+        Pagina {{ paginaOrdini() }} di {{ totalePagineOrdini() }}
+      </p>
+    }
+  </section>
+</main>

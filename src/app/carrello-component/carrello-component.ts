@@ -1,20 +1,12 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-  signal,
-  computed,
-  PLATFORM_ID,
-} from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
 
 import { CarrelloDto } from '../Dto/CarrelloDto';
 import { CarrelloService } from '../Service/CarrelloService';
 import { UserDto } from '../Dto/UserDto';
-import { ordineService } from '../Service/ordineService';
+import { OrdineService } from '../Service/ordineService';
 import { ProdottoDto } from '../Dto/ProdottoDto';
 import { userService } from '../Service/userService';
 
@@ -43,11 +35,9 @@ export class CarrelloComponent implements OnInit {
   // ================= INJECTIONS =================
 
   private readonly carrelloService = inject(CarrelloService);
-  private readonly ordineService = inject(ordineService);
+  private readonly ordineService = inject(OrdineService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly userService = inject(userService);
-
-  // ================= STATE =================
 
   carrelli = signal<CarrelloDto[]>([]);
   selectedCarrelloId = signal<number | null>(null);
@@ -77,6 +67,7 @@ export class CarrelloComponent implements OnInit {
   totalItems = computed(() => {
     if (this.cartItems().length > 0) {
       return this.cartItems().reduce((acc, item) => acc + item.quantity, 0);
+      return this.cartItems().reduce((acc, item) => acc + item.quantity, 0);
     }
     return this.selectedCarrello()?.quantita ?? 0;
   });
@@ -105,7 +96,9 @@ export class CarrelloComponent implements OnInit {
     if (!this.isBrowser()) return null;
 
     const raw = localStorage.getItem('user');
-    if (!raw) return null;
+    if (!raw) {
+      return null;
+    }
 
     try {
       const parsed = JSON.parse(raw) as UserDto;
@@ -339,6 +332,7 @@ export class CarrelloComponent implements OnInit {
 
     if (!userId) {
       this.error.set('Utente non valido, effettua nuovamente il login');
+      this.error.set('Utente non valido, effettua nuovamente il login');
       return;
     }
 
@@ -370,11 +364,29 @@ export class CarrelloComponent implements OnInit {
     return id !== undefined && this.modifyingIds().has(id);
   }
 
-  // ================= ORDINE =================
+  private expandProductsForOrder(items: CartItem[]): Array<{ id: number }> {
+    const result: Array<{ id: number }> = [];
+
+    for (const item of items) {
+      const qty = Math.max(0, Math.trunc(item.quantity));
+      for (let i = 0; i < qty; i += 1) {
+        result.push({ id: item.productId });
+      }
+    }
+
+    return result;
+  }
+
 
   creaOrdine(): void {
-    const carrello = this.selectedCarrello();
-    const userId = this.getStoredUserId();
+  const carrello = this.selectedCarrello();
+  const userId = this.getStoredUserId();
+  const prodotti = this.expandProductsForOrder(this.cartItems())
+  .map(p =>
+    new ProdottoDto(
+      '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, p.id
+    )
+  );
 
     if (!carrello?.id || !userId) {
       this.error.set("Dati non validi per creare l'ordine");

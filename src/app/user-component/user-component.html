@@ -1,7 +1,6 @@
-<main class="home-shell" *ngIf="authService.isLoggedIn()">
+<main class="home-shell" *ngIf="isLogged(); else notLogged">
 
   <section class="hero">
-
     <div>
 
       <p class="hero-eyebrow">
@@ -23,33 +22,22 @@
       </p>
 
       <div class="hero-actions">
-
-        <button
-          class="hero-cta"
-          (click)="logout()"
-        >
+        <button class="hero-cta" (click)="logout()">
           Logout
         </button>
-
       </div>
 
     </div>
 
-    <!-- IMMAGINE PROFILO -->
-
     <div class="profile-image-wrapper">
-
       <img
         src="assets/user.png"
         alt="Profilo utente"
         class="profile-image"
       />
-
     </div>
 
   </section>
-
-  <!-- DATI UTENTE -->
 
   <section class="data-section">
 
@@ -58,97 +46,62 @@
     <div class="cards-grid">
 
       <div class="data-card">
-
-        <p class="card-kicker">
-          Carta fedeltà
-        </p>
-
+        <p class="card-kicker">Carta fedeltà</p>
         <h4>Stato</h4>
 
         <p class="data-main">
-
-          {{
-            user().cartaFedelta
-              ? 'Attiva'
-              : 'Non attiva'
-          }}
-
+          {{ user().cartaFedelta ? 'Attiva' : 'Non attiva' }}
         </p>
-
-        <p class="data-sub">
-          Accumula punti sugli acquisti
-        </p>
-
       </div>
 
       <div class="data-card">
-
-        <p class="card-kicker">
-          Ordini
-        </p>
-
+        <p class="card-kicker">Ordini</p>
         <h4>Numero ordini</h4>
 
         <p class="data-main">
-
-          {{
-            user().ordini?.length || 0
-          }}
-
+          {{ user().ordini?.length || 0 }}
         </p>
-
-        <p class="data-sub">
-          Storico acquisti effettuati
-        </p>
-
       </div>
 
     </div>
 
   </section>
 
-  <!-- LISTA ORDINI -->
   <section class="orders-section" *ngIf="user().ordini?.length">
 
     <h3>I tuoi ordini</h3>
 
     <div class="orders-list">
 
-      <div
-        class="order-card"
-        *ngFor="let ordine of user().ordini"
-      >
+      <div class="order-card" *ngFor="let ordine of user().ordini">
 
-        <!-- HEADER ORDINE -->
         <div class="order-header">
-
-          <div>
-            <p class="order-id">
-              Ordine #{{ ordine.id }}
-            </p>
-
-            <p class="order-address">
-              {{ ordine.indirizzoSpedizione }}
-            </p>
-          </div>
+          <p class="order-id">
+            Ordine #{{ ordine.id }}
+          </p>
         </div>
 
-        <!-- PRODOTTI -->
+        <!-- 🔥 QUI NON CHIAMI PIÙ FUNZIONI -->
         <div class="order-products">
 
           <div
             class="product-row"
-            *ngFor="let prodotto of ordine.prodotti"
+            *ngFor="let prodotto of prodottiPerOrdine.get(ordine.id) || []"
           >
 
-            <img
-              [src]="prodotto.immagineUrl || 'assets/no-image.png'"
-              class="product-img"
-              alt="{{ prodotto.nome }}"
-            />
+            <div class="product-img-wrapper">
+              <img
+                [src]="prodotto.immagineUrl || 'assets/no-image.png'"
+                class="product-img"
+                alt="{{ prodotto.nome }}"
+              />
+
+              <span class="qty-badge">
+                x{{ prodotto.quantita }}
+              </span>
+            </div>
 
             <div class="product-info">
-
               <p class="product-name">
                 {{ prodotto.nome }}
               </p>
@@ -156,69 +109,32 @@
               <p class="product-meta">
                 €{{ prodotto.prezzo }}
               </p>
-
             </div>
 
           </div>
 
         </div>
 
-        <!-- FOOTER -->
         <div class="order-footer">
-            <!-- BOTTONE SPEDIZIONE -->
-          <div class="order-actions">
-            <button
-              class="spedizione-btn"
-              (click)="toggleSpedizione(ordine.id)"
-            >
-              {{ ordineAperto === ordine.id ? 'Nascondi spedizione ▲' : 'Mostra spedizione ▼' }}
-            </button>
-          </div>
 
-          <!-- DETTAGLI SPEDIZIONE -->
-          <div
-            class="spedizione-box"
-            *ngIf="ordineAperto === ordine.id"
+          <button
+            class="spedizione-btn"
+            (click)="toggleSpedizione(ordine.id)"
           >
+            {{ ordineAperto === ordine.id ? 'Nascondi spedizione ▲' : 'Mostra spedizione ▼' }}
+          </button>
 
-            <h4>🚚 Dettagli spedizione</h4>
+          <div *ngIf="ordineAperto === ordine.id">
 
-            <div class="spedizione-grid">
+            <p>{{ ordine.indirizzoSpedizione }}</p>
 
-              <div class="spedizione-item">
-                <span>Altezza</span>
-                <p>{{ ordine.spedizione.altezza }} cm</p>
-              </div>
-
-              <div class="spedizione-item">
-                <span>Lunghezza</span>
-                <p>{{ ordine.spedizione.lunghezza }} cm</p>
-              </div>
-
-              <div class="spedizione-item">
-                <span>Spessore</span>
-                <p>{{ ordine.spedizione.spessore }} cm</p>
-              </div>
-
-              <div class="spedizione-item">
-                <span>Peso</span>
-                <p>{{ ordine.spedizione.peso }} kg</p>
-              </div>
-
-              <div class="spedizione-item">
-                <span>Fragile</span>
-                <p
-                  [ngClass]="ordine.spedizione.fragile ? 'fragile-yes' : 'fragile-no'"
-                >
-                  {{ ordine.spedizione.fragile ? 'Sì ⚠️' : 'No ✔️' }}
-                </p>
-              </div>
-
-            </div>
+            <p>Altezza: {{ ordine.spedizione.altezza }}</p>
+            <p>Lunghezza: {{ ordine.spedizione.lunghezza }}</p>
+            <p>Spessore: {{ ordine.spedizione.spessore }}</p>
+            <p>Peso: {{ ordine.spedizione.peso }}</p>
 
           </div>
 
-          Totale:
           <strong>€{{ ordine.costoTotale }}</strong>
 
         </div>
@@ -231,9 +147,8 @@
 
 </main>
 
-<!-- NON LOGGATO -->
-
-<main
+<ng-template #notLogged>
+  <main
   class="home-shell"
   *ngIf="!authService.isLoggedIn()"
 >
@@ -268,3 +183,4 @@
   </section>
 
 </main>
+</ng-template>
