@@ -46,6 +46,9 @@
 }
 
 .main-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex: 1 1 auto;
   flex-wrap: nowrap;
