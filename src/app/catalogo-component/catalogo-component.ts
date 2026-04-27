@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CatalogoDto } from '../Dto/CatalogoDto';
 import { CategoriaDto } from '../Dto/CategoriaDto';
 import { ProdottoDto } from '../Dto/ProdottoDto';
@@ -35,7 +35,7 @@ type SortOrder = 'none' | 'price-desc' | 'price-asc';
 
 @Component({
   selector: 'app-catalogo-component',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './catalogo-component.html',
   styleUrl: './catalogo-component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,7 +46,34 @@ export class CatalogoComponent implements OnInit {
   private readonly carrelloService = inject(CarrelloService);
   readonly wishlistService = inject(WishlistService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly pageSize = 8;
+
+  private cartIdStorageKey(userId: number): string {
+    return `cartId:user:${userId}`;
+  }
+
+  private cartItemsStorageKey(cartId: number, userId: number): string {
+    return `cart-items:user:${userId}:${cartId}`;
+  }
+
+  private legacyCartItemsStorageKey(cartId: number): string {
+    return `cart-items:${cartId}`;
+  }
+
+  private persistCartIdForUser(userId: number, cartId: number): void {
+    localStorage.setItem(this.cartIdStorageKey(userId), String(cartId));
+    localStorage.setItem('cartId', String(cartId));
+  }
+
+  private readCartIdForUser(userId: number): number | null {
+    const value = localStorage.getItem(this.cartIdStorageKey(userId));
+    if (!value) {
+      return null;
+    }
+    const parsed = Number(value);
+    return !isNaN(parsed) && parsed > 0 ? parsed : null;
+  }
 
   cataloghi = signal<CatalogoDto[]>([]);
   categorie = signal<CategoriaDto[]>([]);
@@ -414,6 +441,16 @@ export class CatalogoComponent implements OnInit {
     this.cartQuantity.set(1);
   }
 
+  openProductDetail(product: ProdottoDto): void {
+    const productId = Number(product?.id);
+    if (isNaN(productId) || productId <= 0) {
+      this.error.set('Prodotto non valido o ID mancante');
+      return;
+    }
+
+    this.router.navigate(['/prodotto', productId]);
+  }
+
   onImageError(event: Event): void {
     const target = event.target;
     if (!(target instanceof HTMLImageElement)) {
@@ -460,7 +497,7 @@ export class CatalogoComponent implements OnInit {
       next: (items) => {
         const match = (items ?? []).find((cart) => (cart.userId ?? cart.user?.id) === userId && (cart.id ?? 0) > 0);
         if (match?.id) {
-          localStorage.setItem('cartId', String(match.id));
+          this.persistCartIdForUser(userId, match.id);
           onFound(match.id);
           return;
         }
@@ -473,23 +510,20 @@ export class CatalogoComponent implements OnInit {
   }
 
   private resolveCartId(onSuccess: (cartId: number) => void, onFailure: (message: string) => void): void {
-    const cartIdStr = localStorage.getItem('cartId');
-    if (cartIdStr) {
-      const parsed = Number(cartIdStr);
-      if (!isNaN(parsed) && parsed > 0) {
-        onSuccess(parsed);
-        return;
-      }
-    }
-
     const user = this.getStoredUser();
     if (!user?.id) {
       onFailure('Devi effettuare il login per aggiungere prodotti al carrello');
       return;
     }
 
+    const storedCartId = this.readCartIdForUser(user.id);
+    if (storedCartId) {
+      onSuccess(storedCartId);
+      return;
+    }
+
     if (user.carrello?.id && user.carrello.id > 0) {
-      localStorage.setItem('cartId', String(user.carrello.id));
+      this.persistCartIdForUser(user.id, user.carrello.id);
       onSuccess(user.carrello.id);
       return;
     }
@@ -497,7 +531,7 @@ export class CatalogoComponent implements OnInit {
     this.carrelloService.findByUser(user).pipe(take(1)).subscribe({
       next: (cart) => {
         if (cart?.id !== undefined && cart.id !== null && cart.id > 0) {
-          localStorage.setItem('cartId', String(cart.id));
+          this.persistCartIdForUser(user.id!, cart.id);
           onSuccess(cart.id);
           return;
         }
@@ -526,7 +560,7 @@ export class CatalogoComponent implements OnInit {
         this.carrelloService.findByUser(userRef).pipe(take(1)).subscribe({
           next: (savedCart: CarrelloDto) => {
             if (savedCart?.id !== undefined && savedCart.id !== null && savedCart.id > 0) {
-              localStorage.setItem('cartId', String(savedCart.id));
+              this.persistCartIdForUser(user.id!, savedCart.id);
               onSuccess(savedCart.id);
               return;
             }
@@ -547,12 +581,15 @@ export class CatalogoComponent implements OnInit {
     });
   }
 
-  private cartItemsStorageKey(cartId: number): string {
-    return `cart-items:${cartId}`;
-  }
+  private loadStoredCartItems(cartId: number, userId: number): StoredCartItem[] {
+    let raw = localStorage.getItem(this.cartItemsStorageKey(cartId, userId));
+    if (!raw) {
+      raw = localStorage.getItem(this.legacyCartItemsStorageKey(cartId));
+      if (raw) {
+        localStorage.setItem(this.cartItemsStorageKey(cartId, userId), raw);
+      }
+    }
 
-  private loadStoredCartItems(cartId: number): StoredCartItem[] {
-    const raw = localStorage.getItem(this.cartItemsStorageKey(cartId));
     if (!raw) {
       return [];
     }
@@ -565,18 +602,23 @@ export class CatalogoComponent implements OnInit {
     }
   }
 
-  private saveStoredCartItems(cartId: number, items: StoredCartItem[]): void {
-    localStorage.setItem(this.cartItemsStorageKey(cartId), JSON.stringify(items));
+  private saveStoredCartItems(cartId: number, userId: number, items: StoredCartItem[]): void {
+    localStorage.setItem(this.cartItemsStorageKey(cartId, userId), JSON.stringify(items));
     window.dispatchEvent(new CustomEvent('cart-items-changed'));
   }
 
   private storeProductInCartItems(cartId: number, product: ProdottoDto, qty: number): void {
+    const userId = this.getStoredUser()?.id;
+    if (!userId) {
+      return;
+    }
+
     const productId = Number(product.id);
     if (isNaN(productId) || productId <= 0) {
       return;
     }
 
-    const items = this.loadStoredCartItems(cartId);
+    const items = this.loadStoredCartItems(cartId, userId);
     const index = items.findIndex((item) => item.productId === productId);
     if (index >= 0) {
       const existing = items[index];
@@ -587,7 +629,7 @@ export class CatalogoComponent implements OnInit {
         unitWeight: product.peso ?? 0,
         immagineUrl: product.immagineUrl,
       };
-      this.saveStoredCartItems(cartId, items);
+      this.saveStoredCartItems(cartId, userId, items);
       return;
     }
 
@@ -599,7 +641,7 @@ export class CatalogoComponent implements OnInit {
       unitPrice: product.prezzo,
       unitWeight: product.peso ?? 0,
     });
-    this.saveStoredCartItems(cartId, items);
+    this.saveStoredCartItems(cartId, userId, items);
   }
 
   private addProductToCart(cartId: number, product: ProdottoDto, qty: number, allowRetry = true): void {
@@ -630,6 +672,10 @@ export class CatalogoComponent implements OnInit {
       error: (err) => {
         const status = Number(err?.status ?? 0);
         if (allowRetry && (status === 403 || status === 404)) {
+          const userId = this.getStoredUser()?.id;
+          if (userId) {
+            localStorage.removeItem(this.cartIdStorageKey(userId));
+          }
           localStorage.removeItem('cartId');
           this.resolveCartId(
             (newCartId) => this.addProductToCart(newCartId, product, qty, false),

@@ -80,22 +80,24 @@
 
       <div class="products-grid">
         @for (item of prodottiPaginati(); track item.prodotto.id ?? item.prodotto.nome) {
-          <article class="product-card">
+          <article
+            class="product-card"
+            role="link"
+            tabindex="0"
+            (click)="openProductDetail(item.prodotto)"
+            (keydown.enter)="openProductDetail(item.prodotto)"
+            (keydown.space)="$event.preventDefault(); openProductDetail(item.prodotto)"
+          >
             <button
               type="button"
               class="favorite-btn"
               [class.is-active]="isFavorite(item.prodotto)"
               [attr.aria-pressed]="isFavorite(item.prodotto)"
               [attr.aria-label]="isFavorite(item.prodotto) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
-              (click)="toggleFavorite($event, item.prodotto)"
+              (click)="toggleFavorite($event, item.prodotto); $event.stopPropagation()"
             >
               ❤
             </button>
-            <a
-              class="card-link-overlay"
-              [routerLink]="['/prodotto', item.prodotto.id]"
-              [attr.aria-label]="'Apri la scheda di ' + item.prodotto.nome"
-            ></a>
             <div class="badges">
               <span class="badge-catalogo">{{ item.catalogoNome }}</span>
               <span class="badge-categoria">{{ item.categoriaNome }}</span>
@@ -132,7 +134,7 @@
               <button
                 type="button"
                 class="btn-add-to-cart"
-                (click)="openAddToCart(item.prodotto)"
+                (click)="openAddToCart(item.prodotto); $event.stopPropagation()"
               >
                 Aggiungi al Carrello
               </button>
