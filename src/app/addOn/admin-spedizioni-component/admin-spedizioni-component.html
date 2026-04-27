@@ -1,1 +1,304 @@
-<p>admin-spedizioni-component works!</p>
+<main class="admin-shell">
+  <section class="admin-header hero-admin">
+    <div>
+      <p class="hero-kicker">PANNELLO AMMINISTRATORE</p>
+      <h1>Gestione Spedizioni</h1>
+      <p>Visualizza e filtra tutte le spedizioni effettuate sul sito.</p>
+    </div>
+
+    <div class="admin-badge">
+      <strong>ADMIN</strong>
+      <span>SPEDIZIONI</span>
+    </div>
+  </section>
+
+  <section class="admin-filters">
+    <h2>Filtri spedizioni</h2>
+
+    <div class="filters-grid">
+      <div class="filter-item">
+        <label>Peso maggiore di</label>
+        <input
+          type="number"
+          placeholder="Es. 5"
+          [ngModel]="filtroPesoMaggiore()"
+          (ngModelChange)="filtroPesoMaggiore.set(+$event)"
+          name="filtroPesoMaggiore"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraPesoMaggiore()">
+          Filtra maggiore
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>Peso minore di</label>
+        <input
+          type="number"
+          placeholder="Es. 10"
+          [ngModel]="filtroPesoMinore()"
+          (ngModelChange)="filtroPesoMinore.set(+$event)"
+          name="filtroPesoMinore"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraPesoMinore()">
+          Filtra minore
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>Altezza tra</label>
+        <div class="double-input">
+          <input
+            type="number"
+            placeholder="Min"
+            [ngModel]="filtroAltezzaMin()"
+            (ngModelChange)="filtroAltezzaMin.set(+$event)"
+            name="filtroAltezzaMin"
+          />
+
+          <input
+            type="number"
+            placeholder="Max"
+            [ngModel]="filtroAltezzaMax()"
+            (ngModelChange)="filtroAltezzaMax.set(+$event)"
+            name="filtroAltezzaMax"
+          />
+        </div>
+
+        <button type="button" class="btn-secondary" (click)="filtraAltezzaBetween()">
+          Filtra altezza
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>ID ordine</label>
+        <input
+          type="number"
+          placeholder="Es. 3"
+          [ngModel]="filtroOrdineId()"
+          (ngModelChange)="filtroOrdineId.set(+$event)"
+          name="filtroOrdineId"
+        />
+
+        <button type="button" class="btn-secondary" (click)="filtraOrdineId()">
+          Cerca ordine
+        </button>
+      </div>
+
+      <div class="filter-item">
+        <label>Dimensioni grandi</label>
+        <div class="double-input">
+          <input
+            type="number"
+            placeholder="Altezza"
+            [ngModel]="filtroAltezzaMaggiore()"
+            (ngModelChange)="filtroAltezzaMaggiore.set(+$event)"
+            name="filtroAltezzaMaggiore"
+          />
+
+          <input
+            type="number"
+            placeholder="Lunghezza"
+            [ngModel]="filtroLunghezzaMaggiore()"
+            (ngModelChange)="filtroLunghezzaMaggiore.set(+$event)"
+            name="filtroLunghezzaMaggiore"
+          />
+        </div>
+
+        <button type="button" class="btn-secondary" (click)="filtraDimensioniGrandi()">
+          Filtra dimensioni
+        </button>
+      </div>
+
+      <div class="filter-item filter-actions">
+        <label>Azioni</label>
+
+        <button type="button" class="btn-secondary" (click)="filtraFragili()">
+          Solo fragili
+        </button>
+
+        <button type="button" class="btn-danger" (click)="resetFiltri()">
+          Reset filtri
+        </button>
+      </div>
+    </div>
+  </section>
+
+  @if (loading()) {
+    <p class="state">Caricamento spedizioni...</p>
+  }
+
+  @if (error()) {
+    <p class="state error">{{ error() }}</p>
+  }
+
+  <section class="admin-list">
+    <h2>Lista spedizioni</h2>
+
+    <p class="filter-current">
+      Filtro attivo:
+      <strong>{{ filtroAttivo() }}</strong>
+    </p>
+
+    @if (!loading() && spedizioni().length === 0) {
+      <p class="state">Nessuna spedizione trovata.</p>
+    } @else {
+      <div class="admin-toolbar">
+        <label>
+          Spedizioni per pagina:
+          <select
+            [ngModel]="spedizioniPerPagina()"
+            (ngModelChange)="cambiaSpedizioniPerPagina(+$event)"
+            name="spedizioniPerPagina"
+          >
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ordine</th>
+              <th>Peso</th>
+              <th>Altezza</th>
+              <th>Lunghezza</th>
+              <th>Spessore</th>
+              <th>Fragile</th>
+              <th>Dettagli</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (spedizione of spedizioniPaginate(); track spedizione.id) {
+              <tr>
+                <td>{{ spedizione.id }}</td>
+                <td>#{{ spedizione.ordine?.id || '—' }}</td>
+                <td>{{ spedizione.peso }} kg</td>
+                <td>{{ spedizione.altezza }} cm</td>
+                <td>{{ spedizione.lunghezza }} cm</td>
+                <td>{{ spedizione.spessore }} cm</td>
+                <td>
+                  {{ spedizione.fragile ? 'Sì ⚠️' : 'No ✔️' }}
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="toggleDettagliSpedizione(spedizione.id)"
+                  >
+                    {{ spedizioneAperta() === spedizione.id ? 'Nascondi' : 'Visualizza dettagli' }}
+                  </button>
+                </td>
+              </tr>
+
+              @if (spedizioneAperta() === spedizione.id) {
+                <tr>
+                  <td colspan="8">
+                    <section class="shipment-details">
+                      <h3>Dettagli spedizione #{{ spedizione.id }}</h3>
+
+                      <div class="details-grid">
+                        <article class="detail-card">
+                          <span>Peso</span>
+                          <strong>{{ spedizione.peso }} kg</strong>
+                        </article>
+
+                        <article class="detail-card">
+                          <span>Altezza</span>
+                          <strong>{{ spedizione.altezza }} cm</strong>
+                        </article>
+
+                        <article class="detail-card">
+                          <span>Lunghezza</span>
+                          <strong>{{ spedizione.lunghezza }} cm</strong>
+                        </article>
+
+                        <article class="detail-card">
+                          <span>Spessore</span>
+                          <strong>{{ spedizione.spessore }} cm</strong>
+                        </article>
+
+                        <article class="detail-card">
+                          <span>Fragile</span>
+                          <strong>{{ spedizione.fragile ? 'Sì ⚠️' : 'No ✔️' }}</strong>
+                        </article>
+
+                        <article class="detail-card">
+                          <span>Ordine collegato</span>
+                          <strong>#{{ spedizione.ordine?.id || '—' }}</strong>
+                        </article>
+                      </div>
+
+                      @if (spedizione.ordine) {
+                        <div class="order-footer">
+                          <p>
+                            <strong>Totale ordine:</strong>
+                            €{{ spedizione.ordine.costoTotale }}
+                          </p>
+
+                          <p>
+                            <strong>Indirizzo spedizione:</strong>
+                            {{ spedizione.ordine.indirizzoSpedizione }}
+                          </p>
+
+                          <p>
+                            <strong>Utente:</strong>
+                            {{ spedizione.ordine.user?.username || spedizione.ordine.user?.email || '—' }}
+                          </p>
+                        </div>
+                      }
+                    </section>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="catalog-pagination">
+        <button
+          type="button"
+          class="pagination-btn"
+          [disabled]="paginaSpedizioni() === 1"
+          (click)="paginaPrecedenteSpedizioni()"
+        >
+          Precedente
+        </button>
+
+        <div class="pagination-pages">
+          @for (pagina of pagineSpedizioni(); track pagina) {
+            <button
+              type="button"
+              class="pagination-page"
+              [class.active]="paginaSpedizioni() === pagina"
+              (click)="vaiPaginaSpedizioni(pagina)"
+            >
+              {{ pagina }}
+            </button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="pagination-btn"
+          [disabled]="paginaSpedizioni() === totalePagineSpedizioni()"
+          (click)="paginaSuccessivaSpedizioni()"
+        >
+          Successiva
+        </button>
+      </div>
+
+      <p class="state">
+        Pagina {{ paginaSpedizioni() }} di {{ totalePagineSpedizioni() }}
+      </p>
+    }
+  </section>
+</main>
