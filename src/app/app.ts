@@ -114,6 +114,7 @@ export class App implements OnInit, OnDestroy {
   // ---------------- LOGOUT ----------------
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/home']);
     this.wishlistService.refreshForActiveUser();
     this.cartItemCount.set(0);
     this.isFavoritesPopupOpen.set(false);

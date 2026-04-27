@@ -21,7 +21,7 @@ import { AdminSpedizioniComponent } from './addOn/admin-spedizioni-component/adm
 
 export const routes: Routes = [
   {path: 'admin/prodotti', component: AdminProdottoComponent, canActivate: [AdminGuard]},
-  {path: 'admin/ordini', component: AdminOrdiniComponent},
+  {path: 'admin/ordini', component: AdminOrdiniComponent, canActivate: [AdminGuard]},
   {path: 'admin/spedizioni', component: AdminSpedizioniComponent, canActivate: [AdminGuard]},
   {path: 'admin/magazzini', component: AdminMagazzinoComponent, canActivate: [AdminGuard]},
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -34,10 +34,9 @@ export const routes: Routes = [
   { path: 'prodotto', component: ProdottoComponent },
   { path: 'spedizione', component: SpedizioneComponent,canActivate: [AdminGuard] },
   { path: 'categoria', component: CategoriaComponent },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [AuthGuard] },
   { path: 'register', component: AddUserComponent },
-  {path: 'gestione-utenti', component: GestioneUtentiComponent},
-  {path: 'user', component: UserComponent, canActivate: [AuthGuard]},
+  {path: 'gestione-utenti', component: GestioneUtentiComponent, canActivate: [AdminGuard]},
+  {path: 'user', component: UserComponent},
   { path: '**', redirectTo: 'home' }
 ];
