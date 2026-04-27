@@ -19,21 +19,69 @@
   border-radius: 18px;
   padding: 1.3rem 1.4rem;
   background:
-    linear-gradient(132deg, rgba(255, 212, 0, 0.2), transparent 56%),
-    linear-gradient(176deg, rgba(0, 180, 216, 0.17), transparent 75%),
+    linear-gradient(132deg, rgba(255, 212, 0, 0.15), transparent 60%),
+    linear-gradient(176deg, rgba(0, 180, 216, 0.15), transparent 70%),
     #ffffff;
+  color: var(--color-jet);
   box-shadow: 6px 7px 0 var(--color-jet);
 }
 
-.admin-header h1 {
+.hero-admin {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.hero-kicker {
+  margin: 0 0 0.35rem;
+  color: var(--color-turquoise);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-admin h1 {
   margin: 0 0 0.4rem;
   font-family: 'Bangers', Impact, 'Arial Black', sans-serif;
   letter-spacing: 0.03em;
   font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--color-gold);
+  text-shadow: 3px 3px 0 #000;
 }
 
 .admin-header p {
   margin: 0;
+}
+
+.admin-badge {
+  width: 170px;
+  height: 170px;
+  background: var(--color-red);
+  color: #fff;
+  clip-path: polygon(
+    50% 0%, 61% 23%, 85% 13%, 77% 38%,
+    100% 50%, 77% 62%, 85% 87%, 61% 77%,
+    50% 100%, 39% 77%, 15% 87%, 23% 62%,
+    0% 50%, 23% 38%, 15% 13%, 39% 23%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.admin-badge strong {
+  font-family: 'Bangers', Impact, 'Arial Black', sans-serif;
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.admin-badge span {
+  font-size: 0.7rem;
+  font-weight: 900;
 }
 
 .admin-toolbar,
@@ -162,15 +210,11 @@ th {
   grid-column: 1 / -1;
 }
 
- .hero-admin {
+.hero-admin {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
-  background:
-    linear-gradient(132deg, rgba(255, 212, 0, 0.18), transparent 45%),
-    linear-gradient(160deg, #264b4a, #142235 70%);
-  color: #fff;
 }
 
 .hero-kicker {
