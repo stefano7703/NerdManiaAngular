@@ -1,6 +1,6 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { OrdineDto } from '../Dto/OrdineDto';
-import { ordineService } from '../Service/ordineService';
+import { OrdineService } from '../Service/OrdineService';
 import { CommonModule } from '@angular/common';
 
 
@@ -13,14 +13,14 @@ import { CommonModule } from '@angular/common';
 })
 export class OrdineComponent implements OnInit{
 
-  service: ordineService; 
+  service: OrdineService; 
   ListOrdini: OrdineDto[]=[];
 
   ngOnInit(){
 
 }
 
-  constructor(service: ordineService) {
+  constructor(service: OrdineService) {
     this.service = service;
   }
 

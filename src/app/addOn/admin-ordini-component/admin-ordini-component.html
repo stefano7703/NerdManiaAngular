@@ -1,0 +1,69 @@
+<main class="admin-shell">
+  <section class="admin-header hero-admin">
+    <div>
+      <p class="hero-kicker">PANNELLO AMMINISTRATORE</p>
+      <h1>Gestione Ordini</h1>
+      <p>Visualizza tutti gli ordini effettuati dagli utenti.</p>
+    </div>
+
+    <div class="admin-badge">
+      <strong>ADMIN</strong>
+      <span>ORDINI</span>
+    </div>
+  </section>
+
+  @if (loading()) {
+    <p class="state">Caricamento ordini...</p>
+  }
+
+  @if (error()) {
+    <p class="state error">{{ error() }}</p>
+  }
+
+  <section class="admin-list">
+    <h2>Lista ordini</h2>
+
+    @if (!loading() && ordini().length === 0) {
+      <p class="state">Nessun ordine trovato.</p>
+    } @else {
+      <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Utente</th>
+        <th>Totale</th>
+        <th>Indirizzo</th>
+        <th>Prodotti</th>
+        <th>Spedizione</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (ordine of ordini(); track ordine.id) {
+        <tr>
+          <td>{{ ordine.id }}</td>
+
+          <td>
+            {{ ordine.user?.email || ordine.user?.username || '—' }}
+          </td>
+
+          <td>€{{ ordine.costoTotale }}</td>
+
+          <td>{{ ordine.indirizzoSpedizione }}</td>
+
+          <td>
+            {{ ordine.prodotti.length }} prodotti
+          </td>
+
+          <td>
+            {{ ordine.spedizione?.id || '—' }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+    }
+  </section>
+</main>
