@@ -105,6 +105,15 @@
       </section>
 
       <div class="cart-actions">
+          <button 
+            type="button"
+            class="btn-primary"
+            (click)="creaOrdine()"
+            [disabled]="modifyingIds().size > 0"
+          >
+            Conferma ordine
+          </button>
+        
         <button 
           type="button"
           class="icon-btn icon-delete"

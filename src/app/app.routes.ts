@@ -22,22 +22,15 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'carrello', component: CarrelloComponent },
   { path: 'catalogo', component: CatalogoComponent },
-  { path: 'magazzino', component: MagazzinoComponent },
-  { path: 'ordine', component: OrdineComponent },
+  { path: 'magazzino', component: MagazzinoComponent, canActivate: [AdminGuard] },
+  { path: 'ordine', component: OrdineComponent, canActivate: [AdminGuard] },
   { path: 'prodotto/:id', component: ProdottoDetailComponent },
   { path: 'prodotto', component: ProdottoComponent },
-  { path: 'spedizione', component: SpedizioneComponent },
+  { path: 'spedizione', component: SpedizioneComponent,canActivate: [AdminGuard] },
   { path: 'categoria', component: CategoriaComponent },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: AddUserComponent },
-  
-  {path: 'gestione-utenti', component: GestioneUtentiComponent},
-  
-  {
-    path: 'user',
-    component: UserComponent,
-    canActivate: [AuthGuard]
-  },
+  { path: 'login', component: LoginComponent, canActivate: [AuthGuard]},
+  { path: 'register', component: AddUserComponent, canActivate: [AuthGuard]},
+  {path: 'gestione-utenti', component: GestioneUtentiComponent, canActivate: [AdminGuard]},
+  {path: 'user', component: UserComponent},
   { path: '**', redirectTo: 'home' }
 ];
