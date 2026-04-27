@@ -41,10 +41,6 @@
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
-  background:
-    linear-gradient(132deg, rgba(255, 212, 0, 0.18), transparent 45%),
-    linear-gradient(160deg, #264b4a, #142235 70%);
-  color: #fff;
 }
 
 .hero-kicker {

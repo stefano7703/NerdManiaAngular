@@ -4,7 +4,7 @@
 
   </a>
 
-  <nav class="main-nav" aria-label="Navigazione principale">
+  <nav class="main-nav" [class.is-admin-nav]="authService.isAdmin()" aria-label="Navigazione principale">
 
   <a routerLink="/home"
      routerLinkActive="is-active"
