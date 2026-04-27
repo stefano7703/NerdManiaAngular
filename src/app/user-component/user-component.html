@@ -148,8 +148,39 @@
 </main>
 
 <ng-template #notLogged>
-  <main class="home-shell">
-    <h2>Devi effettuare il login</h2>
-    <button (click)="goLogin()">Vai al login</button>
-  </main>
+  <main
+  class="home-shell"
+  *ngIf="!authService.isLoggedIn()"
+>
+
+  <section class="hero">
+
+    <div>
+
+      <p class="hero-eyebrow">
+        Accesso richiesto
+      </p>
+
+      <h2>
+        Devi effettuare il login
+      </h2>
+
+      <p>
+        Accedi per visualizzare il tuo profilo.
+      </p>
+
+      <div class="hero-actions">
+
+        <button class="hero-cta" type="button" (click)="goLogin()">
+  Vai al login
+</button>
+
+      </div>
+
+    </div>
+
+
+  </section>
+
+</main>
 </ng-template>
