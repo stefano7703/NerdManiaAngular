@@ -49,6 +49,7 @@
     <div class="admin-list">
   <h2>Lista prodotti</h2>
 
+<<<<<<< HEAD:src/app/addOn/admin-prodotto-component/admin-prodotto-component.html
   @if (loading()) {
     <p class="state">Caricamento prodotti...</p>
   } @else if (prodottiFiltrati().length === 0) {
@@ -71,6 +72,39 @@
               {{ prodotto.fragile ? 'Fragile' : 'Non fragile' }}
             </p>
           </div>
+=======
+      @if (loading()) {
+        <p class="state">Caricamento prodotti...</p>
+      } @else if (prodottiFiltrati().length === 0) {
+        <p class="state">Nessun prodotto trovato.</p>
+      } @else {
+        <p class="products-count">
+          Prodotti visualizzati: <strong>{{ visibleRangeStart() }}-{{ visibleRangeEnd() }}</strong>
+          di <strong>{{ totalItems() }}</strong>
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Prezzo</th>
+                <th>Categoria</th>
+                <th>Fragile</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (prodotto of prodottiPaginati(); track prodotto.id ?? prodotto.nome) {
+                <tr>
+                  <td>{{ prodotto.id }}</td>
+                  <td>{{ prodotto.nome }}</td>
+                  <td>€{{ prodotto.prezzo }}</td>
+                  <td>{{ prodotto.categoria.nome || '—' }}</td>
+                  <td>{{ prodotto.fragile ? 'Sì' : 'No' }}</td>
+>>>>>>> 390d7de (mod. paginazione prodotti):src/app/admin-prodotto-component/admin-prodotto-component.html
 
           <div class="product-actions">
             <button
@@ -88,6 +122,42 @@
             </button>
           </div>
         </div>
+
+        @if (totalPages() > 1) {
+          <nav class="pagination" aria-label="Paginazione prodotti admin">
+            <button
+              type="button"
+              class="btn-page"
+              (click)="previousPage()"
+              [disabled]="safeCurrentPage() <= 1"
+            >
+              Precedente
+            </button>
+
+            <div class="page-number-list" role="group" aria-label="Seleziona pagina">
+              @for (page of pageNumbers(); track page) {
+                <button
+                  type="button"
+                  class="btn-page-number"
+                  [class.active]="page === safeCurrentPage()"
+                  (click)="goToPage(page)"
+                  [attr.aria-current]="page === safeCurrentPage() ? 'page' : null"
+                >
+                  {{ page }}
+                </button>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="btn-page"
+              (click)="nextPage()"
+              [disabled]="safeCurrentPage() >= totalPages()"
+            >
+              Successiva
+            </button>
+          </nav>
+        }
       }
     </div>
   }

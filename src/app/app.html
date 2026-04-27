@@ -117,18 +117,15 @@
 
       <div class="favorites-list">
         @for (item of wishlistService.favorites(); track item.id) {
-          <article
-            class="favorite-item"
-            role="link"
-            tabindex="0"
-            (click)="openFavoriteProduct(item.id)"
-            (keydown.enter)="openFavoriteProduct(item.id)"
-            (keydown.space)="$event.preventDefault(); openFavoriteProduct(item.id)"
-          >
-            <div class="favorite-link">
+          <article class="favorite-item">
+            <button
+              type="button"
+              class="favorite-link"
+              (click)="openFavoriteProduct(item.id)"
+            >
               <span class="favorite-name">{{ item.nome }}</span>
               <span class="favorite-price">€{{ item.prezzo.toFixed(2) }}</span>
-            </div>
+            </button>
             <button
               type="button"
               class="favorite-remove"
