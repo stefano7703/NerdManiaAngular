@@ -49,7 +49,7 @@ export class AdminOrdiniComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    this.ordineService.getAllOrdini().subscribe({
+    this.ordineService.getAll().subscribe({
       next: (data: OrdineDto[]) => {
         this.ordini.set(data ?? []);
         this.paginaOrdini.set(1);
