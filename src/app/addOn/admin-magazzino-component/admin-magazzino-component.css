@@ -155,7 +155,6 @@
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 1rem;
 }
-
 .warehouse-card {
   border: 3px solid var(--color-jet);
   border-radius: 14px;
@@ -198,7 +197,6 @@
   margin-top: auto;
   flex-wrap: wrap;
 }
-
 .movement-box {
   display: flex;
   flex-direction: column;

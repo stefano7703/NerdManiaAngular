@@ -40,6 +40,9 @@ export class CarrelloComponent implements OnInit {
   error = signal<string | null>(null);
   cartItems = signal<CartItem[]>([]);
   shippingAddress = signal('');
+  orderPopupOpen = signal(false);
+  orderPopupState = signal<'confirm' | 'loading' | 'success' | 'error'>('confirm');
+  orderPopupMessage = signal<string | null>(null);
 
   // Derived state
   selectedCarrello = computed(() => {
@@ -94,27 +97,47 @@ export class CarrelloComponent implements OnInit {
     }
   }
 
+  private cartIdStorageKey(userId: number): string {
+    return `cartId:user:${userId}`;
+  }
+
+  private legacyCartItemsStorageKey(cartId: number): string {
+    return `cart-items:${cartId}`;
+  }
+
   private setCurrentCart(cart: CarrelloDto): void {
     this.carrelli.set([cart]);
     this.selectedCarrelloId.set(cart.id ?? null);
     this.loadCartItemsForCurrentCart(cart.id ?? null);
+    const userId = this.getStoredUserId();
     if (cart.id) {
       localStorage.setItem('cartId', String(cart.id));
+      if (userId) {
+        localStorage.setItem(this.cartIdStorageKey(userId), String(cart.id));
+      }
     }
     window.dispatchEvent(new CustomEvent('cart-items-changed'));
   }
 
-  private cartItemsStorageKey(cartId: number): string {
-    return `cart-items:${cartId}`;
+  private cartItemsStorageKey(cartId: number, userId: number): string {
+    return `cart-items:user:${userId}:${cartId}`;
   }
 
   private loadCartItemsForCurrentCart(cartId: number | null): void {
-    if (!cartId) {
+    const userId = this.getStoredUserId();
+    if (!cartId || !userId) {
       this.cartItems.set([]);
       return;
     }
 
-    const raw = localStorage.getItem(this.cartItemsStorageKey(cartId));
+    let raw = localStorage.getItem(this.cartItemsStorageKey(cartId, userId));
+    if (!raw) {
+      raw = localStorage.getItem(this.legacyCartItemsStorageKey(cartId));
+      if (raw) {
+        localStorage.setItem(this.cartItemsStorageKey(cartId, userId), raw);
+      }
+    }
+
     if (!raw) {
       this.cartItems.set([]);
       return;
@@ -129,7 +152,14 @@ export class CarrelloComponent implements OnInit {
   }
 
   private persistCartItems(cartId: number, items: CartItem[]): void {
-    localStorage.setItem(this.cartItemsStorageKey(cartId), JSON.stringify(items));
+    const userId = this.getStoredUserId();
+    if (!userId) {
+      this.cartItems.set(items);
+      window.dispatchEvent(new CustomEvent('cart-items-changed'));
+      return;
+    }
+
+    localStorage.setItem(this.cartItemsStorageKey(cartId, userId), JSON.stringify(items));
     this.cartItems.set(items);
     window.dispatchEvent(new CustomEvent('cart-items-changed'));
   }
@@ -269,7 +299,9 @@ export class CarrelloComponent implements OnInit {
       .subscribe({
         next: () => {
           localStorage.removeItem('cartId');
-          localStorage.removeItem(this.cartItemsStorageKey(carrelloId));
+          localStorage.removeItem(this.legacyCartItemsStorageKey(carrelloId));
+          localStorage.removeItem(this.cartIdStorageKey(userId));
+          localStorage.removeItem(this.cartItemsStorageKey(carrelloId, userId));
           window.dispatchEvent(new CustomEvent('cart-items-changed'));
           this.createUserCart(userId, () => {
             this.modifyingIds().delete(carrelloId);
@@ -284,6 +316,19 @@ export class CarrelloComponent implements OnInit {
 
   isModifying(id: number | undefined): boolean {
     return id !== undefined && this.modifyingIds().has(id);
+  }
+
+  openOrderPopup(): void {
+    this.orderPopupOpen.set(true);
+    this.orderPopupState.set('confirm');
+    this.orderPopupMessage.set(null);
+  }
+
+  closeOrderPopup(): void {
+    if (this.orderPopupState() === 'loading') {
+      return;
+    }
+    this.orderPopupOpen.set(false);
   }
 
   private expandProductsForOrder(items: CartItem[]): Array<{ id: number }> {
@@ -301,40 +346,46 @@ export class CarrelloComponent implements OnInit {
 
 
   creaOrdine(): void {
-  const carrello = this.selectedCarrello();
-  const userId = this.getStoredUserId();
-  const prodotti = this.expandProductsForOrder(this.cartItems())
-  .map(p =>
-    new ProdottoDto(
-      '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, p.id
-    )
-  );
+    const carrello = this.selectedCarrello();
+    const userId = this.getStoredUserId();
+    const prodotti = this.expandProductsForOrder(this.cartItems())
+      .map((p) =>
+        new ProdottoDto(
+          '', 0, 0, '', {} as any, 0, 0, false, 0, undefined, p.id,
+        ),
+      );
 
-  if (!carrello?.id || !userId) {
-    this.error.set('Dati non validi per creare l\'ordine');
-    return;
-  }
+    this.orderPopupState.set('loading');
+    this.orderPopupMessage.set(null);
 
-  if (!this.shippingAddress().trim()) {
-    this.error.set('Inserisci un indirizzo di spedizione');
-    return;
-  }
+    if (!carrello?.id || !userId) {
+      this.orderPopupState.set('error');
+      this.orderPopupMessage.set('Dati non validi per creare l\'ordine');
+      return;
+    }
 
-  const ordineDto = {
-    costoTotale: this.totalPrice(),
-    user: {
-      id: userId
-    },
-    indirizzoSpedizione: this.shippingAddress(),
-    prodotti:prodotti
-  };
+    if (!this.shippingAddress().trim()) {
+      this.orderPopupState.set('error');
+      this.orderPopupMessage.set('Inserisci un indirizzo di spedizione');
+      return;
+    }
+
+    const ordineDto = {
+      costoTotale: this.totalPrice(),
+      user: {
+        id: userId,
+      },
+      indirizzoSpedizione: this.shippingAddress(),
+      prodotti,
+    };
 
     this.ordineService
       .insert(ordineDto as any)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          alert('Ordine creato con successo!');
+          this.orderPopupState.set('success');
+          this.orderPopupMessage.set('Ordine creato con successo!');
 
           this.shippingAddress.set('');
 
@@ -342,20 +393,20 @@ export class CarrelloComponent implements OnInit {
             this.persistCartItems(carrello.id, []);
             this.syncCartTotalsFromItems(carrello, []);
           }
-          console.log(this.userService.findById(userId));
+
           this.userService
             .findById(userId)
             .pipe(take(1))
             .subscribe({
               next: (updatedUser) => {
                 localStorage.setItem('user', JSON.stringify(updatedUser));
-
                 window.dispatchEvent(new Event('user-updated'));
               },
             });
         },
         error: (err) => {
-          this.error.set(err?.message ?? 'Errore creazione ordine');
+          this.orderPopupState.set('error');
+          this.orderPopupMessage.set(err?.message ?? 'Errore creazione ordine');
         },
       });
   }

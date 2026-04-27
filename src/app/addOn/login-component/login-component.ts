@@ -36,9 +36,18 @@ export class LoginComponent {
     private carrelloService: CarrelloService,
   ) {}
 
-  private storeCartId(cart: CarrelloDto | null | undefined): boolean {
-    if (cart?.id !== undefined && cart.id !== null && cart.id > 0) {
-      localStorage.setItem('cartId', String(cart.id));
+  private cartIdStorageKey(userId: number): string {
+    return `cartId:user:${userId}`;
+  }
+
+  private persistCartIdForUser(userId: number, cartId: number): void {
+    localStorage.setItem(this.cartIdStorageKey(userId), String(cartId));
+    localStorage.setItem('cartId', String(cartId));
+  }
+
+  private storeCartId(userId: number, cart: CarrelloDto | null | undefined): boolean {
+    if (userId > 0 && cart?.id !== undefined && cart.id !== null && cart.id > 0) {
+      this.persistCartIdForUser(userId, cart.id);
       return true;
     }
     return false;
@@ -52,7 +61,7 @@ export class LoginComponent {
     }
 
     if (user.carrello?.id && user.carrello.id > 0) {
-      localStorage.setItem('cartId', String(user.carrello.id));
+      this.persistCartIdForUser(user.id, user.carrello.id);
       onDone();
       return;
     }
@@ -63,7 +72,7 @@ export class LoginComponent {
       .pipe(take(1))
       .subscribe({
         next: (cart) => {
-          if (this.storeCartId(cart)) {
+          if (this.storeCartId(user.id!, cart)) {
             onDone();
             return;
           }
@@ -92,7 +101,7 @@ export class LoginComponent {
             .pipe(take(1))
             .subscribe({
               next: (savedCart) => {
-                if (!this.storeCartId(savedCart)) {
+                if (!this.storeCartId(userRef.id!, savedCart)) {
                   localStorage.removeItem('cartId');
                 }
                 onDone();
@@ -149,6 +158,7 @@ export class LoginComponent {
       next: (res) => {
         this.authService.login(res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
+        localStorage.removeItem('cartId');
         this.ensureCartForUser(res.user, () => this.router.navigate(['/home']));
       },
       error: () => {
